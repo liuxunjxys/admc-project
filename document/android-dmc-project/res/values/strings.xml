@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">AndroidDMC</string>
+    <string name="refresh">Refresh</string>
+    <string name="str_progress">Progress</string>
+    <string name="str_play">Play</string>
+    <string name="str_pause">Pause</string>
+    <string name="str_stop">Stop</string>
+
+</resources>
