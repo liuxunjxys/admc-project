@@ -78,14 +78,19 @@ public class DevicesProcessorImpl implements IDevicesProcessor {
 		try {
 			if (m_upnpService != null) {
 				Log.e(TAG, "Stop upnp service");
-				m_upnpService.getRegistry().removeListener(m_upnplistener);
-				m_upnpService.getRegistry().shutdown();
 				m_activity.unbindService(m_serviceConnection);
 				m_serviceConnection = null;
+
+				m_upnpService.getRegistry().removeListener(m_upnplistener);
+				m_upnpService.getRegistry().removeAllLocalDevices();
+				m_upnpService.getRegistry().removeAllRemoteDevices();
+				m_upnpService.getRegistry().pause();
+				m_upnpService.getRegistry().shutdown();
 				m_upnpService = null;
+				m_isServiceReady = false;
 			}
 		} catch (Exception ex) {
-
+			ex.printStackTrace();
 		}
 	}
 
@@ -177,8 +182,12 @@ public class DevicesProcessorImpl implements IDevicesProcessor {
 		if (m_isServiceReady == true) {
 			Log.e(TAG, "Search invoke");
 			DeviceType type = new DeviceType("schemas-upnp-org", "MediaServer", 1);
-			m_upnpService.getRegistry().removeAllRemoteDevices();
-			m_upnpService.getControlPoint().search(new DeviceTypeHeader(type));
+			if (m_upnpService != null) {
+				m_upnpService.getRegistry().removeAllRemoteDevices();
+				m_upnpService.getControlPoint().search(new DeviceTypeHeader(type));
+			} else {
+				Log.e(TAG, "UPnP Service is null");
+			}
 		}
 
 	}
@@ -191,7 +200,5 @@ public class DevicesProcessorImpl implements IDevicesProcessor {
 			m_upnpService.getRegistry().removeAllRemoteDevices();
 			m_upnpService.getControlPoint().search(new DeviceTypeHeader(type));
 		}
-
 	}
-
 }

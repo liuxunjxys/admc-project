@@ -1,15 +1,21 @@
 package com.app.dlna.dmc.gui.dmr;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import org.teleal.cling.model.meta.Action;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
@@ -33,6 +39,8 @@ public class DMRControllerActivity extends Activity implements DMRProcessorListn
 	private SeekBar m_sb_playingProgress;
 	private TextView m_tv_progressTime;
 	private boolean m_isSeeking = false;
+	private SeekBar m_sb_volume;
+	private TextView m_tv_soundValue;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -45,11 +53,16 @@ public class DMRControllerActivity extends Activity implements DMRProcessorListn
 		m_btn_Stop.setEnabled(false);
 		m_sb_playingProgress = (SeekBar) findViewById(R.id.playingProgress);
 		m_tv_progressTime = (TextView) findViewById(R.id.progressTime);
+		m_sb_volume = (SeekBar) findViewById(R.id.volumeControl);
+		m_tv_soundValue = (TextView) findViewById(R.id.soundValue);
+		m_tv_soundValue.setVisibility(View.GONE);
 
-		m_sb_playingProgress.setOnSeekBarChangeListener(seekListener);
+		m_sb_playingProgress.setOnSeekBarChangeListener(playbackSeekListener);
+		m_sb_volume.setOnSeekBarChangeListener(volumeSeekListener);
 
 		Intent intent = getIntent();
 		m_url = intent.getStringExtra("URL");
+
 		Log.e(TAG, "Content uri = " + m_url);
 		if (m_url == null) {
 			new AlertDialog.Builder(DMRControllerActivity.this).setTitle("Error").setMessage("URL is null")
@@ -68,10 +81,26 @@ public class DMRControllerActivity extends Activity implements DMRProcessorListn
 			if (m_processor != null) {
 				m_processor.setURI(m_url);
 			}
+
+			((TextView) findViewById(R.id.itemTitle)).setText(intent.getStringExtra("Title"));
+			Bundle bundle = intent.getBundleExtra("ExtraInfo");
+			String iconURL = bundle.getString("IconURL");
+			if (iconURL != null) {
+				URL url;
+				try {
+					url = new URL(iconURL);
+					((ImageView) findViewById(R.id.itemIcon)).setImageBitmap(BitmapFactory.decodeStream(url.openConnection().getInputStream()));
+				} catch (MalformedURLException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
 		}
 	}
 
-	private OnSeekBarChangeListener seekListener = new OnSeekBarChangeListener() {
+	private OnSeekBarChangeListener playbackSeekListener = new OnSeekBarChangeListener() {
 
 		@Override
 		public void onStopTrackingTouch(SeekBar seekBar) {
@@ -89,6 +118,27 @@ public class DMRControllerActivity extends Activity implements DMRProcessorListn
 		@Override
 		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 			m_tv_progressTime.setText(getTimeString(m_sb_playingProgress.getProgress()) + " / " + getTimeString(m_sb_playingProgress.getMax()));
+		}
+	};
+
+	private OnSeekBarChangeListener volumeSeekListener = new OnSeekBarChangeListener() {
+
+		@Override
+		public void onStopTrackingTouch(SeekBar seekBar) {
+			m_tv_soundValue.setVisibility(View.GONE);
+			m_processor.setVolume(seekBar.getProgress());
+			Log.e(TAG, "Stop tracking");
+		}
+
+		@Override
+		public void onStartTrackingTouch(SeekBar seekBar) {
+			m_tv_soundValue.setVisibility(View.VISIBLE);
+			Log.e(TAG, "Start tracking");
+		}
+
+		@Override
+		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+			m_tv_soundValue.setText(String.valueOf(seekBar.getProgress()));
 		}
 	};
 
@@ -110,30 +160,18 @@ public class DMRControllerActivity extends Activity implements DMRProcessorListn
 		m_processor.stop();
 	}
 
-	@SuppressWarnings("rawtypes")
-	@Override
-	public void onActionComplete(final Action action) {
-		runOnUiThread(new Runnable() {
+	public void onNextClick(View view) {
+	}
 
-			@Override
-			public void run() {
-				String actionName = action.getName();
-				if (actionName.compareTo("Play") == 0) {
-					m_currentState = STATE_PLAYING;
-					m_btn_PlayPause.setText("Pause");
-					m_btn_Stop.setEnabled(true);
-				} else if (actionName.compareTo("Pause") == 0) {
-					m_currentState = STATE_PAUSE;
-					m_btn_PlayPause.setText("Play");
-					m_btn_Stop.setEnabled(true);
-				} else if (actionName.compareTo("Stop") == 0) {
-					m_btn_PlayPause.setText("Play");
-					m_btn_Stop.setEnabled(false);
-					m_currentState = STATE_STOP;
-				}
-			}
-		});
+	public void onPreviousClick(View view) {
+	}
 
+	public void onSoundClick(View view) {
+		if (m_sb_volume.getVisibility() == View.VISIBLE) {
+			m_sb_volume.setVisibility(View.GONE);
+		} else {
+			m_sb_volume.setVisibility(View.VISIBLE);
+		}
 	}
 
 	@Override
@@ -175,6 +213,7 @@ public class DMRControllerActivity extends Activity implements DMRProcessorListn
 					m_sb_playingProgress.invalidate();
 					m_tv_progressTime.setText(getTimeString(current) + " / " + getTimeString(max));
 				}
+				m_sb_volume.setProgress(m_processor.getVolume());
 			}
 		});
 	}
@@ -188,6 +227,48 @@ public class DMRControllerActivity extends Activity implements DMRProcessorListn
 		sb.append(String.format("%02d", hour) + ":" + String.format("%02d", minute) + ":" + String.format("%02d", second));
 
 		return sb.toString();
+	}
+
+	@Override
+	public void onPaused() {
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				m_btn_PlayPause.setBackgroundResource(R.drawable.play);
+				m_btn_Stop.setEnabled(true);
+				m_currentState = STATE_PAUSE;
+			}
+		});
+
+	}
+
+	@Override
+	public void onStoped() {
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				m_btn_Stop.setEnabled(false);
+				m_currentState = STATE_STOP;
+				m_btn_PlayPause.setBackgroundResource(R.drawable.play);
+			}
+		});
+
+	}
+
+	@Override
+	public void onPlaying() {
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				m_btn_PlayPause.setBackgroundResource(R.drawable.pause);
+				m_btn_Stop.setEnabled(true);
+				m_currentState = STATE_PLAYING;
+			}
+		});
+
 	}
 
 }

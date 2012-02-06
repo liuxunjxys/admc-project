@@ -10,6 +10,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -28,6 +31,8 @@ public class DMRListActivity extends Activity implements DevicesProcessorListene
 	private IDevicesProcessor m_devicesProcessor = null;
 	private ListView m_listView;
 	private RemoteDMRArrayAdapter m_adapter;
+	private String m_title;
+	private Bundle m_extraInfo;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +44,8 @@ public class DMRListActivity extends Activity implements DevicesProcessorListene
 
 		Intent intent = getIntent();
 		m_url = intent.getStringExtra("URL");
-
+		m_title = intent.getStringExtra("Title");
+		m_extraInfo = (Bundle) intent.getBundleExtra("ExtraInfo");
 		if (m_url == null) {
 			new AlertDialog.Builder(DMRListActivity.this).setTitle("Error").setMessage("URL is null")
 					.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -62,8 +68,11 @@ public class DMRListActivity extends Activity implements DevicesProcessorListene
 		@Override
 		public void onItemClick(AdapterView<?> adapter, View view, int position, long arg3) {
 			Intent intent = new Intent(DMRListActivity.this, DMRControllerActivity.class);
+			Log.e(TAG, m_url);
 			intent.putExtra("URL", m_url);
 			intent.putExtra("UDN", m_adapter.getItem(position).getIdentity().getUdn().toString());
+			intent.putExtra("Title", m_title);
+			intent.putExtra("ExtraInfo", m_extraInfo);
 			startActivity(intent);
 		}
 	};
@@ -71,15 +80,31 @@ public class DMRListActivity extends Activity implements DevicesProcessorListene
 	@Override
 	protected void onResume() {
 		m_devicesProcessor.addListener(DMRListActivity.this);
+		refresh();
 		super.onResume();
 	}
 
-	public void onRefreshClick(View view) {
-		Log.e(TAG, "Refresh");
-		refresh();
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater menuInflater = getMenuInflater();
+		menuInflater.inflate(R.menu.main_menu, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.refresh:
+			refresh();
+			return true;
+		default:
+			break;
+		}
+		return false;
 	}
 
 	private void refresh() {
+		m_adapter.clear();
 		m_devicesProcessor.searchDMR();
 	}
 

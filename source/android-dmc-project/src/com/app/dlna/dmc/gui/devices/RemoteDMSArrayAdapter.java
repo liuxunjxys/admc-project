@@ -1,13 +1,20 @@
 package com.app.dlna.dmc.gui.devices;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import org.teleal.cling.model.meta.Icon;
 import org.teleal.cling.model.meta.RemoteDevice;
 
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.app.dlna.dmc.R;
@@ -37,6 +44,22 @@ public class RemoteDMSArrayAdapter extends ArrayAdapter<RemoteDevice> {
 		holder.deviceName.setText(device.getDetails().getFriendlyName());
 		holder.deviceType.setText("Digital Media Server");
 
+		Icon[] icons = device.getIcons();
+		if (icons != null && icons[0] != null && icons[0].getUri() != null) {
+			try {
+				String urlString = device.getIdentity().getDescriptorURL().getProtocol() + "://" + device.getIdentity().getDescriptorURL().getAuthority()
+						+ icons[0].getUri().toString();
+				Log.e(TAG, urlString);
+				URL url = new URL(urlString);
+				holder.deviceIcon.setImageBitmap(BitmapFactory.decodeStream(url.openConnection().getInputStream()));
+
+			} catch (MalformedURLException e) {
+				Log.e(TAG, "Can't get Icon of device: " + device.getDisplayString());
+			} catch (IOException e) {
+				Log.e(TAG, "Can't get Icon of device: " + device.getDisplayString());
+			}
+		}
+
 		return convertView;
 	}
 
@@ -50,11 +73,13 @@ public class RemoteDMSArrayAdapter extends ArrayAdapter<RemoteDevice> {
 		ViewHolder viewHolder = new ViewHolder();
 		viewHolder.deviceName = (TextView) view.findViewById(R.id.deviceName);
 		viewHolder.deviceType = (TextView) view.findViewById(R.id.deviceType);
+		viewHolder.deviceIcon = (ImageView) view.findViewById(R.id.deviceIcon);
 		view.setTag(viewHolder);
 	}
 
 	private class ViewHolder {
 		TextView deviceType;
 		TextView deviceName;
+		ImageView deviceIcon;
 	}
 }

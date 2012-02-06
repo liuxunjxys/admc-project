@@ -11,9 +11,11 @@ public interface IDMRProcessor {
 
 	void stop();
 
-	void seek(int position);
-
 	void seek(String position);
+
+	void setVolume(int newVolume);
+	
+	int getVolume();
 
 	void addListener(DMRProcessorListner listener);
 
@@ -21,13 +23,17 @@ public interface IDMRProcessor {
 
 	void dispose();
 
-	@SuppressWarnings("rawtypes")
 	public interface DMRProcessorListner {
-
-		void onActionComplete(Action actionCallback);
-
-		void onActionFail(Action actionCallback, String cause);
-
 		void onUpdatePosition(long current, long max);
+
+		void onPaused();
+
+		void onStoped();
+
+		void onPlaying();
+
+		@SuppressWarnings("rawtypes")
+		void onActionFail(Action actionCallback, final String cause);
 	}
+
 }
