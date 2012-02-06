@@ -6,6 +6,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -13,6 +16,7 @@ import android.widget.ListView;
 
 import com.app.dlna.dmc.R;
 import com.app.dlna.dmc.gui.dms.DMSBrowserActivity;
+import com.app.dlna.dmc.gui.localcontent.BrowseLocalActivity;
 import com.app.dlna.dmc.processor.ProcessorFactory;
 import com.app.dlna.dmc.processor.interfaces.IDevicesProcessor;
 import com.app.dlna.dmc.processor.interfaces.IDevicesProcessor.DevicesProcessorListener;
@@ -44,12 +48,40 @@ public class DMSListActivity extends Activity implements DevicesProcessorListene
 	protected void onResume() {
 		m_processor.setActivity(DMSListActivity.this);
 		m_processor.addListener(this);
+		refresh();
 		super.onResume();
 	}
 
-	public void onRefreshClick(View view) {
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater menuInflater = getMenuInflater();
+		menuInflater.inflate(R.menu.main_menu, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.refresh:
+			refresh();
+			return true;
+		case R.id.browselocal:
+			switchToLocal();
+			return true;
+		default:
+			break;
+		}
+		return false;
+	}
+
+	private void refresh() {
 		m_adapter.clear();
 		m_processor.searchDMS();
+	}
+
+	private void switchToLocal() {
+		Intent intent = new Intent(DMSListActivity.this, BrowseLocalActivity.class);
+		DMSListActivity.this.startActivity(intent);
 	}
 
 	private OnItemClickListener itemClickListener = new OnItemClickListener() {

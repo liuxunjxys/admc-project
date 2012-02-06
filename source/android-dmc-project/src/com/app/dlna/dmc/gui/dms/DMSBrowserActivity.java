@@ -1,11 +1,13 @@
 package com.app.dlna.dmc.gui.dms;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.teleal.cling.model.meta.RemoteDevice;
 import org.teleal.cling.support.model.DIDLObject;
+import org.teleal.cling.support.model.DIDLObject.Property.UPNP.ICON;
 import org.teleal.cling.support.model.container.Container;
 import org.teleal.cling.support.model.item.Item;
 
@@ -14,9 +16,11 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
@@ -81,18 +85,69 @@ public class DMSBrowserActivity extends Activity implements DMSProcessorListner 
 
 		@Override
 		public void onItemClick(AdapterView<?> adapter, View view, int position, long arg3) {
-			DIDLObject object = m_adapter.getItem(position);
+			final DIDLObject object = m_adapter.getItem(position);
 			if (object instanceof Container) {
 				browse(object.getId());
-			}
-			if (object instanceof Item) {
-				String url = object.getResources().get(0).getValue();
-				Intent intent = new Intent(DMSBrowserActivity.this, DMRListActivity.class);
-				intent.putExtra("URL", url);
-				DMSBrowserActivity.this.startActivity(intent);
+			} else if (object instanceof Item) {
+				String[] selectMode = { "Play local", "Play on remote device" };
+
+				new AlertDialog.Builder(DMSBrowserActivity.this).setTitle("Select Play Mode").setItems(selectMode, new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						switch (which) {
+						case 0:
+							playOnLocalDevice(object);
+							break;
+						case 1:
+							playOnRemoteDevice(object);
+							break;
+						default:
+							break;
+						}
+					}
+
+				}).create().show();
 			}
 		}
 	};
+
+	private void playOnLocalDevice(DIDLObject object) {
+		try {
+			String url = object.getResources().get(0).getValue();
+			String extension = MimeTypeMap.getFileExtensionFromUrl(url);
+			String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+			Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
+			mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+			startActivity(mediaIntent);
+		} catch (Exception ex) {
+			new AlertDialog.Builder(DMSBrowserActivity.this).setTitle("Error").setMessage("Cannot file any program to play this content")
+					.setPositiveButton("OK", null).create().show();
+		}
+	}
+
+	private void playOnRemoteDevice(DIDLObject object) {
+		String url = null;
+		if (object.getResources() != null && object.getResources().get(0) != null) {
+			url = object.getResources().get(0).getValue();
+		}
+		Intent intent = new Intent(DMSBrowserActivity.this, DMRListActivity.class);
+		intent.putExtra("URL", url);
+		intent.putExtra("Title", object.getTitle());
+		Bundle extraInfo = new Bundle();
+
+		try {
+			if (object.getFirstProperty(ICON.class) != null)
+				extraInfo.putString("IconURL", object.getFirstProperty(ICON.class).getValue().toURL().toString());
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+
+		intent.putExtra("ExtraInfo", extraInfo);
+
+		Log.e(TAG, "Item title = " + object.getTitle());
+		DMSBrowserActivity.this.startActivity(intent);
+	}
 
 	@Override
 	public void onBrowseComplete(final Map<String, List<? extends DIDLObject>> result) {
