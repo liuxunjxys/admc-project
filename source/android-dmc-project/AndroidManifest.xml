@@ -39,6 +39,10 @@
             android:name="com.app.dlna.dmc.gui.localcontent.BrowseLocalActivity"
             android:label="@string/app_name" >
         </activity>
+        <activity
+            android:name="com.app.dlna.dmc.gui.ytcontent.YoutubeContentActivity"
+            android:label="@string/app_name" >
+        </activity>
 
         <service android:name=".processor.upnp.CoreUpnpService" >
         </service>
