@@ -35,7 +35,7 @@ public class DMRControllerActivity extends Activity implements DMRProcessorListn
 	private static final int STATE_STOP = 3;
 	private int m_currentState;
 	private Button m_btn_PlayPause;
-	private Button m_btn_Stop;
+	private Button m_btn_Stop;	
 	private SeekBar m_sb_playingProgress;
 	private TextView m_tv_progressTime;
 	private boolean m_isSeeking = false;
@@ -76,7 +76,8 @@ public class DMRControllerActivity extends Activity implements DMRProcessorListn
 		} else {
 			String UDN = intent.getStringExtra("UDN");
 			Log.e(TAG, "UDN = " + UDN);
-			m_processor = ProcessorFactory.getDMRProcessorInstance(ProcessorFactory.getProcessorInstance(DMRControllerActivity.this).getRemoteDevice(UDN));
+			m_processor = ProcessorFactory.getDMRProcessorInstance(ProcessorFactory.getProcessorInstance(
+					DMRControllerActivity.this).getRemoteDevice(UDN));
 			m_processor.addListener(DMRControllerActivity.this);
 			if (m_processor != null) {
 				m_processor.setURI(m_url);
@@ -84,16 +85,19 @@ public class DMRControllerActivity extends Activity implements DMRProcessorListn
 
 			((TextView) findViewById(R.id.itemTitle)).setText(intent.getStringExtra("Title"));
 			Bundle bundle = intent.getBundleExtra("ExtraInfo");
-			String iconURL = bundle.getString("IconURL");
-			if (iconURL != null) {
-				URL url;
-				try {
-					url = new URL(iconURL);
-					((ImageView) findViewById(R.id.itemIcon)).setImageBitmap(BitmapFactory.decodeStream(url.openConnection().getInputStream()));
-				} catch (MalformedURLException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
+			if (bundle != null) {
+				String iconURL = bundle.getString("IconURL");
+				if (iconURL != null) {
+					URL url;
+					try {
+						url = new URL(iconURL);
+						((ImageView) findViewById(R.id.itemIcon)).setImageBitmap(BitmapFactory.decodeStream(url
+								.openConnection().getInputStream()));
+					} catch (MalformedURLException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 
@@ -117,7 +121,8 @@ public class DMRControllerActivity extends Activity implements DMRProcessorListn
 
 		@Override
 		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-			m_tv_progressTime.setText(getTimeString(m_sb_playingProgress.getProgress()) + " / " + getTimeString(m_sb_playingProgress.getMax()));
+			m_tv_progressTime.setText(getTimeString(m_sb_playingProgress.getProgress()) + " / "
+					+ getTimeString(m_sb_playingProgress.getMax()));
 		}
 	};
 
@@ -224,7 +229,8 @@ public class DMRControllerActivity extends Activity implements DMRProcessorListn
 		long hour = seconds / 3600;
 		long minute = (seconds - hour * 3600) / 60;
 		long second = seconds - hour * 3600 - minute * 60;
-		sb.append(String.format("%02d", hour) + ":" + String.format("%02d", minute) + ":" + String.format("%02d", second));
+		sb.append(String.format("%02d", hour) + ":" + String.format("%02d", minute) + ":"
+				+ String.format("%02d", second));
 
 		return sb.toString();
 	}

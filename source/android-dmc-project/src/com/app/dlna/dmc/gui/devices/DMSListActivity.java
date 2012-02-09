@@ -17,6 +17,7 @@ import android.widget.ListView;
 import com.app.dlna.dmc.R;
 import com.app.dlna.dmc.gui.dms.DMSBrowserActivity;
 import com.app.dlna.dmc.gui.localcontent.BrowseLocalActivity;
+import com.app.dlna.dmc.gui.ytcontent.YoutubeContentActivity;
 import com.app.dlna.dmc.processor.ProcessorFactory;
 import com.app.dlna.dmc.processor.interfaces.IDevicesProcessor;
 import com.app.dlna.dmc.processor.interfaces.IDevicesProcessor.DevicesProcessorListener;
@@ -68,10 +69,18 @@ public class DMSListActivity extends Activity implements DevicesProcessorListene
 		case R.id.browselocal:
 			switchToLocal();
 			return true;
+		case R.id.youtube:
+			switchToYoutube();
+			return true;
 		default:
 			break;
 		}
 		return false;
+	}
+
+	private void switchToYoutube() {
+		Intent intent = new Intent(DMSListActivity.this, YoutubeContentActivity.class);
+		DMSListActivity.this.startActivity(intent);
 	}
 
 	private void refresh() {

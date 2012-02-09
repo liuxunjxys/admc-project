@@ -15,6 +15,10 @@ import org.teleal.cling.support.model.item.Item;
 import org.teleal.common.util.MimeType;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -27,7 +31,6 @@ import android.widget.ListView;
 
 import com.app.dlna.dmc.R;
 import com.app.dlna.dmc.gui.devices.DMRListActivity;
-import com.app.dlna.dmc.gui.dms.DIDLObjectArrayAdapter;
 import com.app.dlna.dmc.processor.http.HttpThread;
 
 public class BrowseLocalActivity extends Activity {
@@ -39,11 +42,11 @@ public class BrowseLocalActivity extends Activity {
 
 	private int m_viewMode = VM_MUSIC;
 
-	private DIDLObjectArrayAdapter m_adapter = null;
+	private ItemDisplayArrayAdapter m_adapter = null;
 	private ListView m_listView = null;
-	private List<Item> m_listMusic = null;
-	private List<Item> m_listVideo = null;
-	private List<Item> m_listPhoto = null;
+	private List<ItemDisplay> m_listMusic = null;
+	private List<ItemDisplay> m_listVideo = null;
+	private List<ItemDisplay> m_listPhoto = null;
 
 	private List<String> m_musicMap = null;
 	private List<String> m_videoMap = null;
@@ -71,7 +74,7 @@ public class BrowseLocalActivity extends Activity {
 
 		@Override
 		public void onItemClick(AdapterView<?> adapter, View view, int position, long arg3) {
-			DIDLObject object = m_adapter.getItem(position);
+			DIDLObject object = m_adapter.getItem(position).getItem();
 			String url = null;
 			if (object.getResources() != null && object.getResources().get(0) != null) {
 				url = object.getResources().get(0).getValue();
@@ -101,12 +104,29 @@ public class BrowseLocalActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.browselocal_activity);
 
+		if (!checkSDCard()) {
+			new AlertDialog.Builder(BrowseLocalActivity.this).setMessage("Sdcard is busy").setTitle("Error")
+					.setOnCancelListener(new OnCancelListener() {
+
+						@Override
+						public void onCancel(DialogInterface dialog) {
+							BrowseLocalActivity.this.finish();
+						}
+					}).setPositiveButton("Back", new OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							BrowseLocalActivity.this.finish();
+						}
+					}).create().show();
+		}
+
 		m_wifiManager = (WifiManager) this.getSystemService(WIFI_SERVICE);
 		m_ip = intToIp(m_wifiManager.getDhcpInfo().ipAddress);
 
-		m_listMusic = new ArrayList<Item>();
-		m_listVideo = new ArrayList<Item>();
-		m_listPhoto = new ArrayList<Item>();
+		m_listMusic = new ArrayList<ItemDisplay>();
+		m_listVideo = new ArrayList<ItemDisplay>();
+		m_listPhoto = new ArrayList<ItemDisplay>();
 
 		m_musicMap = new ArrayList<String>();
 		m_videoMap = new ArrayList<String>();
@@ -123,6 +143,7 @@ public class BrowseLocalActivity extends Activity {
 		m_videoMap.add(".mpg");
 		m_videoMap.add(".avi");
 		m_videoMap.add(".mkv");
+		m_videoMap.add(".m4v");
 
 		m_photoMap.add(".jpg");
 		m_photoMap.add(".jpeg");
@@ -131,13 +152,24 @@ public class BrowseLocalActivity extends Activity {
 		m_photoMap.add(".gif");
 
 		m_listView = (ListView) findViewById(R.id.listView);
-		m_adapter = new DIDLObjectArrayAdapter(BrowseLocalActivity.this, 0, 0, new ArrayList<DIDLObject>());
+		m_adapter = new ItemDisplayArrayAdapter(BrowseLocalActivity.this, 0);
 		m_listView.setAdapter(m_adapter);
 		m_listView.setOnItemClickListener(m_itemClickListener);
 
 		m_scaningThread.start();
 		m_httpThread = new HttpThread(m_port);
 		m_httpThread.start();
+	}
+
+	private boolean checkSDCard() {
+		Log.d(TAG, "check sd card");
+		try {
+			return new File("/mnt/sdcard/").canRead() == true;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			Log.d(TAG, "check fail");
+			return false;
+		}
 	}
 
 	private void scanFile(String path) {
@@ -154,22 +186,29 @@ public class BrowseLocalActivity extends Activity {
 					Item object = new Item();
 					object.setTitle(subFile.getName());
 					if (mimeType != null) {
+						if (subFile.getAbsolutePath().endsWith("mkv")) {
+							Log.e(TAG, mimeType.toString());
+						}
 						List<Res> res = new ArrayList<Res>();
-						res.add(new Res(new MimeType(mimeType.split("/")[0], mimeType.split("/")[1]), subFile.length(), createLink(subFile)));
+						res.add(new Res(new MimeType(mimeType.split("/")[0], mimeType.split("/")[1]), subFile.length(),
+								createLink(subFile)));
 						object.setResources(res);
 					}
 					if (fileExtension != null) {
 						if (m_musicMap.contains(fileExtension)) {
-							BrowseLocalActivity.this.addItem(object, VM_MUSIC);
-							m_listMusic.add(object);
+							ItemDisplay itemdisplay = new ItemDisplay(object, R.drawable.file_music);
+							BrowseLocalActivity.this.addItem(itemdisplay, VM_MUSIC);
+							m_listMusic.add(itemdisplay);
 						}
 						if (m_photoMap.contains(fileExtension)) {
-							BrowseLocalActivity.this.addItem(object, VM_PHOTO);
-							m_listPhoto.add(object);
+							ItemDisplay itemdisplay = new ItemDisplay(object, R.drawable.file_picture);
+							BrowseLocalActivity.this.addItem(itemdisplay, VM_PHOTO);
+							m_listPhoto.add(itemdisplay);
 						}
 						if (m_videoMap.contains(fileExtension)) {
-							BrowseLocalActivity.this.addItem(object, VM_VIDEO);
-							m_listVideo.add(object);
+							ItemDisplay itemdisplay = new ItemDisplay(object, R.drawable.file_movie);
+							BrowseLocalActivity.this.addItem(itemdisplay, VM_VIDEO);
+							m_listVideo.add(itemdisplay);
 						}
 					}
 
@@ -203,8 +242,8 @@ public class BrowseLocalActivity extends Activity {
 	private void refreshMusicList() {
 		m_adapter.clear();
 		synchronized (m_listMusic) {
-			for (Item item : m_listMusic) {
-				addItem((Item) item, VM_MUSIC);
+			for (ItemDisplay item : m_listMusic) {
+				addItem(item, VM_MUSIC);
 			}
 		}
 	}
@@ -217,8 +256,8 @@ public class BrowseLocalActivity extends Activity {
 	private void refreshVideoList() {
 		m_adapter.clear();
 		synchronized (m_listVideo) {
-			for (Item item : m_listVideo) {
-				addItem((Item) item, VM_VIDEO);
+			for (ItemDisplay item : m_listVideo) {
+				addItem(item, VM_VIDEO);
 			}
 		}
 	}
@@ -231,13 +270,13 @@ public class BrowseLocalActivity extends Activity {
 	private void refreshPhotoList() {
 		m_adapter.clear();
 		synchronized (m_listPhoto) {
-			for (Item item : m_listPhoto) {
-				addItem((Item) item, VM_PHOTO);
+			for (ItemDisplay item : m_listPhoto) {
+				addItem(item, VM_PHOTO);
 			}
 		}
 	}
 
-	private void addItem(final Item item, int type) {
+	private void addItem(final ItemDisplay item, int type) {
 		if (type == m_viewMode) {
 			runOnUiThread(new Runnable() {
 

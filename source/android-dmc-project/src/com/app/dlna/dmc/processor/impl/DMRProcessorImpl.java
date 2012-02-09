@@ -67,8 +67,11 @@ public class DMRProcessorImpl implements IDMRProcessor {
 						@SuppressWarnings("rawtypes")
 						@Override
 						public void received(ActionInvocation invocation, PositionInfo positionInfo) {
-							Log.e(TAG, "PositionInfo = " + positionInfo.toString() + ";Percent = " + positionInfo.getElapsedPercent());
-							fireUpdatePositionEvent(positionInfo.getTrackElapsedSeconds(), positionInfo.getTrackDurationSeconds());
+							Log.e(TAG,
+									"PositionInfo = " + positionInfo.toString() + ";Percent = "
+											+ positionInfo.getElapsedPercent());
+							fireUpdatePositionEvent(positionInfo.getTrackElapsedSeconds(),
+									positionInfo.getTrackDurationSeconds());
 						}
 					});
 
@@ -153,16 +156,47 @@ public class DMRProcessorImpl implements IDMRProcessor {
 				String current_uri = null;
 				String currentPath = null;
 				String newPath = null;
+				String currentQuery = null;
+				String newQuery = null;
+
 				try {
 					current_uri = mediaInfo.getCurrentURI();
-					if (current_uri != null)
-						currentPath = new URI(current_uri).getPath();
-					newPath = new URI(uri).getPath();
+					if (current_uri != null) {
+						URI _uri = new URI(current_uri);
+						currentPath = _uri.getPath();
+						currentQuery = _uri.getQuery();
+					}
+					URI _uri = new URI(uri);
+					newPath = _uri.getPath();
+					newQuery = _uri.getQuery();
 				} catch (URISyntaxException e) {
 					current_uri = null;
 				}
-
-				if (current_uri != null && currentPath != null && newPath != null && currentPath.compareTo(newPath) == 0) {
+				if (currentPath != null) {
+					System.out.println(currentPath);
+				} else {
+					System.out.println("null");
+				}
+				if (newPath != null) {
+					System.out.println(newPath);
+				} else {
+					System.out.println("null");
+				}
+				if (currentQuery != null) {
+					System.out.println(currentQuery);
+				} else {
+					System.out.println("null");
+				}
+				if (newQuery != null) {
+					System.out.println(newQuery);
+				} else {
+					System.out.println("null");
+				}
+				if (currentPath != null
+						&& newPath != null
+						&& currentPath.equals(newPath)
+						&& (currentQuery == newQuery || (currentQuery != null && newQuery != null && currentQuery
+								.equals(newQuery)))) {
 					play();
 				} else {
 					stop();

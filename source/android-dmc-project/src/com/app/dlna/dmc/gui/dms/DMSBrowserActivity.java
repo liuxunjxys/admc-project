@@ -91,23 +91,24 @@ public class DMSBrowserActivity extends Activity implements DMSProcessorListner 
 			} else if (object instanceof Item) {
 				String[] selectMode = { "Play local", "Play on remote device" };
 
-				new AlertDialog.Builder(DMSBrowserActivity.this).setTitle("Select Play Mode").setItems(selectMode, new DialogInterface.OnClickListener() {
+				new AlertDialog.Builder(DMSBrowserActivity.this).setTitle("Select Play Mode")
+						.setItems(selectMode, new DialogInterface.OnClickListener() {
 
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						switch (which) {
-						case 0:
-							playOnLocalDevice(object);
-							break;
-						case 1:
-							playOnRemoteDevice(object);
-							break;
-						default:
-							break;
-						}
-					}
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								switch (which) {
+								case 0:
+									playOnLocalDevice(object);
+									break;
+								case 1:
+									playOnRemoteDevice(object);
+									break;
+								default:
+									break;
+								}
+							}
 
-				}).create().show();
+						}).create().show();
 			}
 		}
 	};
@@ -121,8 +122,9 @@ public class DMSBrowserActivity extends Activity implements DMSProcessorListner 
 			mediaIntent.setDataAndType(Uri.parse(url), mimeType);
 			startActivity(mediaIntent);
 		} catch (Exception ex) {
-			new AlertDialog.Builder(DMSBrowserActivity.this).setTitle("Error").setMessage("Cannot file any program to play this content")
-					.setPositiveButton("OK", null).create().show();
+			new AlertDialog.Builder(DMSBrowserActivity.this).setTitle("Error")
+					.setMessage("Cannot file any program to play this content").setPositiveButton("OK", null).create()
+					.show();
 		}
 	}
 
