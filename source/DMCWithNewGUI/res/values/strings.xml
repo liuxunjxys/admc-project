@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Android DMC</string>
+    <string name="upnp_service">Upnp Service</string>
+    <string name="refresh">Refresh</string>
+    <string name="str_play">Play</string>
+    <string name="str_pause">Pause</string>
+    <string name="str_stop">Stop</string>
+    <string name="browselocal">Browse Local</string>
+    <string name="music">Music</string>
+    <string name="video">Video</string>
+    <string name="photo">Photo</string>
+    <string name="youtube">YouTube</string>
+    <string name="link1">http://www.youtube.com/watch?v=4bNe8WlNAaU</string>
+    <string name="link2">http://www.youtube.com/watch?v=J8r9WArliy4</string>
+    <string name="link3">http://www.youtube.com/watch?v=kPKZNgbC4co</string>
+    <string name="link4">http://www.youtube.com/watch?v=o95Wddd9AQw</string>
+    <string name="link5">http://www.youtube.com/watch?v=oCg4ZgAtd9o</string>
+    <string name="link6">http://www.youtube.com/watch?v=f0NdZ37GSGQ</string>
+    <string name="link7">http://192.168.163.1:7777/abc</string>
+    <string name="youtube_proxy_port">7576</string>
+    <string name="play_to_httpserver_port">7677</string>
+    <string name="submit">Submit</string>
+    <string name="enter_video_link_">Enter video link:</string>
+    <string name="youtube_predefine_link">http://www.youtube.com/watch?v=e47TNTAz2tY</string>
+    <string name="proxy_enable_text">Act as a proxy to transport data from Internet (needed when renderer can\'t connect to internet)</string>
+    <string name="youtubeContent">Youtube Content</string>
+    <string name="youtube_host">youtube.com</string>
+    <string name="media_server">Media Server:</string>
+    <string name="media_renderer">Media Renderer</string>
+
+</resources>
