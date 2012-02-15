@@ -50,7 +50,9 @@ public class DevicesActivity extends UpnpListenerActivity {
 
 		@Override
 		public void onItemClick(AdapterView<?> adapter, View view, int position, long arg3) {
-			
+			synchronized (m_dmrAdapter) {
+				m_upnpProcessor.setCurrentDMR(m_dmrAdapter.getItem(position).getIdentity().getUdn());
+			}
 		}
 
 	};
@@ -59,7 +61,9 @@ public class DevicesActivity extends UpnpListenerActivity {
 
 		@Override
 		public void onItemClick(AdapterView<?> adapter, View view, int position, long arg3) {
-
+			synchronized (m_dmsAdapter) {
+				m_upnpProcessor.setCurrentDMS(m_dmsAdapter.getItem(position).getIdentity().getUdn());
+			}
 		}
 
 	};

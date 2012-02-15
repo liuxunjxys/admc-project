@@ -5,6 +5,7 @@ import java.util.Collection;
 import org.teleal.cling.controlpoint.ControlPoint;
 import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.model.meta.RemoteDevice;
+import org.teleal.cling.model.types.UDN;
 
 public interface UpnpProcessor {
 	void addListener(UpnpProcessorListener listener);
@@ -21,6 +22,14 @@ public interface UpnpProcessor {
 
 	void searchDMR();
 
+	void setCurrentDMS(UDN uDN);
+
+	void setCurrentDMR(UDN uDN);
+
+	RemoteDevice getCurrentDMS();
+
+	RemoteDevice getCurrentDMR();
+
 	@SuppressWarnings("rawtypes")
 	Collection<Device> getDMSList();
 
@@ -28,8 +37,6 @@ public interface UpnpProcessor {
 	Collection<Device> getDMRList();
 
 	ControlPoint getControlPoint();
-
-	RemoteDevice getRemoteDevice(String UDN);
 
 	public interface UpnpProcessorListener {
 

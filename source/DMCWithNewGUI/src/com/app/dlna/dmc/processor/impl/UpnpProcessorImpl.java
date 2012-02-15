@@ -10,6 +10,7 @@ import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.model.meta.LocalDevice;
 import org.teleal.cling.model.meta.RemoteDevice;
 import org.teleal.cling.model.types.DeviceType;
+import org.teleal.cling.model.types.UDN;
 import org.teleal.cling.registry.Registry;
 import org.teleal.cling.registry.RegistryListener;
 
@@ -22,27 +23,32 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerActivity;
+import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerTabActivity;
 import com.app.dlna.dmc.processor.interfaces.UpnpProcessor;
 import com.app.dlna.dmc.processor.upnp.CoreUpnpService;
+import com.app.dlna.dmc.processor.upnp.CoreUpnpService.CoreUpnpServiceBinder;
 
 public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener {
 	private static String TAG = UpnpProcessorImpl.class.getName();
 
 	private Activity m_activity;
 
-	private CoreUpnpService.Binder m_upnpService;
+	private CoreUpnpServiceBinder m_upnpService;
 
 	private ServiceConnection m_serviceConnection;
 
 	private List<UpnpProcessorListener> m_listeners;
 
-	private List<RemoteDevice> m_remoteDevices;
-
 	public UpnpProcessorImpl(UpnpListenerActivity activity) {
 		m_activity = activity;
 		m_listeners = new ArrayList<UpnpProcessorListener>();
 		m_listeners.add(activity);
-		m_remoteDevices = new ArrayList<RemoteDevice>();
+	}
+	
+	public UpnpProcessorImpl(UpnpListenerTabActivity activity) {
+		m_activity = activity;
+		m_listeners = new ArrayList<UpnpProcessorListener>();
+		m_listeners.add(activity);
 	}
 
 	public void bindUpnpService() {
@@ -54,7 +60,7 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener {
 			}
 
 			public void onServiceConnected(ComponentName name, IBinder service) {
-				m_upnpService = (CoreUpnpService.Binder) service;
+				m_upnpService = (CoreUpnpServiceBinder) service;
 				m_upnpService.getRegistry().addListener(UpnpProcessorImpl.this);
 				Log.i(TAG, "Upnp Service Ready");
 				fireOnStartCompleteEvent();
@@ -82,9 +88,13 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener {
 	}
 
 	public void searchAll() {
-		Log.e(TAG, "Search invoke");
-		m_upnpService.getRegistry().removeAllRemoteDevices();
-		m_upnpService.getControlPoint().search();
+		if (m_upnpService != null) {
+			Log.e(TAG, "Search invoke");
+			m_upnpService.getRegistry().removeAllRemoteDevices();
+			m_upnpService.getControlPoint().search();
+		} else {
+			Log.e(TAG, "Upnp Service = null");
+		}
 	}
 
 	public void addListener(UpnpProcessorListener listener) {
@@ -104,18 +114,7 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener {
 	}
 
 	public ControlPoint getControlPoint() {
-		return m_upnpService.getControlPoint();
-	}
-
-	@Override
-	public RemoteDevice getRemoteDevice(String UDN) {
-		synchronized (m_remoteDevices) {
-			for (RemoteDevice device : m_upnpService.getRegistry().getRemoteDevices()) {
-				if (device.getIdentity().getUdn().toString().compareTo(UDN) == 0)
-					return device;
-			}
-			return null;
-		}
+		return m_upnpService != null ? m_upnpService.getControlPoint() : null;
 	}
 
 	private void fireOnStartCompleteEvent() {
@@ -128,23 +127,30 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener {
 
 	@Override
 	public void searchDMS() {
-		Log.e(TAG, "Search invoke");
-		DeviceType type = new DeviceType("schemas-upnp-org", "MediaServer", 1);
 		if (m_upnpService != null) {
-			m_upnpService.getRegistry().removeAllRemoteDevices();
-			m_upnpService.getControlPoint().search(new DeviceTypeHeader(type));
+			Log.e(TAG, "Search invoke");
+			DeviceType type = new DeviceType("schemas-upnp-org", "MediaServer", 1);
+			if (m_upnpService != null) {
+				m_upnpService.getRegistry().removeAllRemoteDevices();
+				m_upnpService.getControlPoint().search(new DeviceTypeHeader(type));
+			} else {
+				Log.e(TAG, "UPnP Service is null");
+			}
 		} else {
-			Log.e(TAG, "UPnP Service is null");
+			Log.e(TAG, "Upnp Service = null");
 		}
-
 	}
 
 	@Override
 	public void searchDMR() {
-		Log.e(TAG, "Search invoke");
-		DeviceType type = new DeviceType("schemas-upnp-org", "MediaRenderer", 1);
-		m_upnpService.getRegistry().removeAllRemoteDevices();
-		m_upnpService.getControlPoint().search(new DeviceTypeHeader(type));
+		if (m_upnpService != null) {
+			Log.e(TAG, "Search invoke");
+			DeviceType type = new DeviceType("schemas-upnp-org", "MediaRenderer", 1);
+			m_upnpService.getRegistry().removeAllRemoteDevices();
+			m_upnpService.getControlPoint().search(new DeviceTypeHeader(type));
+		} else {
+			Log.e(TAG, "Upnp Service = null");
+		}
 	}
 
 	@Override
@@ -217,6 +223,9 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener {
 	public Collection<Device> getDMSList() {
 		if (m_upnpService != null)
 			return m_upnpService.getRegistry().getDevices(new DeviceType("schemas-upnp-org", "MediaServer"));
+		else {
+			Log.e(TAG, "Upnp Service = null");
+		}
 		return new ArrayList<Device>();
 	}
 
@@ -225,6 +234,37 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener {
 	public Collection<Device> getDMRList() {
 		if (m_upnpService != null)
 			return m_upnpService.getRegistry().getDevices(new DeviceType("schemas-upnp-org", "MediaRenderer"));
+		else {
+			Log.e(TAG, "Upnp Service = null");
+		}
 		return new ArrayList<Device>();
+	}
+
+	@Override
+	public void setCurrentDMS(UDN uDN) {
+		if (m_upnpService != null)
+			m_upnpService.setCurrentDMS(uDN);
+		else {
+			Log.e(TAG, "Upnp Service = null");
+		}
+	}
+
+	@Override
+	public void setCurrentDMR(UDN uDN) {
+		if (m_upnpService != null)
+			m_upnpService.setCurrentDMR(uDN);
+		else {
+			Log.e(TAG, "Upnp Service = null");
+		}
+	}
+
+	@Override
+	public RemoteDevice getCurrentDMS() {
+		return m_upnpService != null ? m_upnpService.getCurrentDMS() : null;
+	}
+
+	@Override
+	public RemoteDevice getCurrentDMR() {
+		return m_upnpService != null ? m_upnpService.getCurrentDMR() : null;
 	}
 }
