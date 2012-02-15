@@ -3,11 +3,14 @@ package com.app.dlna.dmc.gui.devices;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.teleal.cling.model.meta.Icon;
 import org.teleal.cling.model.meta.RemoteDevice;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,14 +23,15 @@ import android.widget.TextView;
 import com.app.dlna.dmc.gui.R;
 
 public class DMRArrayAdapter extends ArrayAdapter<RemoteDevice> {
+	private Map<String, Bitmap> m_cacheDMRIcon;
+	private static final String TAG = DMRArrayAdapter.class.getName();
+	private LayoutInflater m_inflater;
 
 	public DMRArrayAdapter(Context context, int textViewResourceId) {
 		super(context, textViewResourceId);
 		m_inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		m_cacheDMRIcon = new HashMap<String, Bitmap>();
 	}
-
-	private static final String TAG = DMRArrayAdapter.class.getName();
-	private LayoutInflater m_inflater;
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
@@ -43,28 +47,37 @@ public class DMRArrayAdapter extends ArrayAdapter<RemoteDevice> {
 		ViewHolder holder = (ViewHolder) convertView.getTag();
 		holder.deviceName.setText(device.getDetails().getFriendlyName());
 		holder.deviceType.setText("Digital Media Renderer");
+		String udn = device.getIdentity().getUdn().getIdentifierString();
+		if (m_cacheDMRIcon.containsKey(udn)) {
+			Log.d(TAG, "Cache hit");
+			holder.deviceIcon.setImageBitmap(m_cacheDMRIcon.get(udn));
+		} else {
+			Log.d(TAG, "Cache miss");
+			Icon[] icons = device.getIcons();
+			if (icons != null && icons[0] != null && icons[0].getUri() != null) {
+				try {
+					String urlString = device.getIdentity().getDescriptorURL().getProtocol() + "://"
+							+ device.getIdentity().getDescriptorURL().getAuthority();
+					String iconURI = icons[0].getUri().toString();
+					if (iconURI.startsWith("/")) {
+						urlString += iconURI;
+					} else {
+						urlString += ("/" + iconURI);
+					}
 
-		Icon[] icons = device.getIcons();
-		if (icons != null && icons[0] != null && icons[0].getUri() != null) {
-			try {
-				String urlString = device.getIdentity().getDescriptorURL().getProtocol() + "://" + device.getIdentity().getDescriptorURL().getAuthority();
-				String iconURI = icons[0].getUri().toString();
-				if (iconURI.startsWith("/")) {
-					urlString += iconURI;
-				} else {
-					urlString += ("/" + iconURI);
+					Log.e(TAG, "ICON URL = " + urlString);
+					URL url = new URL(urlString);
+					Bitmap icon = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+					holder.deviceIcon.setImageBitmap(icon);
+					m_cacheDMRIcon.put(udn, icon);
+
+				} catch (MalformedURLException e) {
+					Log.e(TAG, "Can't get Icon of device: " + device.getDisplayString());
+					holder.deviceIcon.setImageResource(R.drawable.icon_dmr);
+				} catch (IOException e) {
+					Log.e(TAG, "Can't get Icon of device: " + device.getDisplayString());
+					holder.deviceIcon.setImageResource(R.drawable.icon_dmr);
 				}
-
-				Log.e(TAG, "ICON URL = " + urlString);
-				URL url = new URL(urlString);
-				holder.deviceIcon.setImageBitmap(BitmapFactory.decodeStream(url.openConnection().getInputStream()));
-
-			} catch (MalformedURLException e) {
-				Log.e(TAG, "Can't get Icon of device: " + device.getDisplayString());
-				holder.deviceIcon.setImageResource(R.drawable.icon_dmr);
-			} catch (IOException e) {
-				Log.e(TAG, "Can't get Icon of device: " + device.getDisplayString());
-				holder.deviceIcon.setImageResource(R.drawable.icon_dmr);
 			}
 		}
 
@@ -73,7 +86,8 @@ public class DMRArrayAdapter extends ArrayAdapter<RemoteDevice> {
 
 	@Override
 	public void add(RemoteDevice object) {
-		if (object.getType().getNamespace().compareTo("schemas-upnp-org") == 0 && object.getType().getType().compareTo("MediaRenderer") == 0)
+		if (object.getType().getNamespace().compareTo("schemas-upnp-org") == 0
+				&& object.getType().getType().compareTo("MediaRenderer") == 0)
 			super.add(object);
 	}
 

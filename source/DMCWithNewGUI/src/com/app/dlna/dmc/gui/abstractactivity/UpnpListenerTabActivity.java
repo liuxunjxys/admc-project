@@ -2,11 +2,11 @@ package com.app.dlna.dmc.gui.abstractactivity;
 
 import org.teleal.cling.model.meta.RemoteDevice;
 
-import com.app.dlna.dmc.processor.interfaces.UpnpProcessor;
+import com.app.dlna.dmc.processor.interfaces.UpnpProcessor.UpnpProcessorListener;
 
-import android.app.Activity;
+import android.app.TabActivity;
 
-public class UpnpListenerActivity extends Activity implements UpnpProcessor.UpnpProcessorListener {
+public class UpnpListenerTabActivity extends TabActivity implements UpnpProcessorListener {
 
 	@Override
 	public void onRemoteDeviceAdded(RemoteDevice device) {
