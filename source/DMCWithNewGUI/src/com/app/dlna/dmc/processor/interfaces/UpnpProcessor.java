@@ -30,6 +30,8 @@ public interface UpnpProcessor {
 
 	RemoteDevice getCurrentDMR();
 
+	PlaylistProcessor getPlaylistProcessor();
+
 	@SuppressWarnings("rawtypes")
 	Collection<Device> getDMSList();
 
