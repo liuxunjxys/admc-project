@@ -6,7 +6,9 @@ import java.util.Map;
 
 import org.teleal.cling.support.model.DIDLObject;
 import org.teleal.cling.support.model.container.Container;
+import org.teleal.cling.support.model.item.AudioItem;
 import org.teleal.cling.support.model.item.Item;
+import org.teleal.cling.support.model.item.VideoItem;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -28,6 +30,8 @@ import com.app.dlna.dmc.processor.impl.UpnpProcessorImpl;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor.DMSProcessorListner;
 import com.app.dlna.dmc.processor.interfaces.UpnpProcessor;
+import com.app.dlna.dmc.processor.playlist.PlaylistItem;
+import com.app.dlna.dmc.processor.playlist.PlaylistItem.Type;
 
 public class LibraryActivity extends UpnpListenerActivity implements DMSProcessorListner {
 	private static final String TAG = LibraryActivity.class.getName();
@@ -94,7 +98,7 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 			if (object instanceof Container) {
 				browse(object.getId());
 			} else if (object instanceof Item) {
-				addToPlaylist();
+				addToPlaylist(object);
 			}
 		}
 	};
@@ -109,9 +113,18 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 		}
 	}
 
-	protected void addToPlaylist() {
-		// TODO Auto-generated method stub
-
+	protected void addToPlaylist(DIDLObject object) {
+		PlaylistItem item = new PlaylistItem();
+		item.setTitle(object.getTitle());
+		item.setUrl(object.getResources().get(0).getValue());
+		if (object instanceof AudioItem) {
+			item.setType(Type.AUDIO);
+		} else if (object instanceof VideoItem) {
+			item.setType(Type.VIDEO);
+		} else {
+			item.setType(Type.IMAGE);
+		}
+		m_upnpProcessor.getPlaylistProcessor().addItem(item);
 	}
 
 	@Override

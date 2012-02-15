@@ -31,6 +31,8 @@ import android.widget.Toast;
 import com.app.dlna.dmc.gui.R;
 import com.app.dlna.dmc.processor.http.HTTPServerData;
 import com.app.dlna.dmc.processor.http.HttpThread;
+import com.app.dlna.dmc.processor.impl.PlaylistProcessorImpl;
+import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.utility.Utility;
 
 public class CoreUpnpService extends Service {
@@ -41,7 +43,7 @@ public class CoreUpnpService extends Service {
 	private CoreUpnpServiceBinder binder = new CoreUpnpServiceBinder();
 	private RemoteDevice m_currentDMS;
 	private RemoteDevice m_currentDMR;
-
+	private PlaylistProcessor m_playlistProcessor;
 	private NotificationManager m_notificationManager;
 	private WifiLock m_wifiLock;
 
@@ -58,6 +60,8 @@ public class CoreUpnpService extends Service {
 
 		m_httpThread = new HttpThread();
 		m_httpThread.start();
+
+		m_playlistProcessor = new PlaylistProcessorImpl();
 
 		final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 
@@ -118,6 +122,10 @@ public class CoreUpnpService extends Service {
 	}
 
 	public class CoreUpnpServiceBinder extends android.os.Binder implements AndroidUpnpService {
+
+		public PlaylistProcessor getPlaylistProcessor() {
+			return m_playlistProcessor;
+		}
 
 		public void setCurrentDMS(UDN uDN) {
 			m_currentDMS = upnpService.getRegistry().getRemoteDevice(uDN, true);

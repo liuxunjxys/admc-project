@@ -24,6 +24,7 @@ import android.util.Log;
 
 import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerActivity;
 import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerTabActivity;
+import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.interfaces.UpnpProcessor;
 import com.app.dlna.dmc.processor.upnp.CoreUpnpService;
 import com.app.dlna.dmc.processor.upnp.CoreUpnpService.CoreUpnpServiceBinder;
@@ -44,7 +45,7 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener {
 		m_listeners = new ArrayList<UpnpProcessorListener>();
 		m_listeners.add(activity);
 	}
-	
+
 	public UpnpProcessorImpl(UpnpListenerTabActivity activity) {
 		m_activity = activity;
 		m_listeners = new ArrayList<UpnpProcessorListener>();
@@ -155,12 +156,10 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener {
 
 	@Override
 	public void remoteDeviceDiscoveryStarted(Registry registry, RemoteDevice device) {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void remoteDeviceDiscoveryFailed(Registry registry, RemoteDevice device, Exception ex) {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
@@ -170,7 +169,6 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener {
 
 	@Override
 	public void remoteDeviceUpdated(Registry registry, RemoteDevice device) {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
@@ -180,26 +178,20 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener {
 
 	@Override
 	public void localDeviceAdded(Registry registry, LocalDevice device) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void localDeviceRemoved(Registry registry, LocalDevice device) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void beforeShutdown(Registry registry) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void afterShutdown() {
-		// TODO Auto-generated method stub
-
 	}
 
 	private void fireRemoteDeviceAddedEvent(RemoteDevice remoteDevice) {
@@ -266,5 +258,10 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener {
 	@Override
 	public RemoteDevice getCurrentDMR() {
 		return m_upnpService != null ? m_upnpService.getCurrentDMR() : null;
+	}
+
+	@Override
+	public PlaylistProcessor getPlaylistProcessor() {
+		return m_upnpService != null ? m_upnpService.getPlaylistProcessor() : null;
 	}
 }
