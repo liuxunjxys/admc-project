@@ -9,10 +9,22 @@ import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 public class PlaylistProcessorImpl implements PlaylistProcessor {
 	private List<PlaylistItem> m_playlistItems;
 	private int m_currentItemIdx;
+	private int m_maxSize = 100;
 
-	public PlaylistProcessorImpl() {
+	public PlaylistProcessorImpl(int maxSize) {
 		m_playlistItems = new ArrayList<PlaylistItem>();
 		m_currentItemIdx = -1;
+		m_maxSize = maxSize;
+	}
+
+	@Override
+	public int getMaxSize() {
+		return m_maxSize;
+	}
+
+	@Override
+	public boolean isFull() {
+		return m_playlistItems.size() >= m_maxSize ? true : false;
 	}
 
 	@Override
@@ -34,21 +46,46 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 	}
 
 	@Override
-	public void addItem(PlaylistItem item) {
+	public int setCurrentItem(int idx) {
+		if (0 <= idx && idx < m_playlistItems.size()) {
+			m_currentItemIdx = idx;
+			return m_currentItemIdx;
+		}
+		return -1;
+	}
+
+	@Override
+	public int setCurrentItem(PlaylistItem item) {
 		synchronized (m_playlistItems) {
-			m_playlistItems.add(item);
-			if (m_playlistItems.size() == 1) {
-				m_currentItemIdx = 0;
+			if (m_playlistItems.contains(item)) {
+				m_currentItemIdx = m_playlistItems.indexOf(item);
+				return m_currentItemIdx;
 			}
+			return -1;
 		}
 	}
 
 	@Override
-	public void removeItem(PlaylistItem item) {
+	public boolean addItem(PlaylistItem item) {
+		synchronized (m_playlistItems) {
+			if (m_playlistItems.contains(item) || m_playlistItems.size() >= m_maxSize)
+				return false;
+			m_playlistItems.add(item);
+			if (m_playlistItems.size() == 1) {
+				m_currentItemIdx = 0;
+			}
+			return true;
+		}
+	}
+
+	@Override
+	public boolean removeItem(PlaylistItem item) {
 		synchronized (m_playlistItems) {
 			if (m_playlistItems.contains(item)) {
 				m_playlistItems.remove(item);
+				return true;
 			}
+			return false;
 		}
 	}
 

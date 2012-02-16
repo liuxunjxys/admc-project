@@ -11,9 +11,17 @@ public interface PlaylistProcessor {
 
 	PlaylistItem getCurrentItem();
 
-	void addItem(PlaylistItem item);
+	boolean addItem(PlaylistItem item);
 
-	void removeItem(PlaylistItem item);
+	boolean removeItem(PlaylistItem item);
+
+	int getMaxSize();
+
+	boolean isFull();
 
 	List<PlaylistItem> getAllItems();
+
+	int setCurrentItem(int idx);
+
+	int setCurrentItem(PlaylistItem item);
 }

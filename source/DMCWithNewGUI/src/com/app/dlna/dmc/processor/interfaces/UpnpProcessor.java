@@ -40,6 +40,10 @@ public interface UpnpProcessor {
 
 	ControlPoint getControlPoint();
 
+	DMSProcessor getDMSProcessor();
+
+	DMRProcessor getDMRProcessor();
+
 	public interface UpnpProcessorListener {
 
 		void onRemoteDeviceAdded(RemoteDevice device);

@@ -269,7 +269,8 @@ public class DMRProcessorImpl implements DMRProcessor {
 	@Override
 	public void addListener(DMRProcessorListner listener) {
 		synchronized (m_listeners) {
-			m_listeners.add(listener);
+			if (!m_listeners.contains(listener))
+				m_listeners.add(listener);
 		}
 	}
 

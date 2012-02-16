@@ -28,10 +28,15 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.R;
 import com.app.dlna.dmc.processor.http.HTTPServerData;
 import com.app.dlna.dmc.processor.http.HttpThread;
+import com.app.dlna.dmc.processor.impl.DMRProcessorImpl;
+import com.app.dlna.dmc.processor.impl.DMSProcessorImpl;
 import com.app.dlna.dmc.processor.impl.PlaylistProcessorImpl;
+import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
+import com.app.dlna.dmc.processor.interfaces.DMSProcessor;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.utility.Utility;
 
@@ -45,6 +50,8 @@ public class CoreUpnpService extends Service {
 	private RemoteDevice m_currentDMR;
 	private PlaylistProcessor m_playlistProcessor;
 	private NotificationManager m_notificationManager;
+	private DMSProcessor m_dmsProcessor;
+	private DMRProcessor m_dmrProcessor;
 	private WifiLock m_wifiLock;
 
 	@Override
@@ -60,8 +67,8 @@ public class CoreUpnpService extends Service {
 
 		m_httpThread = new HttpThread();
 		m_httpThread.start();
-
-		m_playlistProcessor = new PlaylistProcessorImpl();
+		// Create playlist with capacity = 100;
+		m_playlistProcessor = new PlaylistProcessorImpl(100);
 
 		final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 
@@ -70,8 +77,7 @@ public class CoreUpnpService extends Service {
 		upnpService = new UpnpServiceImpl(createConfiguration(wifiManager)) {
 			@Override
 			protected Router createRouter(ProtocolFactory protocolFactory, Registry registry) {
-				AndroidWifiSwitchableRouter router = CoreUpnpService.this.createRouter(getConfiguration(), protocolFactory,
-						wifiManager, connectivityManager);
+				AndroidWifiSwitchableRouter router = CoreUpnpService.this.createRouter(getConfiguration(), protocolFactory, wifiManager, connectivityManager);
 				if (!ModelUtil.ANDROID_EMULATOR && isListeningForConnectivityChanges()) {
 					registerReceiver(router.getBroadcastReceiver(), new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
 				}
@@ -87,8 +93,8 @@ public class CoreUpnpService extends Service {
 		return new AndroidUpnpServiceConfiguration(wifiManager);
 	}
 
-	protected AndroidWifiSwitchableRouter createRouter(UpnpServiceConfiguration configuration, ProtocolFactory protocolFactory,
-			WifiManager wifiManager, ConnectivityManager connectivityManager) {
+	protected AndroidWifiSwitchableRouter createRouter(UpnpServiceConfiguration configuration, ProtocolFactory protocolFactory, WifiManager wifiManager,
+			ConnectivityManager connectivityManager) {
 		return new AndroidWifiSwitchableRouter(configuration, protocolFactory, wifiManager, connectivityManager);
 	}
 
@@ -127,16 +133,24 @@ public class CoreUpnpService extends Service {
 			return m_playlistProcessor;
 		}
 
+		public DMSProcessor getDMSProcessor() {
+			return m_dmsProcessor;
+		}
+
+		public DMRProcessor getDMRProcessor() {
+			return m_dmrProcessor;
+		}
+
 		public void setCurrentDMS(UDN uDN) {
 			m_currentDMS = upnpService.getRegistry().getRemoteDevice(uDN, true);
 			if (m_currentDMS != null) {
 				Log.d(TAG, "CURRENT DMS:" + m_currentDMS.toString());
-				Toast.makeText(getApplicationContext(), "Set DMS complete: " + m_currentDMS.getDisplayString(),
-						Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), "Set DMS complete: " + m_currentDMS.getDisplayString(), Toast.LENGTH_SHORT).show();
+				m_dmsProcessor = new DMSProcessorImpl(getControlPoint(), m_currentDMS);
 			} else {
 				Log.e(TAG, "GET DMS FAIL:" + uDN.toString());
-				Toast.makeText(getApplicationContext(), "Set DMS fail. Cannot get DMS info; UDN = " + uDN.toString(),
-						Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), "Set DMS fail. Cannot get DMS info; UDN = " + uDN.toString(), Toast.LENGTH_SHORT).show();
+				m_dmsProcessor = null;
 			}
 		}
 
@@ -144,12 +158,12 @@ public class CoreUpnpService extends Service {
 			m_currentDMR = upnpService.getRegistry().getRemoteDevice(uDN, true);
 			if (m_currentDMR != null) {
 				Log.d(TAG, "CURRENT DMR:" + m_currentDMR.toString());
-				Toast.makeText(getApplicationContext(), "Set DMR complete: " + m_currentDMR.getDisplayString(),
-						Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), "Set DMR complete: " + m_currentDMR.getDisplayString(), Toast.LENGTH_SHORT).show();
+				m_dmrProcessor = new DMRProcessorImpl(m_currentDMR, getControlPoint());
 			} else {
 				Log.e(TAG, "GET DMR FAIL:" + uDN.toString());
-				Toast.makeText(getApplicationContext(), "Set DMR fail. Cannot get DMR info; UDN = " + uDN.toString(),
-						Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), "Set DMR fail. Cannot get DMR info; UDN = " + uDN.toString(), Toast.LENGTH_SHORT).show();
+				m_dmrProcessor = null;
 			}
 		}
 
@@ -179,10 +193,9 @@ public class CoreUpnpService extends Service {
 	}
 
 	private void showNotification() {
-		Notification notification = new Notification(R.drawable.ic_launcher, "CoreUpnpService started",
-				System.currentTimeMillis());
+		Notification notification = new Notification(R.drawable.ic_launcher, "CoreUpnpService started", System.currentTimeMillis());
 
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(), 0);
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(CoreUpnpService.this, MainActivity.class), 0);
 
 		notification.setLatestEventInfo(this, "CoreUpnpService", "Service is running", contentIntent);
 		notification.flags = Notification.FLAG_NO_CLEAR;

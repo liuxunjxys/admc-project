@@ -27,7 +27,7 @@ public class DevicesActivity extends UpnpListenerActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Log.i(TAG, "On create");
+		Log.i(TAG, "Devices onCreate");
 		setContentView(R.layout.devices_activity);
 
 		m_dmrList = (ListView) findViewById(R.id.dmrList);
@@ -71,7 +71,7 @@ public class DevicesActivity extends UpnpListenerActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		Log.i(TAG, "On resume");
+		Log.i(TAG, "Devices onResume");
 		m_upnpProcessor.addListener(DevicesActivity.this);
 		refresh();
 	}
@@ -79,14 +79,14 @@ public class DevicesActivity extends UpnpListenerActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		Log.i(TAG, "On pause");
+		Log.i(TAG, "Devices onPause");
 		m_upnpProcessor.removeListener(DevicesActivity.this);
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		Log.i(TAG, "On destroy");
+		Log.i(TAG, "Devices onDestroy");
 		m_upnpProcessor.unbindUpnpService();
 	}
 
