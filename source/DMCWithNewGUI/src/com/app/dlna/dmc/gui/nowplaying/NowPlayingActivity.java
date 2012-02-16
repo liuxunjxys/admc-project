@@ -44,7 +44,7 @@ public class NowPlayingActivity extends UpnpListenerActivity implements DMRProce
 		super.onCreate(savedInstanceState);
 		Log.i(TAG, "NowPlaying onCreate");
 		m_currentState = STATE_STOP;
-		setContentView(R.layout.dmrcontroller_activity);
+		setContentView(R.layout.nowplaying_activity);
 
 		m_upnpProcessor = new UpnpProcessorImpl(NowPlayingActivity.this);
 		m_upnpProcessor.bindUpnpService();

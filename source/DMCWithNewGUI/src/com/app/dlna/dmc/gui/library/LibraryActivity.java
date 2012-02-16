@@ -48,7 +48,7 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.i(TAG, "Library onCreate");
-		setContentView(R.layout.dmsbrowser_activity);
+		setContentView(R.layout.library_activity);
 		m_adapter = new DIDLObjectArrayAdapter(LibraryActivity.this, 0);
 		m_listView = (ListView) findViewById(R.id.lv_ServerContent);
 		m_listView.setAdapter(m_adapter);
@@ -116,6 +116,7 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 		Log.e(TAG, "Browse id = " + id);
 		m_traceID.add(id);
 		m_progressDlg = ProgressDialog.show(LibraryActivity.this, "Loading", "Loading...");
+		m_progressDlg.setCancelable(true);
 		m_dmsProcessor.browse(id);
 		for (String _id : m_traceID) {
 			Log.e(TAG, _id);
@@ -154,15 +155,19 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 
 			@Override
 			public void run() {
-				m_adapter.clear();
+				if (m_progressDlg.isShowing()) {
+					m_adapter.clear();
 
-				for (DIDLObject container : result.get("Containers"))
-					m_adapter.add(container);
+					for (DIDLObject container : result.get("Containers"))
+						m_adapter.add(container);
 
-				for (DIDLObject item : result.get("Items"))
-					m_adapter.add(item);
+					for (DIDLObject item : result.get("Items"))
+						m_adapter.add(item);
 
-				m_progressDlg.dismiss();
+					m_progressDlg.dismiss();
+				} else {
+					m_traceID.remove(m_traceID.size() - 1);
+				}
 			}
 		});
 

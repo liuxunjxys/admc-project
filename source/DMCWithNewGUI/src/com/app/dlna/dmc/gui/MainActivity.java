@@ -1,6 +1,7 @@
 package com.app.dlna.dmc.gui;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,14 +23,18 @@ public class MainActivity extends UpnpListenerTabActivity {
 	private static final String TAG = MainActivity.class.getName();
 	private TabHost m_tabHost;
 	private UpnpProcessor m_processor = null;
+	private ProgressDialog m_progressDialog = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		Log.i(TAG, "MainActivity onCreate");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_activity);
+
 		m_processor = new UpnpProcessorImpl(MainActivity.this);
 		m_processor.bindUpnpService();
+		m_progressDialog = ProgressDialog.show(MainActivity.this, "Starting Service", "");
+		m_progressDialog.setCancelable(true);
 		m_tabHost = getTabHost();
 		m_tabHost.setup();
 
@@ -108,6 +113,20 @@ public class MainActivity extends UpnpListenerTabActivity {
 	public void onStartComplete() {
 		super.onStartComplete();
 		m_tabHost.setOnTabChangedListener(changeListener);
+		m_progressDialog.setTitle("Scanning device");
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(7000);
+					m_progressDialog.dismiss();
+				} catch (Exception ex) {
+					m_progressDialog.dismiss();
+				}
+
+			}
+		}).start();
 	}
 
 	@Override
