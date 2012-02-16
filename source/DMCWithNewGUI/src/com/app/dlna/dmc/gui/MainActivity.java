@@ -1,5 +1,6 @@
 package com.app.dlna.dmc.gui;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +25,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		Log.i(TAG, "MainActivity onCreate");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_activity);
 		m_processor = new UpnpProcessorImpl(MainActivity.this);
@@ -85,7 +87,19 @@ public class MainActivity extends UpnpListenerTabActivity {
 		}
 	};
 
+	protected void onResume() {
+		super.onResume();
+		Log.i(TAG, "MainActivity onResume");
+	};
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		Log.i(TAG, "MainActivity onPause");
+	}
+
 	protected void onDestroy() {
+		Log.i(TAG, "MainActivity onDestroy");
 		m_processor.unbindUpnpService();
 		super.onDestroy();
 	};
@@ -94,5 +108,15 @@ public class MainActivity extends UpnpListenerTabActivity {
 	public void onStartComplete() {
 		super.onStartComplete();
 		m_tabHost.setOnTabChangedListener(changeListener);
+	}
+
+	@Override
+	public void finishFromChild(Activity child) {
+		Log.e(TAG, "Finish from child " + m_tabHost.getCurrentTabTag());
+		if (m_tabHost.getCurrentTabTag().equals("Devices")) {
+			finish();
+		} else {
+			m_tabHost.setCurrentTab(3);
+		}
 	}
 }

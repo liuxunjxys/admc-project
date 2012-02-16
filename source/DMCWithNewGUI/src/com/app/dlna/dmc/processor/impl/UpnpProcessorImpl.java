@@ -24,6 +24,8 @@ import android.util.Log;
 
 import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerActivity;
 import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerTabActivity;
+import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
+import com.app.dlna.dmc.processor.interfaces.DMSProcessor;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.interfaces.UpnpProcessor;
 import com.app.dlna.dmc.processor.upnp.CoreUpnpService;
@@ -263,5 +265,15 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener {
 	@Override
 	public PlaylistProcessor getPlaylistProcessor() {
 		return m_upnpService != null ? m_upnpService.getPlaylistProcessor() : null;
+	}
+
+	@Override
+	public DMSProcessor getDMSProcessor() {
+		return m_upnpService != null ? m_upnpService.getDMSProcessor() : null;
+	}
+
+	@Override
+	public DMRProcessor getDMRProcessor() {
+		return m_upnpService != null ? m_upnpService.getDMRProcessor() : null;
 	}
 }

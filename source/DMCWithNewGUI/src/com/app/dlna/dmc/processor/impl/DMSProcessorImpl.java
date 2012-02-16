@@ -39,6 +39,12 @@ public class DMSProcessorImpl implements DMSProcessor {
 		m_listeners = new ArrayList<DMSProcessor.DMSProcessorListner>();
 	}
 
+	public DMSProcessorImpl(ControlPoint controlPoint, RemoteDevice device) {
+		m_server = device;
+		m_controlPoint = controlPoint;
+		m_listeners = new ArrayList<DMSProcessor.DMSProcessorListner>();
+	}
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void browse(String objectID) {
 		result = new HashMap<String, List<? extends DIDLObject>>();
@@ -100,7 +106,8 @@ public class DMSProcessorImpl implements DMSProcessor {
 	@Override
 	public void addListener(DMSProcessorListner listener) {
 		synchronized (m_listeners) {
-			m_listeners.add(listener);
+			if (!m_listeners.contains(listener))
+				m_listeners.add(listener);
 		}
 
 	}

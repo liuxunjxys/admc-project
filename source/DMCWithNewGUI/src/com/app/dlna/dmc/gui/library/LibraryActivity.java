@@ -25,10 +25,10 @@ import android.widget.Toast;
 
 import com.app.dlna.dmc.gui.R;
 import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerActivity;
-import com.app.dlna.dmc.processor.impl.DMSProcessorImpl;
 import com.app.dlna.dmc.processor.impl.UpnpProcessorImpl;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor.DMSProcessorListner;
+import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.interfaces.UpnpProcessor;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem.Type;
@@ -42,10 +42,12 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 	private ProgressDialog m_progressDlg;
 	private List<String> m_traceID;
 	private String m_currentDMSUDN;
+	private PlaylistProcessor m_playlistProcessor;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Log.i(TAG, "Library onCreate");
 		setContentView(R.layout.dmsbrowser_activity);
 		m_adapter = new DIDLObjectArrayAdapter(LibraryActivity.this, 0);
 		m_listView = (ListView) findViewById(R.id.lv_ServerContent);
@@ -60,23 +62,30 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 
 	@Override
 	protected void onResume() {
-		Log.d(TAG, m_upnpProcessor != null ? "Upnp Processor != null" : "Upnp Processor == null");
+		Log.i(TAG, "Library onResume");
+		Log.i(TAG, m_upnpProcessor != null ? "Upnp Processor != null" : "Upnp Processor == null");
 		super.onResume();
 		if (m_upnpProcessor != null && m_upnpProcessor.getCurrentDMS() != null) {
-			String newUDN = m_upnpProcessor.getCurrentDMS().getIdentity().getUdn().toString();
-			if (m_currentDMSUDN == null || !m_currentDMSUDN.equals(newUDN)) {
-				m_currentDMSUDN = newUDN;
-				m_traceID = new ArrayList<String>();
-				m_traceID.add("-1");
-				m_dmsProcessor = new DMSProcessorImpl(m_upnpProcessor);
-				m_dmsProcessor.addListener(LibraryActivity.this);
-				browse("0");
-			}
+			m_playlistProcessor = m_upnpProcessor.getPlaylistProcessor();
+			browseRootContainer();
+		}
+	}
+
+	private void browseRootContainer() {
+		String newUDN = m_upnpProcessor.getCurrentDMS().getIdentity().getUdn().toString();
+		if (m_currentDMSUDN == null || !m_currentDMSUDN.equals(newUDN)) {
+			m_currentDMSUDN = newUDN;
+			m_traceID = new ArrayList<String>();
+			m_traceID.add("-1");
+			m_dmsProcessor = m_upnpProcessor.getDMSProcessor();
+			m_dmsProcessor.addListener(LibraryActivity.this);
+			browse("0");
 		}
 	}
 
 	@Override
 	protected void onPause() {
+		Log.i(TAG, "Library onPause");
 		if (m_upnpProcessor != null) {
 			m_upnpProcessor.removeListener(LibraryActivity.this);
 		}
@@ -85,8 +94,8 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 
 	@Override
 	protected void onDestroy() {
-		if (m_upnpProcessor != null)
-			m_upnpProcessor.unbindUpnpService();
+		Log.i(TAG, "Library onDestroy");
+		m_upnpProcessor.unbindUpnpService();
 		super.onDestroy();
 	}
 
@@ -114,6 +123,10 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 	}
 
 	protected void addToPlaylist(DIDLObject object) {
+		if (m_playlistProcessor == null) {
+			Toast.makeText(LibraryActivity.this, "Cannot get playlist processor", Toast.LENGTH_SHORT).show();
+			return;
+		}
 		PlaylistItem item = new PlaylistItem();
 		item.setTitle(object.getTitle());
 		item.setUrl(object.getResources().get(0).getValue());
@@ -124,7 +137,15 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 		} else {
 			item.setType(Type.IMAGE);
 		}
-		m_upnpProcessor.getPlaylistProcessor().addItem(item);
+		if (m_playlistProcessor.addItem(item))
+			Toast.makeText(LibraryActivity.this, "Add item \"" + item.getTitle() + "\" to playlist sucess", Toast.LENGTH_SHORT).show();
+		else {
+			if (m_playlistProcessor.isFull()) {
+				Toast.makeText(LibraryActivity.this, "Current playlist is full", Toast.LENGTH_SHORT).show();
+			} else {
+				Toast.makeText(LibraryActivity.this, "Item already exits in current Playlist", Toast.LENGTH_SHORT).show();
+			}
+		}
 	}
 
 	@Override
@@ -176,12 +197,19 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 			m_traceID.remove(m_traceID.size() - 1);
 			m_traceID.remove(m_traceID.size() - 1);
 		} else {
-			Toast.makeText(LibraryActivity.this,
-					"You are in the root of this MediaServer. Press Back again to chose other MediaServer", Toast.LENGTH_SHORT)
+			Toast.makeText(LibraryActivity.this, "You are in the root of this MediaServer. Press Back again to chose other MediaServer", Toast.LENGTH_SHORT)
 					.show();
 			final TabHost tabHost = ((TabActivity) getParent()).getTabHost();
 			tabHost.setCurrentTab(3);
 		}
 	}
 
+	@Override
+	public void onStartComplete() {
+		super.onStartComplete();
+		if (m_upnpProcessor != null && m_upnpProcessor.getCurrentDMS() != null) {
+			m_playlistProcessor = m_upnpProcessor.getPlaylistProcessor();
+			browseRootContainer();
+		}
+	}
 }

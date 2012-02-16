@@ -33,4 +33,14 @@ public class PlaylistItem {
 		this.m_type = type;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof PlaylistItem))
+			return false;
+		PlaylistItem other = (PlaylistItem) o;
+		if (other.getUrl().equals(this.m_url) && other.getType().equals(this.m_type) && other.getTitle().equals(this.m_title))
+			return true;
+		return false;
+	}
+
 }

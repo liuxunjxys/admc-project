@@ -56,8 +56,7 @@ public class DMRArrayAdapter extends ArrayAdapter<RemoteDevice> {
 			Icon[] icons = device.getIcons();
 			if (icons != null && icons[0] != null && icons[0].getUri() != null) {
 				try {
-					String urlString = device.getIdentity().getDescriptorURL().getProtocol() + "://"
-							+ device.getIdentity().getDescriptorURL().getAuthority();
+					String urlString = device.getIdentity().getDescriptorURL().getProtocol() + "://" + device.getIdentity().getDescriptorURL().getAuthority();
 					String iconURI = icons[0].getUri().toString();
 					if (iconURI.startsWith("/")) {
 						urlString += iconURI;
@@ -86,8 +85,7 @@ public class DMRArrayAdapter extends ArrayAdapter<RemoteDevice> {
 
 	@Override
 	public void add(RemoteDevice object) {
-		if (object.getType().getNamespace().compareTo("schemas-upnp-org") == 0
-				&& object.getType().getType().compareTo("MediaRenderer") == 0)
+		if (object.getType().getNamespace().compareTo("schemas-upnp-org") == 0 && object.getType().getType().compareTo("MediaRenderer") == 0)
 			super.add(object);
 	}
 
