@@ -129,7 +129,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 		if (m_tabHost.getCurrentTabTag().equals("Devices")) {
 			finish();
 		} else {
-			m_tabHost.setCurrentTab(3);
+			m_tabHost.setCurrentTab(2);
 		}
 	}
 }

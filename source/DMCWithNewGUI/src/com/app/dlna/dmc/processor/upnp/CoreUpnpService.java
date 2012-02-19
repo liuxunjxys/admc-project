@@ -97,7 +97,7 @@ public class CoreUpnpService extends Service {
 				return router;
 			}
 		};
-
+		LocalContentDirectoryService.scanMedia();
 		showNotification();
 		startLocalDMS();
 	}

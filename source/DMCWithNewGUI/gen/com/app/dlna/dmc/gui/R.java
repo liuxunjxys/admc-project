@@ -54,22 +54,22 @@ public final class R {
         public static final int enter_link_label=0x7f060016;
         public static final int itemIcon=0x7f060002;
         public static final int itemName=0x7f060003;
-        public static final int itemTitle=0x7f060011;
-        public static final int linearLayout1=0x7f060009;
+        public static final int itemTitle=0x7f060013;
+        public static final int linearLayout1=0x7f06000a;
         public static final int lv_ServerContent=0x7f060008;
-        public static final int next=0x7f06000d;
-        public static final int playList=0x7f060014;
-        public static final int playPause=0x7f06000b;
-        public static final int playingProgress=0x7f06000f;
-        public static final int previous=0x7f06000a;
-        public static final int progressTime=0x7f060010;
-        public static final int rendererName=0x7f060015;
+        public static final int next=0x7f06000e;
+        public static final int playList=0x7f060009;
+        public static final int playPause=0x7f06000c;
+        public static final int playingProgress=0x7f060010;
+        public static final int previous=0x7f06000b;
+        public static final int progressTime=0x7f060011;
+        public static final int rendererName=0x7f060012;
         public static final int selected=0x7f060007;
-        public static final int sound=0x7f06000e;
-        public static final int soundValue=0x7f060012;
-        public static final int stop=0x7f06000c;
+        public static final int sound=0x7f06000f;
+        public static final int soundValue=0x7f060014;
+        public static final int stop=0x7f06000d;
         public static final int submit=0x7f060018;
-        public static final int volumeControl=0x7f060013;
+        public static final int volumeControl=0x7f060015;
         public static final int youtube_link=0x7f060017;
     }
     public static final class layout {
@@ -79,9 +79,8 @@ public final class R {
         public static final int dms_listview_item=0x7f030003;
         public static final int library_activity=0x7f030004;
         public static final int main_activity=0x7f030005;
-        public static final int nowplaying_activity=0x7f030006;
-        public static final int playlist_activity=0x7f030007;
-        public static final int ytcontent_activitiy=0x7f030008;
+        public static final int playlist_activity=0x7f030006;
+        public static final int ytcontent_activitiy=0x7f030007;
     }
     public static final class string {
         public static final int app_name=0x7f040000;
