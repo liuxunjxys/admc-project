@@ -29,5 +29,6 @@
     <string name="youtube_host">youtube.com</string>
     <string name="media_server">Media Server:</string>
     <string name="media_renderer">Media Renderer</string>
+    <string name="change_dmr">Change</string>
 
 </resources>

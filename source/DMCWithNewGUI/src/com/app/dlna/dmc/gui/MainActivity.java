@@ -13,7 +13,6 @@ import android.widget.Toast;
 import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerTabActivity;
 import com.app.dlna.dmc.gui.devices.DevicesActivity;
 import com.app.dlna.dmc.gui.library.LibraryActivity;
-import com.app.dlna.dmc.gui.nowplaying.NowPlayingActivity;
 import com.app.dlna.dmc.gui.playlist.PlaylistActivity;
 import com.app.dlna.dmc.gui.youtube.YoutubeActivity;
 import com.app.dlna.dmc.processor.impl.UpnpProcessorImpl;
@@ -37,11 +36,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 		m_progressDialog.setCancelable(true);
 		m_tabHost = getTabHost();
 		m_tabHost.setup();
-
-		TabSpec nowplayingTabSpec = m_tabHost.newTabSpec("NowPlaying");
-		nowplayingTabSpec.setIndicator("Now Playing", getResources().getDrawable(R.drawable.ic_tab_now_playing));
-		Intent intent = new Intent(this, NowPlayingActivity.class);
-		nowplayingTabSpec.setContent(intent);
+		Intent intent = null;
 
 		TabSpec playlistTabSpec = m_tabHost.newTabSpec("Playlist");
 		playlistTabSpec.setIndicator("Playlist", getResources().getDrawable(R.drawable.ic_tab_play_list));
@@ -63,13 +58,12 @@ public class MainActivity extends UpnpListenerTabActivity {
 		intent = new Intent(this, YoutubeActivity.class);
 		youtubeTabSpec.setContent(intent);
 
-		m_tabHost.addTab(nowplayingTabSpec);
 		m_tabHost.addTab(playlistTabSpec);
 		m_tabHost.addTab(libraryTabSpec);
 		m_tabHost.addTab(devicesTabSpec);
 		m_tabHost.addTab(youtubeTabSpec);
 
-		m_tabHost.setCurrentTab(3);
+		m_tabHost.setCurrentTab(2);
 
 	}
 

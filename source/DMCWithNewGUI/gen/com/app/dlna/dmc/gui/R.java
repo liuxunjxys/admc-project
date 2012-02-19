@@ -50,8 +50,8 @@ public final class R {
         public static final int deviceType=0x7f060006;
         public static final int dmrList=0x7f060001;
         public static final int dmsList=0x7f060000;
-        public static final int enable_proxy_mode=0x7f060018;
-        public static final int enter_link_label=0x7f060015;
+        public static final int enable_proxy_mode=0x7f060019;
+        public static final int enter_link_label=0x7f060016;
         public static final int itemIcon=0x7f060002;
         public static final int itemName=0x7f060003;
         public static final int itemTitle=0x7f060011;
@@ -63,13 +63,14 @@ public final class R {
         public static final int playingProgress=0x7f06000f;
         public static final int previous=0x7f06000a;
         public static final int progressTime=0x7f060010;
+        public static final int rendererName=0x7f060015;
         public static final int selected=0x7f060007;
         public static final int sound=0x7f06000e;
         public static final int soundValue=0x7f060012;
         public static final int stop=0x7f06000c;
-        public static final int submit=0x7f060017;
+        public static final int submit=0x7f060018;
         public static final int volumeControl=0x7f060013;
-        public static final int youtube_link=0x7f060016;
+        public static final int youtube_link=0x7f060017;
     }
     public static final class layout {
         public static final int devices_activity=0x7f030000;
@@ -85,6 +86,7 @@ public final class R {
     public static final class string {
         public static final int app_name=0x7f040000;
         public static final int browselocal=0x7f040006;
+        public static final int change_dmr=0x7f04001c;
         public static final int enter_video_link_=0x7f040015;
         public static final int link1=0x7f04000b;
         public static final int link2=0x7f04000c;
