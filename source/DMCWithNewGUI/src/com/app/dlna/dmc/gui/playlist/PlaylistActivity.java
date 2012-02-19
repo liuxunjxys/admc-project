@@ -45,6 +45,7 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 	private SeekBar m_sb_volume;
 	private TextView m_tv_soundValue;
 	protected boolean m_isFailed = false;
+	private TextView m_tv_rendererName;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +67,8 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 		m_tv_soundValue = (TextView) findViewById(R.id.soundValue);
 		m_tv_soundValue.setVisibility(View.GONE);
 
+		m_tv_rendererName = (TextView) findViewById(R.id.rendererName);
+
 		m_sb_playingProgress.setOnSeekBarChangeListener(playbackSeekListener);
 		m_sb_volume.setOnSeekBarChangeListener(volumeSeekListener);
 	}
@@ -77,7 +80,10 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 		if (m_upnpProcessor != null && m_upnpProcessor.getPlaylistProcessor() != null) {
 			refreshPlaylist();
 			m_dmrProcessor = m_upnpProcessor.getDMRProcessor();
-			m_dmrProcessor.addListener(PlaylistActivity.this);
+			if (m_dmrProcessor != null) {
+				m_dmrProcessor.addListener(PlaylistActivity.this);
+				m_tv_rendererName.setText(m_dmrProcessor.getName());
+			}
 		}
 	}
 
@@ -85,7 +91,9 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 	protected void onPause() {
 		Log.i(TAG, "Playlist onPause");
 		m_adapter.clear();
-		m_dmrProcessor.removeListener(PlaylistActivity.this);
+		if (m_dmrProcessor != null) {
+			m_dmrProcessor.removeListener(PlaylistActivity.this);
+		}
 		super.onPause();
 	}
 

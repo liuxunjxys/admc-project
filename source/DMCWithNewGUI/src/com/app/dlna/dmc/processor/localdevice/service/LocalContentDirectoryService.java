@@ -28,12 +28,12 @@ import com.app.dlna.dmc.utility.Utility;
 
 public class LocalContentDirectoryService extends AbstractContentDirectoryService {
 	private static final String TAG = LocalContentDirectoryService.class.getName();
-	private List<MusicTrack> m_listMusic = null;
-	private List<VideoItem> m_listVideo = null;
-	private List<ImageItem> m_listPhoto = null;
-	private List<String> m_musicMap = null;
-	private List<String> m_videoMap = null;
-	private List<String> m_photoMap = null;
+	private static List<MusicTrack> m_listMusic = null;
+	private static List<VideoItem> m_listVideo = null;
+	private static List<ImageItem> m_listPhoto = null;
+	private static List<String> m_musicMap = null;
+	private static List<String> m_videoMap = null;
+	private static List<String> m_photoMap = null;
 
 	public LocalContentDirectoryService() {
 
@@ -63,24 +63,35 @@ public class LocalContentDirectoryService extends AbstractContentDirectoryServic
 		m_photoMap.add(".png");
 		m_photoMap.add(".bmp");
 		m_photoMap.add(".gif");
-
-		m_scaningThread.start();
-
 	}
 
-	private Thread m_scaningThread = new Thread(new Runnable() {
+	public static void scanMedia() {
+		new Thread(new Runnable() {
 
-		@Override
-		public void run() {
-			try {
-				scanFile(Environment.getExternalStorageDirectory().getAbsolutePath());
-			} catch (Exception ex) {
-				ex.printStackTrace();
+			@Override
+			public void run() {
+				try {
+					scanFile(Environment.getExternalStorageDirectory().getAbsolutePath());
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
 			}
-		}
-	});
+		}).start();
+	}
 
-	private void scanFile(String path) {
+	// private Thread m_scaningThread = new Thread(new Runnable() {
+	//
+	// @Override
+	// public void run() {
+	// try {
+	// scanFile(Environment.getExternalStorageDirectory().getAbsolutePath());
+	// } catch (Exception ex) {
+	// ex.printStackTrace();
+	// }
+	// }
+	// });
+
+	private static void scanFile(String path) {
 		try {
 			File file = new File(path);
 			for (File subFile : file.listFiles()) {

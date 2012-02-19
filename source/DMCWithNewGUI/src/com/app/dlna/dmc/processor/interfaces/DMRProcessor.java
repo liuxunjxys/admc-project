@@ -23,6 +23,8 @@ public interface DMRProcessor {
 	void removeListener(DMRProcessorListner listener);
 
 	void dispose();
+	
+	String getName();
 
 	public interface DMRProcessorListner {
 		void onUpdatePosition(long current, long max);

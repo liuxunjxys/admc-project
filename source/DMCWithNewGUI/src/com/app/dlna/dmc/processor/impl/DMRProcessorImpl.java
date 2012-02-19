@@ -377,4 +377,9 @@ public class DMRProcessorImpl implements DMRProcessor {
 		return m_currentVolume;
 	}
 
+	@Override
+	public String getName() {
+		return m_device != null ? m_device.getDetails().getFriendlyName() : "NULL";
+	}
+
 }
