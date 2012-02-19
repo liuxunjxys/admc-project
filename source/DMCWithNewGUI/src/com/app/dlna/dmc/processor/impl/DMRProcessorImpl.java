@@ -9,7 +9,7 @@ import org.teleal.cling.controlpoint.ControlPoint;
 import org.teleal.cling.model.action.ActionInvocation;
 import org.teleal.cling.model.message.UpnpResponse;
 import org.teleal.cling.model.meta.Action;
-import org.teleal.cling.model.meta.RemoteDevice;
+import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.model.meta.Service;
 import org.teleal.cling.model.types.ServiceType;
 import org.teleal.cling.support.avtransport.callback.GetMediaInfo;
@@ -36,7 +36,8 @@ public class DMRProcessorImpl implements DMRProcessor {
 	private static final int SEEK_DELAY_INTERVAL = 1000;
 	private static final int UPDATE_INTERVAL = 500;
 	private static final String TAG = DMRProcessorImpl.class.getName();
-	private RemoteDevice m_device;
+	@SuppressWarnings("rawtypes")
+	private Device m_device;
 	private ControlPoint m_controlPoint;
 	@SuppressWarnings("rawtypes")
 	private Service m_avtransportService = null;
@@ -118,7 +119,8 @@ public class DMRProcessorImpl implements DMRProcessor {
 		}
 	});
 
-	public DMRProcessorImpl(RemoteDevice dmr, ControlPoint controlPoint) {
+	@SuppressWarnings("rawtypes")
+	public DMRProcessorImpl(Device dmr, ControlPoint controlPoint) {
 		m_device = dmr;
 		m_controlPoint = controlPoint;
 		m_avtransportService = m_device.findService(new ServiceType("schemas-upnp-org", "AVTransport"));
@@ -184,8 +186,11 @@ public class DMRProcessorImpl implements DMRProcessor {
 				} else {
 					System.out.println("null");
 				}
-				if (currentPath != null && newPath != null && currentPath.equals(newPath)
-						&& (currentQuery == newQuery || (currentQuery != null && newQuery != null && currentQuery.equals(newQuery)))) {
+				if (currentPath != null
+						&& newPath != null
+						&& currentPath.equals(newPath)
+						&& (currentQuery == newQuery || (currentQuery != null && newQuery != null && currentQuery
+								.equals(newQuery)))) {
 					play();
 				} else {
 					stop();

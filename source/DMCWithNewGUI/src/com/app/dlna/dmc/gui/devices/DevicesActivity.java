@@ -1,7 +1,8 @@
 package com.app.dlna.dmc.gui.devices;
 
 import org.teleal.cling.model.meta.Device;
-import org.teleal.cling.model.meta.RemoteDevice;
+import org.teleal.cling.model.meta.LocalDevice;
+import org.teleal.cling.model.types.UDN;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -51,7 +52,12 @@ public class DevicesActivity extends UpnpListenerActivity {
 		@Override
 		public void onItemClick(AdapterView<?> adapter, View view, int position, long arg3) {
 			synchronized (m_dmrAdapter) {
-				m_upnpProcessor.setCurrentDMR(m_dmrAdapter.getItem(position).getIdentity().getUdn());
+				UDN udn = m_dmrAdapter.getItem(position).getIdentity().getUdn();
+				m_upnpProcessor.setCurrentDMR(udn);
+				synchronized (m_dmrAdapter) {
+					m_dmrAdapter.setCurrentDMRUDN(udn.getIdentifierString());
+					m_dmrAdapter.notifyDataSetChanged();
+				}
 			}
 		}
 
@@ -62,7 +68,12 @@ public class DevicesActivity extends UpnpListenerActivity {
 		@Override
 		public void onItemClick(AdapterView<?> adapter, View view, int position, long arg3) {
 			synchronized (m_dmsAdapter) {
-				m_upnpProcessor.setCurrentDMS(m_dmsAdapter.getItem(position).getIdentity().getUdn());
+				UDN udn = m_dmsAdapter.getItem(position).getIdentity().getUdn();
+				m_upnpProcessor.setCurrentDMS(udn);
+				synchronized (m_dmsAdapter) {
+					m_dmsAdapter.setCurrentDMSUDN(udn.getIdentifierString());
+					m_dmsAdapter.notifyDataSetChanged();
+				}
 			}
 		}
 
@@ -90,9 +101,10 @@ public class DevicesActivity extends UpnpListenerActivity {
 		m_upnpProcessor.unbindUpnpService();
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
-	public void onRemoteDeviceAdded(RemoteDevice device) {
-		super.onRemoteDeviceAdded(device);
+	public void onDeviceAdded(Device device) {
+		super.onDeviceAdded(device);
 		if (device.getType().getNamespace().equals("schemas-upnp-org")) {
 			if (device.getType().getType().equals("MediaServer")) {
 				addDMS(device);
@@ -102,9 +114,10 @@ public class DevicesActivity extends UpnpListenerActivity {
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
-	public void onRemoteDeviceRemoved(RemoteDevice device) {
-		super.onRemoteDeviceRemoved(device);
+	public void onDeviceRemoved(Device device) {
+		super.onDeviceRemoved(device);
 		if (device.getType().getNamespace().equals("schemas-upnp-org")) {
 			if (device.getType().getType().equals("MediaServer")) {
 				removeDMS(device);
@@ -124,10 +137,20 @@ public class DevicesActivity extends UpnpListenerActivity {
 	private void refresh() {
 		synchronized (m_dmsAdapter) {
 			m_dmsAdapter.clear();
+			if (m_upnpProcessor.getCurrentDMS() != null) {
+				m_dmsAdapter.setCurrentDMSUDN(m_upnpProcessor.getCurrentDMS().getIdentity().getUdn().getIdentifierString());
+			} else {
+				m_dmsAdapter.setCurrentDMSUDN("");
+			}
 		}
 
 		synchronized (m_dmrAdapter) {
 			m_dmrAdapter.clear();
+			if (m_upnpProcessor.getCurrentDMR() != null) {
+				m_dmrAdapter.setCurrentDMRUDN(m_upnpProcessor.getCurrentDMR().getIdentity().getUdn().getIdentifierString());
+			} else {
+				m_dmrAdapter.setCurrentDMRUDN("");
+			}
 		}
 
 		for (Device device : m_upnpProcessor.getDMSList()) {
@@ -146,19 +169,20 @@ public class DevicesActivity extends UpnpListenerActivity {
 			@Override
 			public void run() {
 				synchronized (m_dmrAdapter) {
-					if (device instanceof RemoteDevice) {
-						int count = m_dmrAdapter.getCount();
-						for (int i = 0; i < count; ++i) {
-							RemoteDevice remoteDevice = m_dmrAdapter.getItem(i);
-							if (remoteDevice.getIdentity().equals(device.getIdentity())) {
-								m_dmrAdapter.remove(remoteDevice);
-								m_dmrAdapter.insert(remoteDevice, i);
-								return;
-							}
-						}
-						m_dmrAdapter.add((RemoteDevice) device);
-					}
-
+					// int count = m_dmrAdapter.getCount();
+					// for (int i = 0; i < count; ++i) {
+					// Device oldDevice = m_dmrAdapter.getItem(i);
+					// if (oldDevice.getIdentity().equals(device.getIdentity()))
+					// {
+					// m_dmrAdapter.remove(oldDevice);
+					// m_dmrAdapter.insert(oldDevice, i);
+					// return;
+					// }
+					// }
+					if (device instanceof LocalDevice)
+						m_dmrAdapter.insert(device, 0);
+					else
+						m_dmrAdapter.add(device);
 				}
 			}
 		});
@@ -167,16 +191,15 @@ public class DevicesActivity extends UpnpListenerActivity {
 
 	@SuppressWarnings("rawtypes")
 	private void removeDMR(final Device device) {
-		if (device instanceof RemoteDevice)
-			runOnUiThread(new Runnable() {
+		runOnUiThread(new Runnable() {
 
-				@Override
-				public void run() {
-					synchronized (m_dmrAdapter) {
-						m_dmrAdapter.remove((RemoteDevice) device);
-					}
+			@Override
+			public void run() {
+				synchronized (m_dmrAdapter) {
+					m_dmrAdapter.remove(device);
 				}
-			});
+			}
+		});
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -186,18 +209,20 @@ public class DevicesActivity extends UpnpListenerActivity {
 			@Override
 			public void run() {
 				synchronized (m_dmsAdapter) {
-					if (device instanceof RemoteDevice) {
-						int count = m_dmsAdapter.getCount();
-						for (int i = 0; i < count; ++i) {
-							RemoteDevice remoteDevice = m_dmsAdapter.getItem(i);
-							if (remoteDevice.getIdentity().equals(device.getIdentity())) {
-								m_dmsAdapter.remove(remoteDevice);
-								m_dmsAdapter.insert(remoteDevice, i);
-								return;
-							}
-						}
-						m_dmsAdapter.add((RemoteDevice) device);
-					}
+					// int count = m_dmsAdapter.getCount();
+					// for (int i = 0; i < count; ++i) {
+					// Device oldDevice = m_dmsAdapter.getItem(i);
+					// if (oldDevice.getIdentity().equals(device.getIdentity()))
+					// {
+					// m_dmsAdapter.remove(oldDevice);
+					// m_dmsAdapter.insert(oldDevice, i);
+					// return;
+					// }
+					// }
+					if (device instanceof LocalDevice)
+						m_dmsAdapter.insert(device, 0);
+					else
+						m_dmsAdapter.add(device);
 				}
 			}
 		});
@@ -206,16 +231,15 @@ public class DevicesActivity extends UpnpListenerActivity {
 
 	@SuppressWarnings("rawtypes")
 	private void removeDMS(final Device device) {
-		if (device instanceof RemoteDevice)
-			runOnUiThread(new Runnable() {
+		runOnUiThread(new Runnable() {
 
-				@Override
-				public void run() {
-					synchronized (m_dmsAdapter) {
-						m_dmsAdapter.remove((RemoteDevice) device);
-					}
+			@Override
+			public void run() {
+				synchronized (m_dmsAdapter) {
+					m_dmsAdapter.remove(device);
 				}
-			});
+			}
+		});
 	}
 
 }
