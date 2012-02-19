@@ -10,7 +10,7 @@ import org.teleal.cling.controlpoint.ControlPoint;
 import org.teleal.cling.model.action.ActionInvocation;
 import org.teleal.cling.model.message.UpnpResponse;
 import org.teleal.cling.model.meta.Action;
-import org.teleal.cling.model.meta.RemoteDevice;
+import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.model.meta.Service;
 import org.teleal.cling.model.types.ServiceType;
 import org.teleal.cling.model.types.UnsignedIntegerFourBytes;
@@ -28,7 +28,8 @@ import com.app.dlna.dmc.processor.interfaces.UpnpProcessor;
 public class DMSProcessorImpl implements DMSProcessor {
 
 	private static final String TAG = DMSProcessorImpl.class.getName();
-	private RemoteDevice m_server;
+	@SuppressWarnings("rawtypes")
+	private Device m_server;
 	private ControlPoint m_controlPoint;
 	private Map<String, List<? extends DIDLObject>> result;
 	private List<DMSProcessorListner> m_listeners;
@@ -39,7 +40,8 @@ public class DMSProcessorImpl implements DMSProcessor {
 		m_listeners = new ArrayList<DMSProcessor.DMSProcessorListner>();
 	}
 
-	public DMSProcessorImpl(ControlPoint controlPoint, RemoteDevice device) {
+	@SuppressWarnings("rawtypes")
+	public DMSProcessorImpl(ControlPoint controlPoint, Device device) {
 		m_server = device;
 		m_controlPoint = controlPoint;
 		m_listeners = new ArrayList<DMSProcessor.DMSProcessorListner>();

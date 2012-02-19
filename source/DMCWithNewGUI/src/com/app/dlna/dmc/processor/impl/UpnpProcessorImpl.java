@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.teleal.cling.controlpoint.ControlPoint;
-import org.teleal.cling.model.message.header.DeviceTypeHeader;
 import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.model.meta.LocalDevice;
 import org.teleal.cling.model.meta.RemoteDevice;
@@ -129,34 +128,6 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener {
 	}
 
 	@Override
-	public void searchDMS() {
-		if (m_upnpService != null) {
-			Log.e(TAG, "Search invoke");
-			DeviceType type = new DeviceType("schemas-upnp-org", "MediaServer", 1);
-			if (m_upnpService != null) {
-				m_upnpService.getRegistry().removeAllRemoteDevices();
-				m_upnpService.getControlPoint().search(new DeviceTypeHeader(type));
-			} else {
-				Log.e(TAG, "UPnP Service is null");
-			}
-		} else {
-			Log.e(TAG, "Upnp Service = null");
-		}
-	}
-
-	@Override
-	public void searchDMR() {
-		if (m_upnpService != null) {
-			Log.e(TAG, "Search invoke");
-			DeviceType type = new DeviceType("schemas-upnp-org", "MediaRenderer", 1);
-			m_upnpService.getRegistry().removeAllRemoteDevices();
-			m_upnpService.getControlPoint().search(new DeviceTypeHeader(type));
-		} else {
-			Log.e(TAG, "Upnp Service = null");
-		}
-	}
-
-	@Override
 	public void remoteDeviceDiscoveryStarted(Registry registry, RemoteDevice device) {
 	}
 
@@ -166,7 +137,7 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener {
 
 	@Override
 	public void remoteDeviceAdded(Registry registry, RemoteDevice device) {
-		fireRemoteDeviceAddedEvent(device);
+		fireDeviceAddedEvent(device);
 	}
 
 	@Override
@@ -175,17 +146,19 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener {
 
 	@Override
 	public void remoteDeviceRemoved(Registry registry, RemoteDevice device) {
-		fireRemoteDeviceRemovedEvent(device);
+		fireDeviceRemovedEvent(device);
 	}
 
 	@Override
 	public void localDeviceAdded(Registry registry, LocalDevice device) {
-
+		Log.e(TAG, "Local Device Add:" + device.toString());
+		fireDeviceAddedEvent(device);
 	}
 
 	@Override
 	public void localDeviceRemoved(Registry registry, LocalDevice device) {
-
+		Log.e(TAG, "Local Device Removed:" + device.toString());
+		fireDeviceRemovedEvent(device);
 	}
 
 	@Override
@@ -196,18 +169,20 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener {
 	public void afterShutdown() {
 	}
 
-	private void fireRemoteDeviceAddedEvent(RemoteDevice remoteDevice) {
+	@SuppressWarnings("rawtypes")
+	private void fireDeviceAddedEvent(Device device) {
 		synchronized (m_listeners) {
 			for (UpnpProcessorListener listener : m_listeners) {
-				listener.onRemoteDeviceAdded(remoteDevice);
+				listener.onDeviceAdded(device);
 			}
 		}
 	}
 
-	private void fireRemoteDeviceRemovedEvent(RemoteDevice remoteDevice) {
+	@SuppressWarnings("rawtypes")
+	private void fireDeviceRemovedEvent(Device device) {
 		synchronized (m_listeners) {
 			for (UpnpProcessorListener listener : m_listeners) {
-				listener.onRemoteDeviceRemoved(remoteDevice);
+				listener.onDeviceRemoved(device);
 			}
 		}
 	}
@@ -252,13 +227,15 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener {
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
-	public RemoteDevice getCurrentDMS() {
+	public Device getCurrentDMS() {
 		return m_upnpService != null ? m_upnpService.getCurrentDMS() : null;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
-	public RemoteDevice getCurrentDMR() {
+	public Device getCurrentDMR() {
 		return m_upnpService != null ? m_upnpService.getCurrentDMR() : null;
 	}
 

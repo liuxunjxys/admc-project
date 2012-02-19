@@ -33,7 +33,8 @@ public class Utility {
 
 	public static String createLink(File file) {
 		try {
-			return new URI("http", HTTPServerData.HOST + ":" + HTTPServerData.PORT, file.getAbsolutePath(), null, null).toString();
+			return new URI("http", HTTPServerData.HOST + ":" + HTTPServerData.PORT, file.getAbsolutePath(), null, null)
+					.toString();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 			return null;
