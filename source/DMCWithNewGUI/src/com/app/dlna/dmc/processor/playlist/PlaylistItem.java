@@ -9,7 +9,7 @@ public class PlaylistItem {
 	protected String m_title;
 	protected Type m_type;
 
-	public String getUrl() {
+	public String getUri() {
 		return m_url;
 	}
 
@@ -38,7 +38,7 @@ public class PlaylistItem {
 		if (!(o instanceof PlaylistItem))
 			return false;
 		PlaylistItem other = (PlaylistItem) o;
-		if (other.getUrl().equals(this.m_url) && other.getType().equals(this.m_type) && other.getTitle().equals(this.m_title))
+		if (other.getUri().equals(this.m_url) && other.getType().equals(this.m_type) && other.getTitle().equals(this.m_title))
 			return true;
 		return false;
 	}

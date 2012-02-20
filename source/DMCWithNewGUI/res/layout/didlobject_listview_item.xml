@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="96dip" >
+    android:layout_height="48dip" >
 
     <ImageView
         android:id="@+id/itemIcon"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:adjustViewBounds="true"
         android:contentDescription="@string/app_name"
         android:scaleType="centerInside" />
@@ -18,7 +18,7 @@
         android:layout_centerVertical="true"
         android:layout_toRightOf="@id/itemIcon"
         android:singleLine="true"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:textStyle="bold" />
 
 </RelativeLayout>

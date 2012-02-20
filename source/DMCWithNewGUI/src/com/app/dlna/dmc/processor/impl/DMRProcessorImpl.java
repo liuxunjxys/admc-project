@@ -32,10 +32,9 @@ import android.util.Log;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 
 public class DMRProcessorImpl implements DMRProcessor {
-
-	private static final int SEEK_DELAY_INTERVAL = 1000;
-	private static final int UPDATE_INTERVAL = 500;
+	private static final int UPDATE_INTERVAL = 1000;
 	private static final String TAG = DMRProcessorImpl.class.getName();
+	protected static final long SEEK_DELAY_INTERVAL = 1000;
 	@SuppressWarnings("rawtypes")
 	private Device m_device;
 	private ControlPoint m_controlPoint;
@@ -45,8 +44,14 @@ public class DMRProcessorImpl implements DMRProcessor {
 	private Service m_renderingControl = null;
 	private List<DMRProcessorListner> m_listeners;
 	private boolean m_isRunning = true;
-	private boolean m_canUpdatePosition = true;
 	private int m_currentVolume;
+	private boolean m_isBusy = false;
+	private int m_state = -1;
+	private static final int PLAYING = 0;
+	private static final int PAUSE = 1;
+	private static final int STOP = 2;
+	private boolean check1 = false;
+
 	private Thread m_updateThread = new Thread(new Runnable() {
 
 		@Override
@@ -55,20 +60,39 @@ public class DMRProcessorImpl implements DMRProcessor {
 			while (m_isRunning) {
 				if (m_avtransportService == null)
 					return;
-				m_controlPoint.execute(new GetPositionInfo(m_avtransportService) {
+				if (!check1) {
+					check1 = true;
+					m_controlPoint.execute(new GetPositionInfo(m_avtransportService) {
 
-					@SuppressWarnings("rawtypes")
-					@Override
-					public void failure(ActionInvocation invocation, UpnpResponse response, String defaultMsg) {
-						fireOnFailEvent(invocation.getAction(), response, defaultMsg);
-					}
+						@SuppressWarnings("rawtypes")
+						@Override
+						public void failure(ActionInvocation invocation, UpnpResponse response, String defaultMsg) {
+							fireOnFailEvent(invocation.getAction(), response, defaultMsg);
+							check1 = false;
+						}
 
-					@SuppressWarnings("rawtypes")
-					@Override
-					public void received(ActionInvocation invocation, PositionInfo positionInfo) {
-						fireUpdatePositionEvent(positionInfo.getTrackElapsedSeconds(), positionInfo.getTrackDurationSeconds());
-					}
-				});
+						@SuppressWarnings("rawtypes")
+						@Override
+						public void received(ActionInvocation invocation, PositionInfo positionInfo) {
+							check1 = false;
+							Log.e(TAG, positionInfo.toString());
+							fireUpdatePositionEvent(positionInfo.getTrackElapsedSeconds(), positionInfo.getTrackDurationSeconds());
+
+							if ((positionInfo.getTrack().getValue() == 0 && m_state == PLAYING)) {
+								try {
+									m_state = STOP;
+									Thread.sleep(2000);
+								} catch (InterruptedException e) {
+									e.printStackTrace();
+								}
+								fireOnEndTrackEvent();
+							}
+							Log.i(TAG, positionInfo.getRelTime());
+
+						}
+					});
+
+				}
 
 				m_controlPoint.execute(new GetTransportInfo(m_avtransportService) {
 					@SuppressWarnings("rawtypes")
@@ -125,11 +149,6 @@ public class DMRProcessorImpl implements DMRProcessor {
 		m_controlPoint = controlPoint;
 		m_avtransportService = m_device.findService(new ServiceType("schemas-upnp-org", "AVTransport"));
 		m_renderingControl = m_device.findService(new ServiceType("schemas-upnp-org", "RenderingControl"));
-		if (m_avtransportService == null)
-			Log.e(TAG, "service = null");
-		else
-			Log.e(TAG, "Service != null");
-
 		m_listeners = new ArrayList<DMRProcessor.DMRProcessorListner>();
 		m_updateThread.start();
 	}
@@ -137,16 +156,19 @@ public class DMRProcessorImpl implements DMRProcessor {
 	@SuppressWarnings({ "rawtypes" })
 	@Override
 	public void setURI(final String uri) {
-
+		m_isBusy = true;
 		m_controlPoint.execute(new GetMediaInfo(m_avtransportService) {
 
 			@Override
 			public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
 				fireOnFailEvent(invocation.getAction(), operation, defaultMsg);
+				m_isBusy = false;
 			}
 
 			@Override
 			public void received(ActionInvocation invocation, MediaInfo mediaInfo) {
+				if (mediaInfo != null && mediaInfo.getCurrentURIMetaData() != null)
+					Log.e(TAG, mediaInfo.getCurrentURIMetaData());
 				String current_uri = null;
 				String currentPath = null;
 				String newPath = null;
@@ -166,31 +188,8 @@ public class DMRProcessorImpl implements DMRProcessor {
 				} catch (URISyntaxException e) {
 					current_uri = null;
 				}
-				if (currentPath != null) {
-					System.out.println(currentPath);
-				} else {
-					System.out.println("null");
-				}
-				if (newPath != null) {
-					System.out.println(newPath);
-				} else {
-					System.out.println("null");
-				}
-				if (currentQuery != null) {
-					System.out.println(currentQuery);
-				} else {
-					System.out.println("null");
-				}
-				if (newQuery != null) {
-					System.out.println(newQuery);
-				} else {
-					System.out.println("null");
-				}
-				if (currentPath != null
-						&& newPath != null
-						&& currentPath.equals(newPath)
-						&& (currentQuery == newQuery || (currentQuery != null && newQuery != null && currentQuery
-								.equals(newQuery)))) {
+				if (currentPath != null && newPath != null && currentPath.equals(newPath)
+						&& (currentQuery == newQuery || (currentQuery != null && newQuery != null && currentQuery.equals(newQuery)))) {
 					play();
 				} else {
 					stop();
@@ -199,33 +198,108 @@ public class DMRProcessorImpl implements DMRProcessor {
 						@Override
 						public void success(ActionInvocation invocation) {
 							super.success(invocation);
-							play();
+							m_isBusy = false;
 						}
 
 						@Override
 						public void failure(ActionInvocation invocation, UpnpResponse response, String defaultMsg) {
 							fireOnFailEvent(invocation.getAction(), response, defaultMsg);
+							m_isBusy = false;
 						}
 					});
 				}
 			}
 		});
+	}
 
+	@SuppressWarnings({ "rawtypes" })
+	@Override
+	public void setURIandPlay(final String uri) {
+		m_isBusy = true;
+		m_controlPoint.execute(new GetMediaInfo(m_avtransportService) {
+
+			@Override
+			public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
+				fireOnFailEvent(invocation.getAction(), operation, defaultMsg);
+				m_isBusy = false;
+			}
+
+			@Override
+			public void received(ActionInvocation invocation, MediaInfo mediaInfo) {
+				if (mediaInfo != null && mediaInfo.getCurrentURIMetaData() != null)
+					Log.e(TAG, mediaInfo.getCurrentURIMetaData());
+				String current_uri = null;
+				String currentPath = null;
+				String newPath = null;
+				String currentQuery = null;
+				String newQuery = null;
+
+				try {
+					current_uri = mediaInfo.getCurrentURI();
+					if (current_uri != null) {
+						URI _uri = new URI(current_uri);
+						currentPath = _uri.getPath();
+						currentQuery = _uri.getQuery();
+					}
+					URI _uri = new URI(uri);
+					newPath = _uri.getPath();
+					newQuery = _uri.getQuery();
+				} catch (URISyntaxException e) {
+					current_uri = null;
+				}
+				if (currentPath != null && newPath != null && currentPath.equals(newPath)
+						&& (currentQuery == newQuery || (currentQuery != null && newQuery != null && currentQuery.equals(newQuery)))) {
+					play();
+				} else {
+					Log.e(TAG, "set AV uri = " + uri);
+					m_controlPoint.execute(new SetAVTransportURI(m_avtransportService, uri, null) {
+						@Override
+						public void success(ActionInvocation invocation) {
+							super.success(invocation);
+							m_controlPoint.execute(new Play(m_avtransportService) {
+
+								@Override
+								public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
+									Log.e(TAG, "Call fail");
+									fireOnFailEvent(invocation.getAction(), operation, defaultMsg);
+									m_isBusy = false;
+								}
+
+								public void success(ActionInvocation invocation) {
+									m_isBusy = false;
+									m_state = PLAYING;
+								};
+							});
+						}
+
+						@Override
+						public void failure(ActionInvocation invocation, UpnpResponse response, String defaultMsg) {
+							fireOnFailEvent(invocation.getAction(), response, defaultMsg);
+							m_isBusy = false;
+						}
+					});
+				}
+			}
+		});
 	}
 
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void play() {
+		m_isBusy = true;
 		Play play = new Play(m_avtransportService) {
 
 			@Override
 			public void success(ActionInvocation invocation) {
 				super.success(invocation);
+				m_isBusy = false;
+				m_state = PLAYING;
 			}
 
 			@Override
 			public void failure(ActionInvocation invocation, UpnpResponse response, String defaultMsg) {
 				fireOnFailEvent(invocation.getAction(), response, defaultMsg);
+				m_isBusy = false;
 			}
 
 		};
@@ -236,16 +310,20 @@ public class DMRProcessorImpl implements DMRProcessor {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void pause() {
+		m_isBusy = true;
 		Pause pause = new Pause(m_avtransportService) {
 
 			@Override
 			public void success(ActionInvocation invocation) {
 				super.success(invocation);
+				m_isBusy = false;
+				m_state = PAUSE;
 			}
 
 			@Override
 			public void failure(ActionInvocation invocation, UpnpResponse response, String defaultMsg) {
 				fireOnFailEvent(invocation.getAction(), response, defaultMsg);
+				m_isBusy = false;
 			}
 
 		};
@@ -255,16 +333,20 @@ public class DMRProcessorImpl implements DMRProcessor {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void stop() {
+		m_isBusy = true;
 		Stop stop = new Stop(m_avtransportService) {
 			@Override
 			public void success(ActionInvocation invocation) {
 				super.success(invocation);
 				fireUpdatePositionEvent(0, 0);
+				m_isBusy = false;
+				m_state = STOP;
 			}
 
 			@Override
 			public void failure(ActionInvocation invocation, UpnpResponse response, String defaultMsg) {
 				fireOnFailEvent(invocation.getAction(), response, defaultMsg);
+				m_isBusy = false;
 			}
 		};
 
@@ -276,6 +358,8 @@ public class DMRProcessorImpl implements DMRProcessor {
 		synchronized (m_listeners) {
 			if (!m_listeners.contains(listener))
 				m_listeners.add(listener);
+			if (m_avtransportService == null || m_renderingControl == null)
+				fireOnErrorEvent("Cannot get service on this device");
 		}
 	}
 
@@ -296,16 +380,18 @@ public class DMRProcessorImpl implements DMRProcessor {
 	}
 
 	private void fireUpdatePositionEvent(long current, long max) {
-		if (m_canUpdatePosition) {
-			synchronized (m_listeners) {
-				for (DMRProcessorListner listener : m_listeners) {
-					listener.onUpdatePosition(current, max);
-				}
+		if (m_isBusy)
+			return;
+		synchronized (m_listeners) {
+			for (DMRProcessorListner listener : m_listeners) {
+				listener.onUpdatePosition(current, max);
 			}
 		}
 	}
 
 	private void fireOnStopedEvent() {
+		if (m_isBusy)
+			return;
 		synchronized (m_listeners) {
 			for (DMRProcessorListner listener : m_listeners) {
 				listener.onStoped();
@@ -314,6 +400,8 @@ public class DMRProcessorImpl implements DMRProcessor {
 	}
 
 	private void fireOnPausedEvent() {
+		if (m_isBusy)
+			return;
 		synchronized (m_listeners) {
 			for (DMRProcessorListner listener : m_listeners) {
 				listener.onPaused();
@@ -322,6 +410,8 @@ public class DMRProcessorImpl implements DMRProcessor {
 	}
 
 	private void fireOnPlayingEvent() {
+		if (m_isBusy)
+			return;
 		synchronized (m_listeners) {
 			for (DMRProcessorListner listener : m_listeners) {
 				listener.onPlaying();
@@ -329,45 +419,74 @@ public class DMRProcessorImpl implements DMRProcessor {
 		}
 	}
 
+	private void fireOnEndTrackEvent() {
+		if (m_isBusy)
+			return;
+		synchronized (m_listeners) {
+			for (DMRProcessorListner listener : m_listeners) {
+				listener.onEndTrack();
+			}
+		}
+	}
+
+	private void fireOnErrorEvent(String error) {
+		synchronized (m_listeners) {
+			for (DMRProcessorListner listener : m_listeners) {
+				listener.onErrorEvent(error);
+			}
+		}
+	}
+
 	@Override
 	public void dispose() {
 		m_isRunning = false;
+		synchronized (m_listeners) {
+			m_listeners.clear();
+		}
 	}
 
 	public void seek(String position) {
+		m_isBusy = true;
 		Log.e(TAG, "Call seek");
-		m_canUpdatePosition = false;
 		@SuppressWarnings("rawtypes")
 		Seek seek = new Seek(m_avtransportService, SeekMode.REL_TIME, position) {
 			@Override
 			public void success(ActionInvocation invocation) {
 				super.success(invocation);
+				m_isBusy = false;
 				Log.e(TAG, "Call seek complete");
 				try {
 					Thread.sleep(SEEK_DELAY_INTERVAL);
-					m_canUpdatePosition = true;
+					m_isBusy = false;
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-
 			}
 
 			@Override
 			public void failure(ActionInvocation invocation, UpnpResponse reponse, String defaultMsg) {
 				Log.e(TAG, "Seek fail: " + defaultMsg);
+				m_isBusy = false;
 			}
 		};
 		m_controlPoint.execute(seek);
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void setVolume(int newVolume) {
+		m_isBusy = true;
 		m_controlPoint.execute(new SetVolume(m_renderingControl, newVolume) {
+			@Override
+			public void success(ActionInvocation invocation) {
+				super.success(invocation);
+				m_isBusy = false;
+			}
 
-			@SuppressWarnings("rawtypes")
 			@Override
 			public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
 				fireOnFailEvent(invocation.getAction(), operation, defaultMsg);
+				m_isBusy = false;
 			}
 		});
 	}

@@ -23,6 +23,7 @@ import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerActivity;
 import com.app.dlna.dmc.processor.impl.UpnpProcessorImpl;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor.DMRProcessorListner;
+import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.interfaces.UpnpProcessor;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 
@@ -33,6 +34,7 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 	private ListView m_listView;
 	private PlaylistItemArrayAdapter m_adapter;
 	private DMRProcessor m_dmrProcessor;
+	private PlaylistProcessor m_playlistProcessor;
 	private static final int STATE_PAUSE = 1;
 	private static final int STATE_PLAYING = 2;
 	private static final int STATE_STOP = 3;
@@ -77,13 +79,12 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 	protected void onResume() {
 		Log.i(TAG, "Playlist onResume");
 		super.onResume();
-		if (m_upnpProcessor != null && m_upnpProcessor.getPlaylistProcessor() != null) {
-			refreshPlaylist();
+		if (m_upnpProcessor != null && m_upnpProcessor.getPlaylistProcessor() != null && m_upnpProcessor.getDMRProcessor() != null) {
 			m_dmrProcessor = m_upnpProcessor.getDMRProcessor();
-			if (m_dmrProcessor != null) {
-				m_dmrProcessor.addListener(PlaylistActivity.this);
-				m_tv_rendererName.setText(m_dmrProcessor.getName());
-			}
+			m_playlistProcessor = m_upnpProcessor.getPlaylistProcessor();
+			m_dmrProcessor.addListener(PlaylistActivity.this);
+			m_tv_rendererName.setText(m_dmrProcessor.getName());
+			refreshPlaylist();
 		}
 	}
 
@@ -128,8 +129,7 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 
 		@Override
 		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-			m_tv_progressTime.setText(getTimeString(m_sb_playingProgress.getProgress()) + " / "
-					+ getTimeString(m_sb_playingProgress.getMax()));
+			m_tv_progressTime.setText(getTimeString(m_sb_playingProgress.getProgress()) + " / " + getTimeString(m_sb_playingProgress.getMax()));
 		}
 	};
 
@@ -151,10 +151,55 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 		m_dmrProcessor.stop();
 	}
 
+	public void onChangeClick(View view) {
+		showDMRList();
+	}
+
+	private void showDMRList() {
+
+	}
+
 	public void onNextClick(View view) {
+		doNext();
+	}
+
+	private void doNext() {
+		if (m_playlistProcessor != null && m_dmrProcessor != null) {
+			m_playlistProcessor.next();
+			final PlaylistItem item = m_playlistProcessor.getCurrentItem();
+			if (item != null) {
+				m_adapter.setCurrentItem(item);
+				validateListView(item);
+				m_dmrProcessor.setURIandPlay(item.getUri());
+			}
+		}
 	}
 
 	public void onPreviousClick(View view) {
+		doPrevious();
+	}
+
+	private void doPrevious() {
+		if (m_playlistProcessor != null && m_dmrProcessor != null) {
+			m_playlistProcessor.previous();
+			final PlaylistItem item = m_playlistProcessor.getCurrentItem();
+			if (item != null) {
+				m_adapter.setCurrentItem(item);
+				validateListView(item);
+				m_dmrProcessor.setURIandPlay(item.getUri());
+			}
+		}
+	}
+
+	private void validateListView(final PlaylistItem item) {
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				m_adapter.notifyDataSetChanged();
+				m_listView.smoothScrollToPosition(m_adapter.getPosition(item));
+			}
+		});
 	}
 
 	public void onSoundClick(View view) {
@@ -177,8 +222,7 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 				if (!m_isFailed) {
 					m_isFailed = true;
 					try {
-						new AlertDialog.Builder(PlaylistActivity.this).setTitle("Error")
-								.setMessage("Remote Device Error: " + cause)
+						new AlertDialog.Builder(PlaylistActivity.this).setTitle("Error").setMessage("Remote Device Error: " + cause)
 								.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 
 									@Override
@@ -194,6 +238,34 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 			}
 		});
 
+	}
+
+	@Override
+	public void onErrorEvent(final String error) {
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				m_dmrProcessor.dispose();
+				m_upnpProcessor.setCurrentDMR(new UDN("null"));
+				if (!m_isFailed) {
+					m_isFailed = true;
+					try {
+						new AlertDialog.Builder(PlaylistActivity.this).setTitle("Error").setMessage("Remote Device Error: " + error)
+								.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+										PlaylistActivity.this.finish();
+									}
+								}).setCancelable(false).show();
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+				}
+
+			}
+		});
 	}
 
 	@Override
@@ -266,6 +338,18 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 
 	}
 
+	@Override
+	public void onEndTrack() {
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				Toast.makeText(getApplicationContext(), "Next", Toast.LENGTH_SHORT);
+			}
+		});
+		doNext();
+	}
+
 	private OnSeekBarChangeListener volumeSeekListener = new OnSeekBarChangeListener() {
 
 		@Override
@@ -292,21 +376,25 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 		@Override
 		public void onItemClick(AdapterView<?> adaper, View view, int position, long arg3) {
 			PlaylistItem item = m_adapter.getItem(position);
-			String url = item.getUrl();
-			DMRProcessor dmrProcessor = m_upnpProcessor.getDMRProcessor();
-			if (dmrProcessor == null) {
+			String url = item.getUri();
+			if (m_dmrProcessor == null) {
 				Toast.makeText(PlaylistActivity.this, "Cannot get DMRProcessor", Toast.LENGTH_SHORT).show();
 			} else {
-				dmrProcessor.setURI(url);
+				m_dmrProcessor.setURIandPlay(url);
+				m_playlistProcessor.setCurrentItem(item);
+				m_adapter.setCurrentItem(item);
+				validateListView(item);
 			}
 		}
 	};
 
 	private void refreshPlaylist() {
 		synchronized (m_adapter) {
-			m_adapter.clear();
-			for (PlaylistItem item : m_upnpProcessor.getPlaylistProcessor().getAllItems()) {
-				m_adapter.add(item);
+			if (m_playlistProcessor != null) {
+				m_adapter.clear();
+				for (PlaylistItem item : m_playlistProcessor.getAllItems()) {
+					m_adapter.add(item);
+				}
 			}
 		}
 	}

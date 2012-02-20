@@ -35,12 +35,10 @@ public class LocalContentDirectoryService extends AbstractContentDirectoryServic
 	private static List<String> m_videoMap = null;
 	private static List<String> m_photoMap = null;
 
-	public LocalContentDirectoryService() {
-
+	public static void scanMedia() {
 		m_listMusic = new ArrayList<MusicTrack>();
 		m_listVideo = new ArrayList<VideoItem>();
 		m_listPhoto = new ArrayList<ImageItem>();
-
 		m_musicMap = new ArrayList<String>();
 		m_videoMap = new ArrayList<String>();
 		m_photoMap = new ArrayList<String>();
@@ -63,9 +61,7 @@ public class LocalContentDirectoryService extends AbstractContentDirectoryServic
 		m_photoMap.add(".png");
 		m_photoMap.add(".bmp");
 		m_photoMap.add(".gif");
-	}
-
-	public static void scanMedia() {
+		Log.e(TAG, "Start media scanning");
 		new Thread(new Runnable() {
 
 			@Override
@@ -96,36 +92,32 @@ public class LocalContentDirectoryService extends AbstractContentDirectoryServic
 			File file = new File(path);
 			for (File subFile : file.listFiles()) {
 				if (subFile.isDirectory()) {
+					Log.i(TAG, "DIR = " + subFile.getAbsolutePath());
 					scanFile(subFile.getAbsolutePath());
 				} else if (subFile.length() >= 51200) {
-					Log.i(TAG, subFile.getAbsolutePath());
+					Log.i(TAG, "FILE = " + subFile.getAbsolutePath());
 					String fileName = subFile.getName();
 					String mimeType = URLConnection.getFileNameMap().getContentTypeFor(subFile.getName());
 					int dotPos = subFile.getName().lastIndexOf(".");
 					String fileExtension = dotPos != -1 ? fileName.substring(dotPos) : null;
 					if (mimeType != null) {
-						Res res = new Res(new MimeType(mimeType.split("/")[0], mimeType.split("/")[1]), subFile.length(),
-								Utility.createLink(subFile));
+						Res res = new Res(new MimeType(mimeType.split("/")[0], mimeType.split("/")[1]), subFile.length(), Utility.createLink(subFile));
 						if (fileExtension != null) {
 							if (m_musicMap.contains(fileExtension)) {
-								MusicTrack musicTrack = new MusicTrack("0/1/" + subFile.getName(), "0/1", subFile.getName(),
-										"local dms", "", "", res);
+								MusicTrack musicTrack = new MusicTrack("0/1/" + subFile.getName(), "0/1", subFile.getName(), "local dms", "", "", res);
 								m_listMusic.add(musicTrack);
 							}
 
 							if (m_videoMap.contains(fileExtension)) {
-								VideoItem videoItem = new VideoItem("0/2/" + subFile.getName(), "0/2", subFile.getName(),
-										"local dms", res);
+								VideoItem videoItem = new VideoItem("0/2/" + subFile.getName(), "0/2", subFile.getName(), "local dms", res);
 								m_listVideo.add(new VideoItem(videoItem));
 							}
 							if (m_photoMap.contains(fileExtension)) {
-								ImageItem imageItem = new ImageItem("0/3/" + subFile.getName(), "0/3", subFile.getName(),
-										"local dms", res);
+								ImageItem imageItem = new ImageItem("0/3/" + subFile.getName(), "0/3", subFile.getName(), "local dms", res);
 								m_listPhoto.add(new ImageItem(imageItem));
 							}
 						}
 					}
-
 				}
 			}
 		} catch (Exception ex) {
@@ -134,8 +126,8 @@ public class LocalContentDirectoryService extends AbstractContentDirectoryServic
 	}
 
 	@Override
-	public BrowseResult browse(String objectID, BrowseFlag browseFlag, String filter, long firstResult, long maxResults,
-			SortCriterion[] orderby) throws ContentDirectoryException {
+	public BrowseResult browse(String objectID, BrowseFlag browseFlag, String filter, long firstResult, long maxResults, SortCriterion[] orderby)
+			throws ContentDirectoryException {
 		Log.d(TAG, "Browse " + objectID);
 		BrowseResult br = null;
 		int count = 0;

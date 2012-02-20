@@ -29,12 +29,22 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 
 	@Override
 	public void next() {
+		if (m_playlistItems.size() == 0)
+			return;
 		m_currentItemIdx = (m_currentItemIdx + 1) % m_playlistItems.size();
+		if (m_currentItemIdx >= m_playlistItems.size()) {
+			m_currentItemIdx = 0;
+		}
 	}
 
 	@Override
 	public void previous() {
+		if (m_playlistItems.size() == 0)
+			return;
 		m_currentItemIdx = (m_currentItemIdx - 1) % m_playlistItems.size();
+		if (m_currentItemIdx < 0) {
+			m_currentItemIdx = m_playlistItems.size() - 1;
+		}
 	}
 
 	@Override
