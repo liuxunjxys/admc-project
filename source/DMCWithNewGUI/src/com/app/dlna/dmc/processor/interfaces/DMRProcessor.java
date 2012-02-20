@@ -6,6 +6,8 @@ import org.teleal.cling.model.meta.Action;
 public interface DMRProcessor {
 	void setURI(String uri);
 
+	void setURIandPlay(String uri);
+
 	void play();
 
 	void pause();
@@ -23,7 +25,7 @@ public interface DMRProcessor {
 	void removeListener(DMRProcessorListner listener);
 
 	void dispose();
-	
+
 	String getName();
 
 	public interface DMRProcessorListner {
@@ -34,6 +36,10 @@ public interface DMRProcessor {
 		void onStoped();
 
 		void onPlaying();
+
+		void onEndTrack();
+
+		void onErrorEvent(String error);
 
 		@SuppressWarnings("rawtypes")
 		void onActionFail(Action actionCallback, UpnpResponse response, final String cause);

@@ -1,6 +1,7 @@
 package com.app.dlna.dmc.gui.playlist;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,10 +16,15 @@ import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 public class PlaylistItemArrayAdapter extends ArrayAdapter<PlaylistItem> {
 	private static final String TAG = PlaylistItemArrayAdapter.class.getName();
 	private LayoutInflater m_inflater = null;
+	private PlaylistItem m_currentItem;
 
 	public PlaylistItemArrayAdapter(Context context, int textViewResourceId) {
 		super(context, textViewResourceId);
 		m_inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	}
+
+	public void setCurrentItem(PlaylistItem item) {
+		m_currentItem = item;
 	}
 
 	@Override
@@ -46,6 +52,11 @@ public class PlaylistItemArrayAdapter extends ArrayAdapter<PlaylistItem> {
 			break;
 		default:
 			break;
+		}
+		if (m_currentItem != null && m_currentItem.equals(object)) {
+			convertView.setBackgroundColor(Color.GREEN);
+		} else {
+			convertView.setBackgroundColor(Color.BLACK);
 		}
 
 		return convertView;
