@@ -75,10 +75,8 @@ public class DMRProcessorImpl implements DMRProcessor {
 						@Override
 						public void received(ActionInvocation invocation, PositionInfo positionInfo) {
 							check1 = false;
-							Log.e(TAG, positionInfo.toString());
 							fireUpdatePositionEvent(positionInfo.getTrackElapsedSeconds(), positionInfo.getTrackDurationSeconds());
-
-							if ((positionInfo.getTrack().getValue() == 0 && m_state == PLAYING)) {
+							if ((positionInfo.getTrack().getValue() == 0 || positionInfo.getElapsedPercent() == 100) && m_state == PLAYING) {
 								try {
 									m_state = STOP;
 									Thread.sleep(2000);
@@ -87,8 +85,6 @@ public class DMRProcessorImpl implements DMRProcessor {
 								}
 								fireOnEndTrackEvent();
 							}
-							Log.i(TAG, positionInfo.getRelTime());
-
 						}
 					});
 

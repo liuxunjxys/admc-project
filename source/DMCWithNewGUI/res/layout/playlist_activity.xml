@@ -16,7 +16,7 @@
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="0.35"
-        android:background="#44330033" >
+        android:background="#aaaaff" >
 
         <RelativeLayout
             android:id="@+id/linearLayout1"
@@ -86,6 +86,7 @@
             android:layout_alignParentRight="true"
             android:layout_margin="5dp"
             android:gravity="center"
+            android:textColor="@android:color/black"
             android:textSize="15sp" />
 
         <LinearLayout
@@ -104,14 +105,15 @@
                 android:layout_weight="0.7"
                 android:gravity="center"
                 android:maxLines="1"
+                android:textColor="@android:color/black"
                 android:textSize="20sp" />
 
             <Button
                 android:layout_width="0dp"
                 android:layout_height="fill_parent"
                 android:layout_weight="0.3"
-                android:text="@string/change_dmr" 
-                android:onClick="onChangeClick"/>
+                android:onClick="onChangeClick"
+                android:text="@string/change_dmr" />
         </LinearLayout>
 
         <TextView

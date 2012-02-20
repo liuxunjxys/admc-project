@@ -74,12 +74,12 @@ public class MainActivity extends UpnpListenerTabActivity {
 			Log.d(TAG, "Select tab = " + tabId);
 			if (tabId.equals("Library") && m_processor.getCurrentDMS() == null) {
 				Toast.makeText(MainActivity.this, "Please select a MediaServer to browse", Toast.LENGTH_SHORT).show();
-				m_tabHost.setCurrentTab(3);
+				m_tabHost.setCurrentTab(2);
 				return;
 			}
 			if (tabId.equals("NowPlaying") && m_processor.getCurrentDMR() == null) {
 				Toast.makeText(MainActivity.this, "Please select a MediaRenderer to control", Toast.LENGTH_SHORT).show();
-				m_tabHost.setCurrentTab(3);
+				m_tabHost.setCurrentTab(2);
 				return;
 			}
 

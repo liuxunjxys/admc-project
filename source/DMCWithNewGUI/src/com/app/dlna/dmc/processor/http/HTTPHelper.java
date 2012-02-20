@@ -164,6 +164,7 @@ public class HTTPHelper {
 			byte[] buffer = new byte[65536];
 			int read = -1;
 			while ((read = dis.read(buffer)) > 0 && HTTPServerData.RUNNING) {
+				Log.v(TAG, "read from yt: " + read + " bytes");
 				dos.write(buffer, 0, read);
 			}
 			dis.close();

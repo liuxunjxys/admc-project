@@ -205,7 +205,7 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 			Toast.makeText(LibraryActivity.this, "You are in the root of this MediaServer. Press Back again to chose other MediaServer", Toast.LENGTH_SHORT)
 					.show();
 			final TabHost tabHost = ((TabActivity) getParent()).getTabHost();
-			tabHost.setCurrentTab(3);
+			tabHost.setCurrentTab(2);
 		}
 	}
 
