@@ -10,11 +10,13 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 	private List<PlaylistItem> m_playlistItems;
 	private int m_currentItemIdx;
 	private int m_maxSize = 100;
+	private List<String> m_listURI;
 
 	public PlaylistProcessorImpl(int maxSize) {
 		m_playlistItems = new ArrayList<PlaylistItem>();
 		m_currentItemIdx = -1;
 		m_maxSize = maxSize;
+		m_listURI = new ArrayList<String>();
 	}
 
 	@Override
@@ -81,6 +83,7 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 			if (m_playlistItems.contains(item) || m_playlistItems.size() >= m_maxSize)
 				return false;
 			m_playlistItems.add(item);
+			m_listURI.add(item.getUri());
 			if (m_playlistItems.size() == 1) {
 				m_currentItemIdx = 0;
 			}
@@ -93,6 +96,7 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 		synchronized (m_playlistItems) {
 			if (m_playlistItems.contains(item)) {
 				m_playlistItems.remove(item);
+				m_listURI.remove(item.getUri());
 				return true;
 			}
 			return false;
@@ -102,6 +106,11 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 	@Override
 	public List<PlaylistItem> getAllItems() {
 		return m_playlistItems;
+	}
+
+	@Override
+	public boolean containsUrl(String url) {
+		return m_listURI.contains(url);
 	}
 
 }

@@ -45,7 +45,6 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 	private TextView m_tv_progressTime;
 	private boolean m_isSeeking = false;
 	private SeekBar m_sb_volume;
-	private TextView m_tv_soundValue;
 	protected boolean m_isFailed = false;
 	private TextView m_tv_rendererName;
 
@@ -66,8 +65,6 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 		m_sb_playingProgress = (SeekBar) findViewById(R.id.playingProgress);
 		m_tv_progressTime = (TextView) findViewById(R.id.progressTime);
 		m_sb_volume = (SeekBar) findViewById(R.id.volumeControl);
-		m_tv_soundValue = (TextView) findViewById(R.id.soundValue);
-		m_tv_soundValue.setVisibility(View.GONE);
 
 		m_tv_rendererName = (TextView) findViewById(R.id.rendererName);
 
@@ -79,11 +76,17 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 	protected void onResume() {
 		Log.i(TAG, "Playlist onResume");
 		super.onResume();
-		if (m_upnpProcessor != null && m_upnpProcessor.getPlaylistProcessor() != null && m_upnpProcessor.getDMRProcessor() != null) {
-			m_dmrProcessor = m_upnpProcessor.getDMRProcessor();
-			m_playlistProcessor = m_upnpProcessor.getPlaylistProcessor();
-			m_dmrProcessor.addListener(PlaylistActivity.this);
-			m_tv_rendererName.setText(m_dmrProcessor.getName());
+		if (m_upnpProcessor != null) {
+			if (m_upnpProcessor.getPlaylistProcessor() != null) {
+				m_playlistProcessor = m_upnpProcessor.getPlaylistProcessor();
+			}
+
+			if (m_upnpProcessor.getDMRProcessor() != null) {
+				m_dmrProcessor = m_upnpProcessor.getDMRProcessor();
+				m_dmrProcessor.addListener(PlaylistActivity.this);
+				m_tv_rendererName.setText(m_dmrProcessor.getName());
+			}
+
 			refreshPlaylist();
 		}
 	}
@@ -108,7 +111,19 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 	@Override
 	public void onStartComplete() {
 		super.onStartComplete();
-		refreshPlaylist();
+		if (m_upnpProcessor != null) {
+			if (m_upnpProcessor.getPlaylistProcessor() != null) {
+				m_playlistProcessor = m_upnpProcessor.getPlaylistProcessor();
+			}
+
+			if (m_upnpProcessor.getDMRProcessor() != null) {
+				m_dmrProcessor = m_upnpProcessor.getDMRProcessor();
+				m_dmrProcessor.addListener(PlaylistActivity.this);
+				m_tv_rendererName.setText(m_dmrProcessor.getName());
+			}
+
+			refreshPlaylist();
+		}
 		m_listView.setOnItemClickListener(onPlaylistItemClick);
 	}
 
@@ -354,20 +369,17 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 
 		@Override
 		public void onStopTrackingTouch(SeekBar seekBar) {
-			m_tv_soundValue.setVisibility(View.GONE);
 			m_dmrProcessor.setVolume(seekBar.getProgress());
 			Log.e(TAG, "Stop tracking");
 		}
 
 		@Override
 		public void onStartTrackingTouch(SeekBar seekBar) {
-			m_tv_soundValue.setVisibility(View.VISIBLE);
 			Log.e(TAG, "Start tracking");
 		}
 
 		@Override
 		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-			m_tv_soundValue.setText(String.valueOf(seekBar.getProgress()));
 		}
 	};
 

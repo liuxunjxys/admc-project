@@ -15,10 +15,13 @@ import android.app.ProgressDialog;
 import android.app.TabActivity;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.Toast;
@@ -43,6 +46,7 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 	private List<String> m_traceID;
 	private String m_currentDMSUDN;
 	private PlaylistProcessor m_playlistProcessor;
+	private EditText filterText;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +62,25 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 		m_upnpProcessor.bindUpnpService();
 		m_traceID = new ArrayList<String>();
 		m_traceID.add("-1");
+
+		filterText = (EditText) findViewById(R.id.search_box);
+		filterText.addTextChangedListener(filterTextWatcher);
+
 	}
+
+	private TextWatcher filterTextWatcher = new TextWatcher() {
+
+		public void afterTextChanged(Editable s) {
+		}
+
+		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+		}
+
+		public void onTextChanged(CharSequence s, int start, int before, int count) {
+			// m_adapter.getFilter().filter(s);
+		}
+
+	};
 
 	@Override
 	protected void onResume() {
@@ -67,6 +89,7 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 		super.onResume();
 		if (m_upnpProcessor != null && m_upnpProcessor.getCurrentDMS() != null) {
 			m_playlistProcessor = m_upnpProcessor.getPlaylistProcessor();
+			m_adapter.setPlaylistProcessor(m_playlistProcessor);
 			browseRootContainer();
 		}
 	}
@@ -96,6 +119,8 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 	protected void onDestroy() {
 		Log.i(TAG, "Library onDestroy");
 		m_upnpProcessor.unbindUpnpService();
+		filterText.removeTextChangedListener(filterTextWatcher);
+
 		super.onDestroy();
 	}
 
@@ -138,9 +163,9 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 		} else {
 			item.setType(Type.IMAGE);
 		}
-		if (m_playlistProcessor.addItem(item))
-			Toast.makeText(LibraryActivity.this, "Add item \"" + item.getTitle() + "\" to playlist sucess", Toast.LENGTH_SHORT).show();
-		else {
+		if (m_playlistProcessor.addItem(item)) {
+			m_adapter.notifyDataSetChanged();
+		} else {
 			if (m_playlistProcessor.isFull()) {
 				Toast.makeText(LibraryActivity.this, "Current playlist is full", Toast.LENGTH_SHORT).show();
 			} else {
@@ -214,6 +239,7 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 		super.onStartComplete();
 		if (m_upnpProcessor != null && m_upnpProcessor.getCurrentDMS() != null) {
 			m_playlistProcessor = m_upnpProcessor.getPlaylistProcessor();
+			m_adapter.setPlaylistProcessor(m_playlistProcessor);
 			browseRootContainer();
 		}
 	}

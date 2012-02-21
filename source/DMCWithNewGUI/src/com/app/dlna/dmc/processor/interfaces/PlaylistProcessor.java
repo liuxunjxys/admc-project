@@ -15,6 +15,8 @@ public interface PlaylistProcessor {
 
 	boolean removeItem(PlaylistItem item);
 
+	boolean containsUrl(String url);
+
 	int getMaxSize();
 
 	boolean isFull();

@@ -22,8 +22,8 @@ public class DevicesActivity extends UpnpListenerActivity {
 
 	private ListView m_dmrList;
 	private ListView m_dmsList;
-	private DMRArrayAdapter m_dmrAdapter;
-	private DMSArrayAdapter m_dmsAdapter;
+	private DeviceArrayAdapter m_dmrAdapter;
+	private DeviceArrayAdapter m_dmsAdapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +34,8 @@ public class DevicesActivity extends UpnpListenerActivity {
 		m_dmrList = (ListView) findViewById(R.id.dmrList);
 		m_dmsList = (ListView) findViewById(R.id.dmsList);
 
-		m_dmrAdapter = new DMRArrayAdapter(DevicesActivity.this, 0);
-		m_dmsAdapter = new DMSArrayAdapter(DevicesActivity.this, 0);
+		m_dmrAdapter = new DeviceArrayAdapter(DevicesActivity.this, 0);
+		m_dmsAdapter = new DeviceArrayAdapter(DevicesActivity.this, 0);
 
 		m_dmrList.setOnItemClickListener(onDMRClick);
 		m_dmsList.setOnItemClickListener(onDMSClick);
@@ -55,7 +55,7 @@ public class DevicesActivity extends UpnpListenerActivity {
 				UDN udn = m_dmrAdapter.getItem(position).getIdentity().getUdn();
 				m_upnpProcessor.setCurrentDMR(udn);
 				synchronized (m_dmrAdapter) {
-					m_dmrAdapter.setCurrentDMRUDN(udn.getIdentifierString());
+					m_dmrAdapter.setCurrentDMSUDN(udn.getIdentifierString());
 					m_dmrAdapter.notifyDataSetChanged();
 				}
 			}
@@ -147,9 +147,9 @@ public class DevicesActivity extends UpnpListenerActivity {
 		synchronized (m_dmrAdapter) {
 			m_dmrAdapter.clear();
 			if (m_upnpProcessor.getCurrentDMR() != null) {
-				m_dmrAdapter.setCurrentDMRUDN(m_upnpProcessor.getCurrentDMR().getIdentity().getUdn().getIdentifierString());
+				m_dmrAdapter.setCurrentDMSUDN(m_upnpProcessor.getCurrentDMR().getIdentity().getUdn().getIdentifierString());
 			} else {
-				m_dmrAdapter.setCurrentDMRUDN("");
+				m_dmrAdapter.setCurrentDMSUDN("");
 			}
 		}
 
