@@ -42,21 +42,23 @@ public class PlaylistItemArrayAdapter extends ArrayAdapter<PlaylistItem> {
 		holder.name.setText(object.getTitle());
 		switch (object.getType()) {
 		case AUDIO:
-			holder.icon.setImageResource(R.drawable.file_music);
+			holder.icon.setImageResource(R.drawable.ic_didlobject_audio);
 			break;
 		case VIDEO:
-			holder.icon.setImageResource(R.drawable.file_movie);
+			holder.icon.setImageResource(R.drawable.ic_didlobject_video);
 			break;
 		case IMAGE:
-			holder.icon.setImageResource(R.drawable.file_picture);
+			holder.icon.setImageResource(R.drawable.ic_didlobject_image);
 			break;
 		default:
 			break;
 		}
 		if (m_currentItem != null && m_currentItem.equals(object)) {
-			convertView.setBackgroundColor(Color.GREEN);
+			convertView.setBackgroundColor(Color.rgb(242, 189, 15));
+			holder.name.setTextColor(Color.BLACK);
 		} else {
 			convertView.setBackgroundColor(Color.BLACK);
+			holder.name.setTextColor(Color.WHITE);
 		}
 
 		return convertView;

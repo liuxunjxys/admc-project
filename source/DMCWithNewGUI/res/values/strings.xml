@@ -30,5 +30,6 @@
     <string name="media_server">Media Server:</string>
     <string name="media_renderer">Media Renderer</string>
     <string name="change_dmr">Change</string>
+    <string name="type_to_filter">type to filter</string>
 
 </resources>

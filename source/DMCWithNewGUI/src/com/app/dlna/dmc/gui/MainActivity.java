@@ -38,32 +38,32 @@ public class MainActivity extends UpnpListenerTabActivity {
 		m_tabHost.setup();
 		Intent intent = null;
 
-		TabSpec playlistTabSpec = m_tabHost.newTabSpec("Playlist");
-		playlistTabSpec.setIndicator("Playlist", getResources().getDrawable(R.drawable.ic_tab_play_list));
-		intent = new Intent(this, PlaylistActivity.class);
-		playlistTabSpec.setContent(intent);
+		TabSpec devicesTabSpec = m_tabHost.newTabSpec("Devices");
+		devicesTabSpec.setIndicator("Devices", getResources().getDrawable(R.drawable.ic_tab_devices));
+		intent = new Intent(this, DevicesActivity.class);
+		devicesTabSpec.setContent(intent);
 
 		TabSpec libraryTabSpec = m_tabHost.newTabSpec("Library");
 		libraryTabSpec.setIndicator("Library", getResources().getDrawable(R.drawable.ic_tab_browse));
 		intent = new Intent(this, LibraryActivity.class);
 		libraryTabSpec.setContent(intent);
 
-		TabSpec devicesTabSpec = m_tabHost.newTabSpec("Devices");
-		devicesTabSpec.setIndicator("Devices", getResources().getDrawable(R.drawable.ic_tab_devices));
-		intent = new Intent(this, DevicesActivity.class);
-		devicesTabSpec.setContent(intent);
-
 		TabSpec youtubeTabSpec = m_tabHost.newTabSpec("Youtube");
 		youtubeTabSpec.setIndicator("Youtube", getResources().getDrawable(R.drawable.ic_tab_youtube));
 		intent = new Intent(this, YoutubeActivity.class);
 		youtubeTabSpec.setContent(intent);
 
-		m_tabHost.addTab(playlistTabSpec);
-		m_tabHost.addTab(libraryTabSpec);
-		m_tabHost.addTab(devicesTabSpec);
-		m_tabHost.addTab(youtubeTabSpec);
+		TabSpec playlistTabSpec = m_tabHost.newTabSpec("Playlist");
+		playlistTabSpec.setIndicator("Playlist", getResources().getDrawable(R.drawable.ic_tab_play_list));
+		intent = new Intent(this, PlaylistActivity.class);
+		playlistTabSpec.setContent(intent);
 
-		m_tabHost.setCurrentTab(2);
+		m_tabHost.addTab(devicesTabSpec);
+		m_tabHost.addTab(libraryTabSpec);
+		m_tabHost.addTab(youtubeTabSpec);
+		m_tabHost.addTab(playlistTabSpec);
+
+		m_tabHost.setCurrentTab(0);
 
 	}
 
@@ -74,12 +74,12 @@ public class MainActivity extends UpnpListenerTabActivity {
 			Log.d(TAG, "Select tab = " + tabId);
 			if (tabId.equals("Library") && m_processor.getCurrentDMS() == null) {
 				Toast.makeText(MainActivity.this, "Please select a MediaServer to browse", Toast.LENGTH_SHORT).show();
-				m_tabHost.setCurrentTab(2);
+				m_tabHost.setCurrentTab(0);
 				return;
 			}
 			if (tabId.equals("NowPlaying") && m_processor.getCurrentDMR() == null) {
 				Toast.makeText(MainActivity.this, "Please select a MediaRenderer to control", Toast.LENGTH_SHORT).show();
-				m_tabHost.setCurrentTab(2);
+				m_tabHost.setCurrentTab(0);
 				return;
 			}
 
@@ -113,7 +113,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 			@Override
 			public void run() {
 				try {
-					Thread.sleep(7000);
+					Thread.sleep(10000);
 					m_progressDialog.dismiss();
 				} catch (Exception ex) {
 					m_progressDialog.dismiss();
@@ -129,7 +129,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 		if (m_tabHost.getCurrentTabTag().equals("Devices")) {
 			finish();
 		} else {
-			m_tabHost.setCurrentTab(2);
+			m_tabHost.setCurrentTab(0);
 		}
 	}
 }
