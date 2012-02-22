@@ -9,6 +9,12 @@ import com.app.dlna.dmc.processor.interfaces.UpnpProcessor;
 public class UpnpListenerActivity extends Activity implements UpnpProcessor.UpnpProcessorListener {
 
 	@Override
+	protected void onResume() {
+		super.onResume();
+	}
+	
+
+	@Override
 	public void onStartComplete() {
 
 	}

@@ -66,6 +66,13 @@ public class DeviceArrayAdapter extends ArrayAdapter<Device> {
 			holder.selected.setChecked(false);
 			Log.e(TAG, "NotSelected");
 		}
+
+		if (device instanceof RemoteDevice) {
+			holder.deviceAddress.setText(((RemoteDevice) device).getIdentity().getDescriptorURL().getAuthority());
+		} else {
+			holder.deviceAddress.setText("Local device");
+		}
+
 		if (m_cacheDMSIcon.containsKey(udn)) {
 			Log.d(TAG, "Cache hit");
 			holder.deviceIcon.setImageBitmap(m_cacheDMSIcon.get(udn));
@@ -87,16 +94,15 @@ public class DeviceArrayAdapter extends ArrayAdapter<Device> {
 								Log.e(TAG, urlString);
 								URL url = new URL(urlString);
 								final Bitmap icon = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+								m_cacheDMSIcon.put(udn, icon);
 								m_mainActivity.runOnUiThread(new Runnable() {
 
 									@Override
 									public void run() {
-										holder.deviceAddress.setText(remoteDevice.getIdentity().getDescriptorURL().getAuthority());
-										holder.deviceIcon.setImageBitmap(icon);
+										DeviceArrayAdapter.this.notifyDataSetChanged();
 									}
 								});
 
-								m_cacheDMSIcon.put(udn, icon);
 							} catch (MalformedURLException e) {
 								Log.e(TAG, "Can't get Icon of device: " + device.getDisplayString());
 								holder.deviceIcon.setImageResource(R.drawable.icon_dms);
@@ -110,7 +116,6 @@ public class DeviceArrayAdapter extends ArrayAdapter<Device> {
 				}
 			} else {
 				holder.deviceIcon.setImageResource(R.drawable.ic_launcher);
-				holder.deviceAddress.setText("Local device");
 			}
 		}
 

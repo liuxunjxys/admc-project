@@ -33,6 +33,7 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
@@ -65,11 +66,12 @@ public class CoreUpnpService extends Service {
 	private DMSProcessor m_dmsProcessor;
 	private DMRProcessor m_dmrProcessor;
 	private WifiLock m_wifiLock;
+	private WifiManager m_wifiManager;
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		WifiManager m_wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+		m_wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		// prevent wifi sleep when screen
 		m_wifiLock = m_wifiManager.createWifiLock(3, "UpnpWifiLock");
 		m_wifiLock.acquire();
@@ -104,13 +106,19 @@ public class CoreUpnpService extends Service {
 	@SuppressWarnings("unchecked")
 	private void startLocalDMS() {
 		try {
+			String deviceName = Build.MODEL.toUpperCase() + " " + Build.DEVICE.toUpperCase();
+			String MACAddress = m_wifiManager.getConnectionInfo().getMacAddress();
+			Log.i(TAG, "Local DMS: Device name = " + deviceName + ";MAC = " + MACAddress);
+			String hashUDN = Utility.getMD5(deviceName + "-" + MACAddress);
+			Log.i(TAG, "Hash UDN = " + hashUDN);
+			String uDNString = hashUDN.substring(0, 8) + "-" + hashUDN.substring(8, 12) + "-" + hashUDN.substring(12, 16) + "-" + hashUDN.substring(16, 20)
+					+ "-" + hashUDN.substring(20);
 			LocalService<LocalContentDirectoryService> localService = new AnnotationLocalServiceBinder().read(LocalContentDirectoryService.class);
 			localService.setManager(new DefaultServiceManager<LocalContentDirectoryService>(localService, LocalContentDirectoryService.class));
 
-			DeviceIdentity identity = new DeviceIdentity(new UDN("54b9d723-86ad-4abc-87b1-6d6f01cc0341"));
+			DeviceIdentity identity = new DeviceIdentity(new UDN(uDNString));
 			DeviceType type = new DeviceType("schemas-upnp-org", "MediaServer");
-			DeviceDetails details = new DeviceDetails("Android DMS (ndphu)", new ManufacturerDetails("Android Digital Controller"), new ModelDetails("v1.0"),
-					"0123456789qwertyuiop", "");
+			DeviceDetails details = new DeviceDetails(deviceName, new ManufacturerDetails("Android Digital Controller"), new ModelDetails("v1.0"), "", "");
 
 			LocalDevice localDevice = new LocalDevice(identity, type, details, localService);
 

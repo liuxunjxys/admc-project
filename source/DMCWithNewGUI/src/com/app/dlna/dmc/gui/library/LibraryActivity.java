@@ -12,18 +12,18 @@ import org.teleal.cling.support.model.item.VideoItem;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.app.TabActivity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TabHost;
 import android.widget.Toast;
 
 import com.app.dlna.dmc.gui.R;
@@ -55,6 +55,7 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 		setContentView(R.layout.library_activity);
 		m_adapter = new DIDLObjectArrayAdapter(LibraryActivity.this, 0);
 		m_listView = (ListView) findViewById(R.id.lv_ServerContent);
+		m_listView.setTextFilterEnabled(true);
 		m_listView.setAdapter(m_adapter);
 		m_listView.setOnItemClickListener(itemClickListener);
 
@@ -77,7 +78,7 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 		}
 
 		public void onTextChanged(CharSequence s, int start, int before, int count) {
-			// m_adapter.getFilter().filter(s);
+			m_adapter.getFilter().filter(s);
 		}
 
 	};
@@ -85,7 +86,6 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 	@Override
 	protected void onResume() {
 		Log.i(TAG, "Library onResume");
-		Log.i(TAG, m_upnpProcessor != null ? "Upnp Processor != null" : "Upnp Processor == null");
 		super.onResume();
 		if (m_upnpProcessor != null && m_upnpProcessor.getCurrentDMS() != null) {
 			m_playlistProcessor = m_upnpProcessor.getPlaylistProcessor();
@@ -103,12 +103,16 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 			m_dmsProcessor = m_upnpProcessor.getDMSProcessor();
 			m_dmsProcessor.addListener(LibraryActivity.this);
 			browse("0");
+		} else {
+			m_adapter.notifyDataSetChanged();
 		}
 	}
 
 	@Override
 	protected void onPause() {
 		Log.i(TAG, "Library onPause");
+		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(filterText.getWindowToken(), 0);
 		if (m_upnpProcessor != null) {
 			m_upnpProcessor.removeListener(LibraryActivity.this);
 		}
@@ -169,7 +173,7 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 			if (m_playlistProcessor.isFull()) {
 				Toast.makeText(LibraryActivity.this, "Current playlist is full", Toast.LENGTH_SHORT).show();
 			} else {
-				Toast.makeText(LibraryActivity.this, "Item already exits in current Playlist", Toast.LENGTH_SHORT).show();
+				m_playlistProcessor.removeItem(item);
 			}
 		}
 	}
@@ -220,6 +224,10 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 
 	@Override
 	public void onBackPressed() {
+		upOneLevel();
+	}
+
+	private void upOneLevel() {
 		int traceSize = m_traceID.size();
 		if (traceSize > 2) {
 			String parentID = m_traceID.get(traceSize - 2);
@@ -229,8 +237,7 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 		} else {
 			Toast.makeText(LibraryActivity.this, "You are in the root of this MediaServer. Press Back again to chose other MediaServer", Toast.LENGTH_SHORT)
 					.show();
-			final TabHost tabHost = ((TabActivity) getParent()).getTabHost();
-			tabHost.setCurrentTab(2);
+			finish();
 		}
 	}
 
@@ -242,5 +249,9 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 			m_adapter.setPlaylistProcessor(m_playlistProcessor);
 			browseRootContainer();
 		}
+	}
+
+	public void onButtonBackClick(View view) {
+		upOneLevel();
 	}
 }

@@ -23,6 +23,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 	private TabHost m_tabHost;
 	private UpnpProcessor m_processor = null;
 	private ProgressDialog m_progressDialog = null;
+	private static final int DEFAULT_TAB_INDEX = 0;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -63,7 +64,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 		m_tabHost.addTab(youtubeTabSpec);
 		m_tabHost.addTab(playlistTabSpec);
 
-		m_tabHost.setCurrentTab(0);
+		m_tabHost.setCurrentTab(DEFAULT_TAB_INDEX);
 
 	}
 
@@ -74,12 +75,12 @@ public class MainActivity extends UpnpListenerTabActivity {
 			Log.d(TAG, "Select tab = " + tabId);
 			if (tabId.equals("Library") && m_processor.getCurrentDMS() == null) {
 				Toast.makeText(MainActivity.this, "Please select a MediaServer to browse", Toast.LENGTH_SHORT).show();
-				m_tabHost.setCurrentTab(0);
+				m_tabHost.setCurrentTab(DEFAULT_TAB_INDEX);
 				return;
 			}
 			if (tabId.equals("NowPlaying") && m_processor.getCurrentDMR() == null) {
 				Toast.makeText(MainActivity.this, "Please select a MediaRenderer to control", Toast.LENGTH_SHORT).show();
-				m_tabHost.setCurrentTab(0);
+				m_tabHost.setCurrentTab(DEFAULT_TAB_INDEX);
 				return;
 			}
 
@@ -129,7 +130,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 		if (m_tabHost.getCurrentTabTag().equals("Devices")) {
 			finish();
 		} else {
-			m_tabHost.setCurrentTab(0);
+			m_tabHost.setCurrentTab(DEFAULT_TAB_INDEX);
 		}
 	}
 }

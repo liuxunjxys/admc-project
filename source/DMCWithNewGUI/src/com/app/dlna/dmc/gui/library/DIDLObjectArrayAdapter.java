@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -42,9 +43,9 @@ public class DIDLObjectArrayAdapter extends ArrayAdapter<DIDLObject> {
 		if (convertView.getTag() == null) {
 			setViewHolder(convertView);
 		}
-
-		DIDLObject object = getItem(position);
 		ViewHolder holder = (ViewHolder) convertView.getTag();
+		DIDLObject object = getItem(position);
+		convertView.setVisibility(View.VISIBLE);
 		holder.name.setText(object.getTitle());
 		if (object instanceof Container) {
 			holder.icon.setImageResource(R.drawable.folder);
@@ -69,8 +70,8 @@ public class DIDLObjectArrayAdapter extends ArrayAdapter<DIDLObject> {
 			else {
 				holder.checked.setVisibility(View.GONE);
 			}
-
 		return convertView;
+
 	}
 
 	public void setViewHolder(View view) {
@@ -86,6 +87,22 @@ public class DIDLObjectArrayAdapter extends ArrayAdapter<DIDLObject> {
 		ImageView icon;
 		TextView name;
 		ImageView checked;
+	}
+
+	@Override
+	public Filter getFilter() {
+		return new Filter() {
+
+			@Override
+			protected void publishResults(CharSequence constraint, FilterResults results) {
+			}
+
+			@Override
+			protected FilterResults performFiltering(CharSequence constraint) {
+				
+				return null;
+			}
+		};
 	}
 
 }
