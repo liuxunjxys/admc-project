@@ -34,7 +34,11 @@ import org.teleal.cling.model.ModelUtil;
 import org.teleal.cling.transport.spi.InitializationException;
 import org.teleal.cling.transport.spi.NetworkAddressFactory;
 
+import com.app.dlna.dmc.processor.http.HTTPServerData;
+import com.app.dlna.dmc.processor.http.HttpThread;
+
 import android.net.wifi.WifiManager;
+import android.util.Log;
 
 /**
  * Implementation appropriate for Android environment, avoids unavailable methods.
@@ -49,6 +53,8 @@ public class AndroidNetworkAddressFactory implements NetworkAddressFactory {
 
 	final private static Logger log = Logger.getLogger(NetworkAddressFactory.class.getName());
 
+	private static final String TAG = "AndroidNetworkAddressFactory";
+
 	protected NetworkInterface wifiInterface;
 	protected List<InetAddress> bindAddresses = new ArrayList();
 
@@ -56,9 +62,7 @@ public class AndroidNetworkAddressFactory implements NetworkAddressFactory {
 	 * Defaults to an ephemeral port.
 	 */
 	public AndroidNetworkAddressFactory(WifiManager wifiManager) throws InitializationException {
-
 		wifiInterface = getWifiNetworkInterface(wifiManager);
-
 		if (wifiInterface == null)
 			throw new InitializationException("Could not discover WiFi network interface");
 		log.info("Discovered WiFi network interface: " + wifiInterface.getDisplayName());
@@ -171,7 +175,7 @@ public class AndroidNetworkAddressFactory implements NetworkAddressFactory {
 	}
 
 	public static NetworkInterface getRealWifiNetworkInterface(WifiManager manager) {
-
+		// TODO: change here
 		Enumeration<NetworkInterface> interfaces = null;
 		try {
 			// the WiFi network interface will be one of these.
@@ -191,26 +195,48 @@ public class AndroidNetworkAddressFactory implements NetworkAddressFactory {
 
 		// so I keep the same IP number with the reverse endianness
 		int reverseWifiIP = Integer.reverseBytes(wifiIP);
+		Enumeration<NetworkInterface> temp = interfaces;
 
+		while (temp.hasMoreElements()) {
+			NetworkInterface iface = temp.nextElement();
+			Enumeration<InetAddress> inetAddresses = iface.getInetAddresses();
+			Log.e(TAG, "iface name = " + iface.getName());
+			while (inetAddresses.hasMoreElements()) {
+				InetAddress nextElement = inetAddresses.nextElement();
+				Log.e(TAG, "Host address = " + nextElement.getHostAddress() + ";Host name = " + nextElement.getHostName());
+				Log.e(TAG, "IsLoopback = " + nextElement.isLoopbackAddress());
+			}
+
+		}
 		while (interfaces.hasMoreElements()) {
-
 			NetworkInterface iface = interfaces.nextElement();
-
 			// since each interface could have many InetAddresses...
 			Enumeration<InetAddress> inetAddresses = iface.getInetAddresses();
 			while (inetAddresses.hasMoreElements()) {
+
 				InetAddress nextElement = inetAddresses.nextElement();
-				int byteArrayToInt = byteArrayToInt(nextElement.getAddress(), 0);
+
+				// int byteArrayToInt = byteArrayToInt(nextElement.getAddress(), 0);
 
 				// grab that IP in byte[] form and convert it to int, then compare it
 				// to the IP given by the WifiManager's ConnectionInfo. We compare
 				// in both endianness to make sure we get it.
-				if (byteArrayToInt == wifiIP || byteArrayToInt == reverseWifiIP) {
-					return iface;
+
+				// if (byteArrayToInt == wifiIP || byteArrayToInt == reverseWifiIP) {
+				// return iface;
+				// }
+
+				try {
+					if (!iface.isLoopback()) {
+						HTTPServerData.HOST = iface.getInetAddresses().nextElement().getHostAddress();
+						Log.e(TAG, "Host address = " + HTTPServerData.HOST);
+						return iface;
+					}
+				} catch (SocketException e) {
+					e.printStackTrace();
 				}
 			}
 		}
-
 		return null;
 	}
 

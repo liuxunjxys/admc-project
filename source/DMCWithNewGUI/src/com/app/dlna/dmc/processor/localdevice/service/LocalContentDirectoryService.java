@@ -24,6 +24,7 @@ import org.teleal.common.util.MimeType;
 import android.os.Environment;
 import android.util.Log;
 
+import com.app.dlna.dmc.processor.http.HTTPServerData;
 import com.app.dlna.dmc.utility.Utility;
 
 public class LocalContentDirectoryService extends AbstractContentDirectoryService {
@@ -66,6 +67,13 @@ public class LocalContentDirectoryService extends AbstractContentDirectoryServic
 
 			@Override
 			public void run() {
+				while (HTTPServerData.HOST == null) {
+					try {
+						Thread.sleep(2000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
 				try {
 					scanFile(Environment.getExternalStorageDirectory().getAbsolutePath());
 				} catch (Exception ex) {
@@ -92,10 +100,10 @@ public class LocalContentDirectoryService extends AbstractContentDirectoryServic
 			File file = new File(path);
 			for (File subFile : file.listFiles()) {
 				if (subFile.isDirectory()) {
-					Log.i(TAG, "DIR = " + subFile.getAbsolutePath());
+					// Log.i(TAG, "DIR = " + subFile.getAbsolutePath());
 					scanFile(subFile.getAbsolutePath());
 				} else if (subFile.length() >= 51200) {
-					Log.i(TAG, "FILE = " + subFile.getAbsolutePath());
+					// Log.i(TAG, "FILE = " + subFile.getAbsolutePath());
 					String fileName = subFile.getName();
 					String mimeType = URLConnection.getFileNameMap().getContentTypeFor(subFile.getName());
 					int dotPos = subFile.getName().lastIndexOf(".");

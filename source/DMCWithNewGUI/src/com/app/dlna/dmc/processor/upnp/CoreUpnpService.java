@@ -67,15 +67,20 @@ public class CoreUpnpService extends Service {
 	private DMRProcessor m_dmrProcessor;
 	private WifiLock m_wifiLock;
 	private WifiManager m_wifiManager;
+	private ConnectivityManager m_connectivityManager;
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		m_wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+		m_connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		// prevent wifi sleep when screen
 		m_wifiLock = m_wifiManager.createWifiLock(3, "UpnpWifiLock");
 		m_wifiLock.acquire();
-		HTTPServerData.HOST = Utility.intToIp(m_wifiManager.getDhcpInfo().ipAddress);
+		if (m_wifiManager.isWifiEnabled() && m_connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected())
+			HTTPServerData.HOST = Utility.intToIp(m_wifiManager.getDhcpInfo().ipAddress);
+		else
+			HTTPServerData.HOST = null;
 
 		m_notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -101,33 +106,6 @@ public class CoreUpnpService extends Service {
 		LocalContentDirectoryService.scanMedia();
 		showNotification();
 		startLocalDMS();
-	}
-
-	@SuppressWarnings("unchecked")
-	private void startLocalDMS() {
-		try {
-			String deviceName = Build.MODEL.toUpperCase() + " " + Build.DEVICE.toUpperCase();
-			String MACAddress = m_wifiManager.getConnectionInfo().getMacAddress();
-			Log.i(TAG, "Local DMS: Device name = " + deviceName + ";MAC = " + MACAddress);
-			String hashUDN = Utility.getMD5(deviceName + "-" + MACAddress);
-			Log.i(TAG, "Hash UDN = " + hashUDN);
-			String uDNString = hashUDN.substring(0, 8) + "-" + hashUDN.substring(8, 12) + "-" + hashUDN.substring(12, 16) + "-" + hashUDN.substring(16, 20)
-					+ "-" + hashUDN.substring(20);
-			LocalService<LocalContentDirectoryService> localService = new AnnotationLocalServiceBinder().read(LocalContentDirectoryService.class);
-			localService.setManager(new DefaultServiceManager<LocalContentDirectoryService>(localService, LocalContentDirectoryService.class));
-
-			DeviceIdentity identity = new DeviceIdentity(new UDN(uDNString));
-			DeviceType type = new DeviceType("schemas-upnp-org", "MediaServer");
-			DeviceDetails details = new DeviceDetails(deviceName, new ManufacturerDetails("Android Digital Controller"), new ModelDetails("v1.0"), "", "");
-
-			LocalDevice localDevice = new LocalDevice(identity, type, details, localService);
-
-			upnpService.getRegistry().addDevice(localDevice);
-			Log.d(TAG, "Create Local Device complete");
-		} catch (Exception ex) {
-			Log.d(TAG, "Cannot create Local Device");
-			ex.printStackTrace();
-		}
 	}
 
 	protected AndroidUpnpServiceConfiguration createConfiguration(WifiManager wifiManager) {
@@ -234,6 +212,33 @@ public class CoreUpnpService extends Service {
 
 		public ControlPoint getControlPoint() {
 			return upnpService.getControlPoint();
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private void startLocalDMS() {
+		try {
+			String deviceName = Build.MODEL.toUpperCase() + " " + Build.DEVICE.toUpperCase();
+			String MACAddress = m_wifiManager.getConnectionInfo().getMacAddress();
+			Log.i(TAG, "Local DMS: Device name = " + deviceName + ";MAC = " + MACAddress);
+			String hashUDN = Utility.getMD5(deviceName + "-" + MACAddress);
+			Log.i(TAG, "Hash UDN = " + hashUDN);
+			String uDNString = hashUDN.substring(0, 8) + "-" + hashUDN.substring(8, 12) + "-" + hashUDN.substring(12, 16) + "-" + hashUDN.substring(16, 20)
+					+ "-" + hashUDN.substring(20);
+			LocalService<LocalContentDirectoryService> localService = new AnnotationLocalServiceBinder().read(LocalContentDirectoryService.class);
+			localService.setManager(new DefaultServiceManager<LocalContentDirectoryService>(localService, LocalContentDirectoryService.class));
+
+			DeviceIdentity identity = new DeviceIdentity(new UDN(uDNString));
+			DeviceType type = new DeviceType("schemas-upnp-org", "MediaServer");
+			DeviceDetails details = new DeviceDetails(deviceName, new ManufacturerDetails("Android Digital Controller"), new ModelDetails("v1.0"), "", "");
+
+			LocalDevice localDevice = new LocalDevice(identity, type, details, localService);
+
+			upnpService.getRegistry().addDevice(localDevice);
+			Log.d(TAG, "Create Local Device complete");
+		} catch (Exception ex) {
+			Log.d(TAG, "Cannot create Local Device");
+			ex.printStackTrace();
 		}
 	}
 
