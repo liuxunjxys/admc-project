@@ -6,11 +6,13 @@ import org.teleal.cling.model.types.UDN;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SeekBar;
@@ -68,8 +70,6 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 
 		m_tv_rendererName = (TextView) findViewById(R.id.rendererName);
 
-		m_sb_playingProgress.setOnSeekBarChangeListener(playbackSeekListener);
-		m_sb_volume.setOnSeekBarChangeListener(volumeSeekListener);
 	}
 
 	@Override
@@ -114,17 +114,20 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 		if (m_upnpProcessor != null) {
 			if (m_upnpProcessor.getPlaylistProcessor() != null) {
 				m_playlistProcessor = m_upnpProcessor.getPlaylistProcessor();
+				m_listView.setOnItemClickListener(onPlaylistItemClick);
+				m_listView.setOnItemLongClickListener(onPlaylistItemLongClick);
 			}
 
 			if (m_upnpProcessor.getDMRProcessor() != null) {
 				m_dmrProcessor = m_upnpProcessor.getDMRProcessor();
 				m_dmrProcessor.addListener(PlaylistActivity.this);
 				m_tv_rendererName.setText(m_dmrProcessor.getName());
+				m_sb_playingProgress.setOnSeekBarChangeListener(playbackSeekListener);
+				m_sb_volume.setOnSeekBarChangeListener(volumeSeekListener);
 			}
 
 			refreshPlaylist();
 		}
-		m_listView.setOnItemClickListener(onPlaylistItemClick);
 	}
 
 	private OnSeekBarChangeListener playbackSeekListener = new OnSeekBarChangeListener() {
@@ -397,6 +400,23 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 				m_adapter.setCurrentItem(item);
 				validateListView(item);
 			}
+		}
+	};
+
+	private OnItemLongClickListener onPlaylistItemLongClick = new OnItemLongClickListener() {
+
+		@Override
+		public boolean onItemLongClick(AdapterView<?> adapter, View view, final int position, long arg3) {
+			new AlertDialog.Builder(PlaylistActivity.this).setMessage("Confirm to delete this item").setTitle("Confirm").setCancelable(false)
+					.setPositiveButton("Delete", new OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							m_playlistProcessor.removeItem(m_adapter.getItem(position));
+							m_adapter.notifyDataSetChanged();
+						}
+					}).setNegativeButton("Cancel", null).create().show();
+			return true;
 		}
 	};
 

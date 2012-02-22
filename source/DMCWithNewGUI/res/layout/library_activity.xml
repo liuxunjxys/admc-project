@@ -4,13 +4,25 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <EditText
-        android:id="@+id/search_box"
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/type_to_filter"
-        android:inputType="text"
-        android:maxLines="1" />
+        android:orientation="horizontal" >
+
+        <Button
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/ic_control_back"
+            android:onClick="onButtonBackClick" />
+
+        <EditText
+            android:id="@+id/search_box"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/type_to_filter"
+            android:inputType="text"
+            android:maxLines="1" />
+    </LinearLayout>
 
     <ListView
         android:id="@+id/lv_ServerContent"
