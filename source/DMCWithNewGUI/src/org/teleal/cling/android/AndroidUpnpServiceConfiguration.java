@@ -75,7 +75,6 @@ public class AndroidUpnpServiceConfiguration extends DefaultUpnpServiceConfigura
 
 	public AndroidUpnpServiceConfiguration(WifiManager wifiManager, int streamListenPort) {
 		super(streamListenPort, false);
-
 		this.wifiManager = wifiManager;
 
 		// This should be the default on Android 2.1 but it's not set by default

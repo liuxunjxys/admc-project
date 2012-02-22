@@ -26,6 +26,9 @@ import org.teleal.cling.transport.Router;
 import org.teleal.cling.transport.SwitchableRouterImpl;
 import org.teleal.cling.transport.spi.InitializationException;
 
+import com.app.dlna.dmc.processor.http.HTTPServerData;
+import com.app.dlna.dmc.utility.Utility;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -36,106 +39,114 @@ import android.net.wifi.WifiManager;
 /**
  * Switches the network transport layer on/off by monitoring WiFi connectivity.
  * <p>
- * This implementation listens to connectivity changes in an Android environment. Register the
- * {@link #getBroadcastReceiver()} instance with intent <code>android.net.conn.CONNECTIVITY_CHANGE</code>.
+ * This implementation listens to connectivity changes in an Android environment. Register the {@link #getBroadcastReceiver()} instance with intent
+ * <code>android.net.conn.CONNECTIVITY_CHANGE</code>.
  * </p>
- *
+ * 
  * @author Christian Bauer
  */
 public class AndroidWifiSwitchableRouter extends SwitchableRouterImpl {
 
-    private static Logger log = Logger.getLogger(Router.class.getName());
+	private static Logger log = Logger.getLogger(Router.class.getName());
 
-    final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (!intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) return;
-            NetworkInfo wifiInfo = getConnectivityManager().getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-            // We can't listen to "is available" or simply "is switched on", we have to make sure it's connected
-            if (!wifiInfo.isConnected()) {
-                log.info("WiFi state changed, trying to disable router");
-                disable();
-            } else {
-                log.info("WiFi state changed, trying to enable router");
-                enable();
-            }
-        }
-    };
+	final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (!intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION))
+				return;
+			NetworkInfo wifiInfo = getConnectivityManager().getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+			// We can't listen to "is available" or simply "is switched on", we have to make sure it's connected
+			// TODO: must add secondcheck here
+			// if (!wifiInfo.isConnected()) {
+			// log.info("WiFi state changed, trying to disable router");
+			// disable();
+			// } else {
+			// log.info("WiFi state changed, trying to enable router");
+			// enable();
+			// }
 
-    final private WifiManager wifiManager;
-    final private ConnectivityManager connectivityManager;
-    private WifiManager.MulticastLock multicastLock;
+			enable();
+		}
+	};
 
-    public AndroidWifiSwitchableRouter(UpnpServiceConfiguration configuration, ProtocolFactory protocolFactory,
-                                       WifiManager wifiManager, ConnectivityManager connectivityManager) {
-        super(configuration, protocolFactory);
-        this.wifiManager = wifiManager;
-        this.connectivityManager = connectivityManager;
+	final private WifiManager wifiManager;
+	final private ConnectivityManager connectivityManager;
+	private WifiManager.MulticastLock multicastLock;
 
-        // Let's not wait for the first "wifi switched on" broadcast (which might be late on
-        // some real devices and will never occur on the emulator)
-        NetworkInfo wifiInfo = getConnectivityManager().getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        if (wifiInfo.isConnected() || ModelUtil.ANDROID_EMULATOR) {
-            log.info("WiFi is enabled (or running on Android emulator), starting router immediately");
-            enable();
-       }
-    }
+	public AndroidWifiSwitchableRouter(UpnpServiceConfiguration configuration, ProtocolFactory protocolFactory, WifiManager wifiManager,
+			ConnectivityManager connectivityManager) {
+		super(configuration, protocolFactory);
+		this.wifiManager = wifiManager;
+		this.connectivityManager = connectivityManager;
 
-    public BroadcastReceiver getBroadcastReceiver() {
-        return broadcastReceiver;
-    }
+		// Let's not wait for the first "wifi switched on" broadcast (which might be late on
+		// some real devices and will never occur on the emulator)
+		NetworkInfo wifiInfo = getConnectivityManager().getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
-    protected WifiManager getWifiManager() {
-        return wifiManager;
-    }
+		// TODO: recheck wifi here
+		// if (wifiInfo.isConnected() || ModelUtil.ANDROID_EMULATOR) {
+		// log.info("WiFi is enabled (or running on Android emulator), starting router immediately");
+		// enable();
+		// }
 
-    protected ConnectivityManager getConnectivityManager() {
-        return connectivityManager;
-    }
+		enable();
+	}
 
-    @Override
-    public boolean enable() throws RouterLockAcquisitionException {
-        lock(writeLock);
-        try {
-            boolean enabled;
-            if ((enabled = super.enable())) {
-                // Enable multicast on the WiFi network interface, requires android.permission.CHANGE_WIFI_MULTICAST_STATE
-                multicastLock = getWifiManager().createMulticastLock(getClass().getSimpleName());
-                multicastLock.acquire();
-            }
-            return enabled;
-        } finally {
-            unlock(writeLock);
-        }
-    }
+	public BroadcastReceiver getBroadcastReceiver() {
+		return broadcastReceiver;
+	}
 
-    @Override
-    public void handleStartFailure(InitializationException ex) {
-        if (multicastLock != null && multicastLock.isHeld()) {
-            multicastLock.release();
-            multicastLock = null;
-        }
-        super.handleStartFailure(ex);
-    }
+	protected WifiManager getWifiManager() {
+		return wifiManager;
+	}
 
-    @Override
-    public boolean disable() throws RouterLockAcquisitionException {
-        lock(writeLock);
-        try {
-            if (multicastLock != null && multicastLock.isHeld()) {
-                multicastLock.release();
-                multicastLock = null;
-            }
-            return super.disable();
-        } finally {
-            unlock(writeLock);
-        }
-    }
-    
-    @Override
-    protected int getLockTimeoutMillis() {
-        return 10000;
-    }
+	protected ConnectivityManager getConnectivityManager() {
+		return connectivityManager;
+	}
 
+	@Override
+	public boolean enable() throws RouterLockAcquisitionException {
+		lock(writeLock);
+		try {
+			boolean enabled;
+			if ((enabled = super.enable())) {
+				
+				// Enable multicast on the WiFi network interface, requires android.permission.CHANGE_WIFI_MULTICAST_STATE
+				multicastLock = getWifiManager().createMulticastLock(getClass().getSimpleName());
+				multicastLock.acquire();
+			}
+			return enabled;
+		} finally {
+			unlock(writeLock);
+		}
+	}
+
+	@Override
+	public void handleStartFailure(InitializationException ex) {
+		if (multicastLock != null && multicastLock.isHeld()) {
+			multicastLock.release();
+			multicastLock = null;
+		}
+		super.handleStartFailure(ex);
+	}
+
+	@Override
+	public boolean disable() throws RouterLockAcquisitionException {
+		lock(writeLock);
+		try {
+			if (multicastLock != null && multicastLock.isHeld()) {
+				multicastLock.release();
+				multicastLock = null;
+			}
+			return super.disable();
+		} finally {
+			unlock(writeLock);
+		}
+	}
+
+	@Override
+	protected int getLockTimeoutMillis() {
+		return 10000;
+	}
 
 }
