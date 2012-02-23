@@ -35,6 +35,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
+import android.util.Log;
 
 /**
  * Switches the network transport layer on/off by monitoring WiFi connectivity.
@@ -46,6 +47,8 @@ import android.net.wifi.WifiManager;
  * @author Christian Bauer
  */
 public class AndroidWifiSwitchableRouter extends SwitchableRouterImpl {
+
+	private static final String TAG = "AndroidWifiSwitchableRouter";
 
 	private static Logger log = Logger.getLogger(Router.class.getName());
 
@@ -81,13 +84,18 @@ public class AndroidWifiSwitchableRouter extends SwitchableRouterImpl {
 
 		// Let's not wait for the first "wifi switched on" broadcast (which might be late on
 		// some real devices and will never occur on the emulator)
-		NetworkInfo wifiInfo = getConnectivityManager().getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+		// NetworkInfo wifiInfo = getConnectivityManager().getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
 		// TODO: recheck wifi here
 		// if (wifiInfo.isConnected() || ModelUtil.ANDROID_EMULATOR) {
 		// log.info("WiFi is enabled (or running on Android emulator), starting router immediately");
 		// enable();
 		// }
+		if (connectivityManager.getActiveNetworkInfo() != null) {
+			Log.d(TAG, connectivityManager.getActiveNetworkInfo().getTypeName());
+		} else {
+			Log.d(TAG, "No active network");
+		}
 
 		enable();
 	}
@@ -110,7 +118,7 @@ public class AndroidWifiSwitchableRouter extends SwitchableRouterImpl {
 		try {
 			boolean enabled;
 			if ((enabled = super.enable())) {
-				
+
 				// Enable multicast on the WiFi network interface, requires android.permission.CHANGE_WIFI_MULTICAST_STATE
 				multicastLock = getWifiManager().createMulticastLock(getClass().getSimpleName());
 				multicastLock.acquire();
