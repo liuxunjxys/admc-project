@@ -53,7 +53,7 @@ public class AndroidNetworkAddressFactory implements NetworkAddressFactory {
 
 	final private static Logger log = Logger.getLogger(NetworkAddressFactory.class.getName());
 
-	private static final String TAG = "AndroidNetworkAddressFactory";
+	//private static final String TAG = "AndroidNetworkAddressFactory";
 
 	protected NetworkInterface wifiInterface;
 	protected List<InetAddress> bindAddresses = new ArrayList<InetAddress>();

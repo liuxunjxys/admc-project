@@ -9,7 +9,6 @@ import org.teleal.cling.android.AndroidWifiSwitchableRouter;
 import org.teleal.cling.binding.annotations.AnnotationLocalServiceBinder;
 import org.teleal.cling.controlpoint.ControlPoint;
 import org.teleal.cling.model.DefaultServiceManager;
-import org.teleal.cling.model.ModelUtil;
 import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.model.meta.DeviceDetails;
 import org.teleal.cling.model.meta.DeviceIdentity;
@@ -29,7 +28,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
@@ -100,10 +98,11 @@ public class CoreUpnpService extends Service {
 		upnpService = new UpnpServiceImpl(createConfiguration(wifiManager)) {
 			@Override
 			protected Router createRouter(ProtocolFactory protocolFactory, Registry registry) {
+				// TODO: Add broadcast receiver here
 				AndroidWifiSwitchableRouter router = CoreUpnpService.this.createRouter(getConfiguration(), protocolFactory, wifiManager, m_connectivityManager);
-				if (!ModelUtil.ANDROID_EMULATOR && isListeningForConnectivityChanges()) {
-					registerReceiver(router.getBroadcastReceiver(), new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
-				}
+				// if (!ModelUtil.ANDROID_EMULATOR && isListeningForConnectivityChanges()) {
+				// registerReceiver(router.getBroadcastReceiver(), new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
+				// }
 				return router;
 			}
 		};
@@ -123,8 +122,9 @@ public class CoreUpnpService extends Service {
 
 	@Override
 	public void onDestroy() {
-		if (!ModelUtil.ANDROID_EMULATOR && isListeningForConnectivityChanges())
-			unregisterReceiver(((AndroidWifiSwitchableRouter) upnpService.getRouter()).getBroadcastReceiver());
+		// TODO: Remove broadcast receiver here
+		// if (!ModelUtil.ANDROID_EMULATOR && isListeningForConnectivityChanges())
+		// unregisterReceiver(((AndroidWifiSwitchableRouter) upnpService.getRouter()).getBroadcastReceiver());
 		try {
 			upnpService.shutdown();
 		} catch (Exception ex) {

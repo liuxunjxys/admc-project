@@ -1,7 +1,5 @@
 package com.app.dlna.dmc.gui.devices;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +26,7 @@ import com.app.dlna.dmc.gui.R;
 @SuppressWarnings("rawtypes")
 public class DeviceArrayAdapter extends ArrayAdapter<Device> {
 
-	private static final String TAG = DeviceArrayAdapter.class.getName();
+	// private static final String TAG = DeviceArrayAdapter.class.getName();
 	private LayoutInflater m_inflater;
 	private Map<String, Bitmap> m_cacheDMSIcon;
 	private String m_currentDMSUDN = "";
@@ -54,17 +52,14 @@ public class DeviceArrayAdapter extends ArrayAdapter<Device> {
 			setViewHolder(convertView);
 		}
 		final Device device = getItem(position);
-		Log.e(TAG, "adding device to listview :" + device.getDetails().getFriendlyName());
 
 		final ViewHolder holder = (ViewHolder) convertView.getTag();
 		holder.deviceName.setText(device.getDetails().getFriendlyName());
 		final String udn = device.getIdentity().getUdn().getIdentifierString();
 		if (udn.equals(m_currentDMSUDN)) {
 			holder.selected.setChecked(true);
-			Log.e(TAG, "Selected");
 		} else {
 			holder.selected.setChecked(false);
-			Log.e(TAG, "NotSelected");
 		}
 
 		if (device instanceof RemoteDevice) {
@@ -74,10 +69,8 @@ public class DeviceArrayAdapter extends ArrayAdapter<Device> {
 		}
 
 		if (m_cacheDMSIcon.containsKey(udn)) {
-			Log.d(TAG, "Cache hit");
 			holder.deviceIcon.setImageBitmap(m_cacheDMSIcon.get(udn));
 		} else {
-			Log.d(TAG, "Cache miss");
 			if (device instanceof RemoteDevice) {
 				final Icon[] icons = device.getIcons();
 				if (icons != null && icons[0] != null && icons[0].getUri() != null) {
@@ -91,7 +84,6 @@ public class DeviceArrayAdapter extends ArrayAdapter<Device> {
 
 								String urlString = remoteDevice.getIdentity().getDescriptorURL().getProtocol() + "://"
 										+ remoteDevice.getIdentity().getDescriptorURL().getAuthority() + icons[0].getUri().toString();
-								Log.e(TAG, urlString);
 								URL url = new URL(urlString);
 								final Bitmap icon = BitmapFactory.decodeStream(url.openConnection().getInputStream());
 								m_cacheDMSIcon.put(udn, icon);
@@ -103,11 +95,7 @@ public class DeviceArrayAdapter extends ArrayAdapter<Device> {
 									}
 								});
 
-							} catch (MalformedURLException e) {
-								Log.e(TAG, "Can't get Icon of device: " + device.getDisplayString());
-								holder.deviceIcon.setImageResource(R.drawable.icon_dms);
-							} catch (IOException e) {
-								Log.e(TAG, "Can't get Icon of device: " + device.getDisplayString());
+							} catch (Exception ex) {
 								holder.deviceIcon.setImageResource(R.drawable.icon_dms);
 							}
 						}
