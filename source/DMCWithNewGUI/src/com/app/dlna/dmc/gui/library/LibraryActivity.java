@@ -174,6 +174,7 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 				Toast.makeText(LibraryActivity.this, "Current playlist is full", Toast.LENGTH_SHORT).show();
 			} else {
 				m_playlistProcessor.removeItem(item);
+				m_adapter.notifyDataSetChanged();
 			}
 		}
 	}
