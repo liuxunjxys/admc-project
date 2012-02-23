@@ -390,33 +390,61 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 
 		@Override
 		public void onItemClick(AdapterView<?> adaper, View view, int position, long arg3) {
-			PlaylistItem item = m_adapter.getItem(position);
-			String url = item.getUri();
-			if (m_dmrProcessor == null) {
-				Toast.makeText(PlaylistActivity.this, "Cannot get DMRProcessor", Toast.LENGTH_SHORT).show();
-			} else {
-				m_dmrProcessor.setURIandPlay(url);
-				m_playlistProcessor.setCurrentItem(item);
-				m_adapter.setCurrentItem(item);
-				validateListView(item);
-			}
+			playItem(position);
 		}
 	};
+
+	private void playItem(int position) {
+		PlaylistItem item = m_adapter.getItem(position);
+		String url = item.getUri();
+		if (m_dmrProcessor == null) {
+			Toast.makeText(PlaylistActivity.this, "Cannot get DMRProcessor", Toast.LENGTH_SHORT).show();
+		} else {
+			m_dmrProcessor.setURIandPlay(url);
+			m_playlistProcessor.setCurrentItem(item);
+			m_adapter.setCurrentItem(item);
+			validateListView(item);
+		}
+	}
 
 	private OnItemLongClickListener onPlaylistItemLongClick = new OnItemLongClickListener() {
 
 		@Override
 		public boolean onItemLongClick(AdapterView<?> adapter, View view, final int position, long arg3) {
-			new AlertDialog.Builder(PlaylistActivity.this).setMessage("Confirm to delete this item").setTitle("Confirm").setCancelable(false)
-					.setPositiveButton("Delete", new OnClickListener() {
+			// new AlertDialog.Builder(PlaylistActivity.this).setMessage("Confirm to delete this item").setTitle("Confirm").setCancelable(false)
+			// .setPositiveButton("Delete", new OnClickListener() {
+			//
+			// @Override
+			// public void onClick(DialogInterface dialog, int which) {
+			// m_playlistProcessor.removeItem(m_adapter.getItem(position));
+			// m_adapter.notifyDataSetChanged();
+			// }
+			// }).setNegativeButton("Cancel", null).create().show();
+			final String actionList[] = new String[2];
+			actionList[0] = "Play";
+			actionList[1] = "Remove";
+			new AlertDialog.Builder(PlaylistActivity.this).setTitle("Select action").setCancelable(false).setItems(actionList, new OnClickListener() {
 
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							m_playlistProcessor.removeItem(m_adapter.getItem(position));
-							m_adapter.notifyDataSetChanged();
-						}
-					}).setNegativeButton("Cancel", null).create().show();
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					switch (which) {
+					case 0:
+						playItem(position);
+						break;
+					case 1:
+						PlaylistItem item = m_adapter.getItem(position);
+						m_playlistProcessor.removeItem(item);
+						m_adapter.remove(item);
+						m_adapter.notifyDataSetChanged();
+						break;
+					default:
+						break;
+					}
+				}
+			}).setNegativeButton("Cancel", null).create().show();
+
 			return true;
+
 		}
 	};
 

@@ -83,6 +83,18 @@ public class LocalContentDirectoryService extends AbstractContentDirectoryServic
 		}).start();
 	}
 
+	public static void removeAllContent() {
+		synchronized (m_listMusic) {
+			m_listMusic.clear();
+		}
+		synchronized (m_listPhoto) {
+			m_listPhoto.clear();
+		}
+		synchronized (m_listVideo) {
+			m_listVideo.clear();
+		}
+	}
+
 	// private Thread m_scaningThread = new Thread(new Runnable() {
 	//
 	// @Override

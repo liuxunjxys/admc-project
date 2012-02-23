@@ -2,7 +2,10 @@ package com.app.dlna.dmc.gui;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TabHost;
@@ -17,6 +20,7 @@ import com.app.dlna.dmc.gui.playlist.PlaylistActivity;
 import com.app.dlna.dmc.gui.youtube.YoutubeActivity;
 import com.app.dlna.dmc.processor.impl.UpnpProcessorImpl;
 import com.app.dlna.dmc.processor.interfaces.UpnpProcessor;
+import com.app.dlna.dmc.processor.localdevice.service.LocalContentDirectoryService;
 
 public class MainActivity extends UpnpListenerTabActivity {
 	private static final String TAG = MainActivity.class.getName();
@@ -24,7 +28,19 @@ public class MainActivity extends UpnpListenerTabActivity {
 	private UpnpProcessor m_processor = null;
 	private ProgressDialog m_progressDialog = null;
 	private static final int DEFAULT_TAB_INDEX = 0;
-	private boolean m_isStartCommplete = false;
+
+	BroadcastReceiver m_mountedReceiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String action = intent.getAction();
+			if (action.equals(Intent.ACTION_MEDIA_UNMOUNTED)) {
+				LocalContentDirectoryService.removeAllContent();
+			} else if (action.equals(Intent.ACTION_MEDIA_MOUNTED)) {
+				LocalContentDirectoryService.scanMedia();
+			}
+		}
+	};
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -38,6 +54,13 @@ public class MainActivity extends UpnpListenerTabActivity {
 		m_processor.bindUpnpService();
 		m_progressDialog = ProgressDialog.show(MainActivity.this, "Starting Service", "");
 		m_progressDialog.setCancelable(true);
+
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(Intent.ACTION_MEDIA_MOUNTED);
+		filter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
+		filter.addDataScheme("file");
+
+		registerReceiver(m_mountedReceiver, filter);
 	}
 
 	private OnTabChangeListener changeListener = new OnTabChangeListener() {
@@ -74,12 +97,12 @@ public class MainActivity extends UpnpListenerTabActivity {
 		Log.i(TAG, "MainActivity onDestroy");
 		m_processor.unbindUpnpService();
 		super.onDestroy();
+		unregisterReceiver(m_mountedReceiver);
 	};
 
 	@Override
 	public void onStartComplete() {
 		super.onStartComplete();
-		m_isStartCommplete = true;
 		TabSpec devicesTabSpec = m_tabHost.newTabSpec("Devices");
 
 		Intent intent = null;
