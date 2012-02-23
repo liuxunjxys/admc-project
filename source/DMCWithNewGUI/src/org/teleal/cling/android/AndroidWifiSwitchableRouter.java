@@ -51,26 +51,35 @@ public class AndroidWifiSwitchableRouter extends SwitchableRouterImpl {
 	private static final String TAG = "AndroidWifiSwitchableRouter";
 
 	private static Logger log = Logger.getLogger(Router.class.getName());
-
-	final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			if (!intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION))
-				return;
-			NetworkInfo wifiInfo = getConnectivityManager().getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-			// We can't listen to "is available" or simply "is switched on", we have to make sure it's connected
-			// TODO: must add secondcheck here
-			// if (!wifiInfo.isConnected()) {
-			// log.info("WiFi state changed, trying to disable router");
-			// disable();
-			// } else {
-			// log.info("WiFi state changed, trying to enable router");
-			// enable();
-			// }
-
-			enable();
-		}
-	};
+	// TODO: remake the broadcast receiver to listen the connection state change event
+	// final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+	// @Override
+	// public void onReceive(Context context, Intent intent) {
+	// if (!intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION))
+	// return;
+	//
+	// // NetworkInfo wifiInfo = getConnectivityManager().getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+	// //
+	// // if (wifiInfo.isConnected()) {
+	// // Log.e(TAG, "Wifi is connected");
+	// // enable();
+	// // } else {
+	// // Log.e(TAG, "Wifi is not connected");
+	// // disable();
+	// // enable();
+	// // }
+	// // We can't listen to "is available" or simply "is switched on", we have to make sure it's connected
+	// // TODO: must add secondcheck here
+	// // if (!wifiInfo.isConnected()) {
+	// // log.info("WiFi state changed, trying to disable router");
+	// // disable();
+	// // } else {
+	// // log.info("WiFi state changed, trying to enable router");
+	// // enable();
+	// // }
+	//
+	// }
+	// };
 
 	final private WifiManager wifiManager;
 	final private ConnectivityManager connectivityManager;
@@ -87,22 +96,13 @@ public class AndroidWifiSwitchableRouter extends SwitchableRouterImpl {
 		// NetworkInfo wifiInfo = getConnectivityManager().getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
 		// TODO: recheck wifi here
-		// if (wifiInfo.isConnected() || ModelUtil.ANDROID_EMULATOR) {
-		// log.info("WiFi is enabled (or running on Android emulator), starting router immediately");
-		// enable();
-		// }
-		if (connectivityManager.getActiveNetworkInfo() != null) {
-			Log.d(TAG, connectivityManager.getActiveNetworkInfo().getTypeName());
-		} else {
-			Log.d(TAG, "No active network");
-		}
 
 		enable();
 	}
 
-	public BroadcastReceiver getBroadcastReceiver() {
-		return broadcastReceiver;
-	}
+	// public BroadcastReceiver getBroadcastReceiver() {
+	// return broadcastReceiver;
+	// }
 
 	protected WifiManager getWifiManager() {
 		return wifiManager;
@@ -154,7 +154,7 @@ public class AndroidWifiSwitchableRouter extends SwitchableRouterImpl {
 
 	@Override
 	protected int getLockTimeoutMillis() {
-		return 10000;
+		return 100000;
 	}
 
 }

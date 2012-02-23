@@ -24,48 +24,20 @@ public class MainActivity extends UpnpListenerTabActivity {
 	private UpnpProcessor m_processor = null;
 	private ProgressDialog m_progressDialog = null;
 	private static final int DEFAULT_TAB_INDEX = 0;
+	private boolean m_isStartCommplete = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		Log.i(TAG, "MainActivity onCreate");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_activity);
+		m_tabHost = getTabHost();
+		m_tabHost.setup();
 
 		m_processor = new UpnpProcessorImpl(MainActivity.this);
 		m_processor.bindUpnpService();
 		m_progressDialog = ProgressDialog.show(MainActivity.this, "Starting Service", "");
 		m_progressDialog.setCancelable(true);
-		m_tabHost = getTabHost();
-		m_tabHost.setup();
-		Intent intent = null;
-
-		TabSpec devicesTabSpec = m_tabHost.newTabSpec("Devices");
-		devicesTabSpec.setIndicator("Devices", getResources().getDrawable(R.drawable.ic_tab_devices));
-		intent = new Intent(this, DevicesActivity.class);
-		devicesTabSpec.setContent(intent);
-
-		TabSpec libraryTabSpec = m_tabHost.newTabSpec("Library");
-		libraryTabSpec.setIndicator("Library", getResources().getDrawable(R.drawable.ic_tab_browse));
-		intent = new Intent(this, LibraryActivity.class);
-		libraryTabSpec.setContent(intent);
-
-		TabSpec youtubeTabSpec = m_tabHost.newTabSpec("Youtube");
-		youtubeTabSpec.setIndicator("Youtube", getResources().getDrawable(R.drawable.ic_tab_youtube));
-		intent = new Intent(this, YoutubeActivity.class);
-		youtubeTabSpec.setContent(intent);
-
-		TabSpec playlistTabSpec = m_tabHost.newTabSpec("Playlist");
-		playlistTabSpec.setIndicator("Playlist", getResources().getDrawable(R.drawable.ic_tab_play_list));
-		intent = new Intent(this, PlaylistActivity.class);
-		playlistTabSpec.setContent(intent);
-
-		m_tabHost.addTab(devicesTabSpec);
-		m_tabHost.addTab(libraryTabSpec);
-		m_tabHost.addTab(youtubeTabSpec);
-		m_tabHost.addTab(playlistTabSpec);
-
-		m_tabHost.setCurrentTab(DEFAULT_TAB_INDEX);
-
 	}
 
 	private OnTabChangeListener changeListener = new OnTabChangeListener() {
@@ -107,6 +79,36 @@ public class MainActivity extends UpnpListenerTabActivity {
 	@Override
 	public void onStartComplete() {
 		super.onStartComplete();
+		m_isStartCommplete = true;
+		TabSpec devicesTabSpec = m_tabHost.newTabSpec("Devices");
+
+		Intent intent = null;
+		devicesTabSpec.setIndicator("Devices", getResources().getDrawable(R.drawable.ic_tab_devices));
+		intent = new Intent(this, DevicesActivity.class);
+		devicesTabSpec.setContent(intent);
+
+		TabSpec libraryTabSpec = m_tabHost.newTabSpec("Library");
+		libraryTabSpec.setIndicator("Library", getResources().getDrawable(R.drawable.ic_tab_browse));
+		intent = new Intent(this, LibraryActivity.class);
+		libraryTabSpec.setContent(intent);
+
+		TabSpec youtubeTabSpec = m_tabHost.newTabSpec("Youtube");
+		youtubeTabSpec.setIndicator("Youtube", getResources().getDrawable(R.drawable.ic_tab_youtube));
+		intent = new Intent(this, YoutubeActivity.class);
+		youtubeTabSpec.setContent(intent);
+
+		TabSpec playlistTabSpec = m_tabHost.newTabSpec("Playlist");
+		playlistTabSpec.setIndicator("Playlist", getResources().getDrawable(R.drawable.ic_tab_play_list));
+		intent = new Intent(this, PlaylistActivity.class);
+		playlistTabSpec.setContent(intent);
+
+		m_tabHost.addTab(devicesTabSpec);
+		m_tabHost.addTab(libraryTabSpec);
+		m_tabHost.addTab(youtubeTabSpec);
+		m_tabHost.addTab(playlistTabSpec);
+
+		m_tabHost.setCurrentTab(DEFAULT_TAB_INDEX);
+
 		m_tabHost.setOnTabChangedListener(changeListener);
 		m_progressDialog.setTitle("Scanning device");
 		new Thread(new Runnable() {
