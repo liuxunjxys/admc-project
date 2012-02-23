@@ -82,6 +82,12 @@ public class CoreUpnpService extends Service {
 		else
 			HTTPServerData.HOST = null;
 
+		if (m_connectivityManager.getActiveNetworkInfo() != null) {
+			Log.e(TAG, m_connectivityManager.getActiveNetworkInfo().getTypeName());
+		} else {
+			Log.e(TAG, "No active network");
+		}
+
 		m_notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
 		m_httpThread = new HttpThread();
@@ -91,12 +97,10 @@ public class CoreUpnpService extends Service {
 
 		final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 
-		final ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-
 		upnpService = new UpnpServiceImpl(createConfiguration(wifiManager)) {
 			@Override
 			protected Router createRouter(ProtocolFactory protocolFactory, Registry registry) {
-				AndroidWifiSwitchableRouter router = CoreUpnpService.this.createRouter(getConfiguration(), protocolFactory, wifiManager, connectivityManager);
+				AndroidWifiSwitchableRouter router = CoreUpnpService.this.createRouter(getConfiguration(), protocolFactory, wifiManager, m_connectivityManager);
 				if (!ModelUtil.ANDROID_EMULATOR && isListeningForConnectivityChanges()) {
 					registerReceiver(router.getBroadcastReceiver(), new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
 				}
@@ -109,7 +113,7 @@ public class CoreUpnpService extends Service {
 	}
 
 	protected AndroidUpnpServiceConfiguration createConfiguration(WifiManager wifiManager) {
-		return new AndroidUpnpServiceConfiguration(wifiManager);
+		return new AndroidUpnpServiceConfiguration(wifiManager, m_connectivityManager);
 	}
 
 	protected AndroidWifiSwitchableRouter createRouter(UpnpServiceConfiguration configuration, ProtocolFactory protocolFactory, WifiManager wifiManager,

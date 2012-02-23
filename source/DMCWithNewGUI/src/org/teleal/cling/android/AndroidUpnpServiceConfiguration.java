@@ -36,6 +36,7 @@ import org.teleal.cling.transport.spi.NetworkAddressFactory;
 import org.teleal.cling.transport.spi.StreamClient;
 import org.teleal.cling.transport.spi.StreamServer;
 
+import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 
 /**
@@ -68,9 +69,11 @@ public class AndroidUpnpServiceConfiguration extends DefaultUpnpServiceConfigura
 	final private static Logger log = Logger.getLogger(AndroidUpnpServiceConfiguration.class.getName());
 
 	final protected WifiManager wifiManager;
+	private ConnectivityManager m_connectivityManager;
 
-	public AndroidUpnpServiceConfiguration(WifiManager wifiManager) {
+	public AndroidUpnpServiceConfiguration(WifiManager wifiManager, ConnectivityManager connectivityManager) {
 		this(wifiManager, 0); // Ephemeral port
+		m_connectivityManager = connectivityManager;
 	}
 
 	public AndroidUpnpServiceConfiguration(WifiManager wifiManager, int streamListenPort) {
@@ -83,7 +86,7 @@ public class AndroidUpnpServiceConfiguration extends DefaultUpnpServiceConfigura
 
 	@Override
 	protected NetworkAddressFactory createNetworkAddressFactory(int streamListenPort) {
-		return new AndroidNetworkAddressFactory(wifiManager);
+		return new AndroidNetworkAddressFactory(wifiManager, m_connectivityManager);
 	}
 
 	@Override
