@@ -34,7 +34,7 @@ import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 public class DMRProcessorImpl implements DMRProcessor {
 	private static final int UPDATE_INTERVAL = 1000;
 	private static final String TAG = DMRProcessorImpl.class.getName();
-	protected static final long SEEK_DELAY_INTERVAL = 1000;
+	protected static final long SEEK_DELAY_INTERVAL = 200;
 	@SuppressWarnings("rawtypes")
 	private Device m_device;
 	private ControlPoint m_controlPoint;
@@ -76,7 +76,8 @@ public class DMRProcessorImpl implements DMRProcessor {
 						public void received(ActionInvocation invocation, PositionInfo positionInfo) {
 							check1 = false;
 							fireUpdatePositionEvent(positionInfo.getTrackElapsedSeconds(), positionInfo.getTrackDurationSeconds());
-							if ((positionInfo.getTrack().getValue() == 0 || positionInfo.getElapsedPercent() == 100) && m_state == PLAYING) {
+							if ((positionInfo.getTrack().getValue() == 0 || positionInfo.getElapsedPercent() == 100)
+									&& m_state == PLAYING) {
 								try {
 									m_state = STOP;
 									Thread.sleep(2000);
@@ -184,8 +185,11 @@ public class DMRProcessorImpl implements DMRProcessor {
 				} catch (URISyntaxException e) {
 					current_uri = null;
 				}
-				if (currentPath != null && newPath != null && currentPath.equals(newPath)
-						&& (currentQuery == newQuery || (currentQuery != null && newQuery != null && currentQuery.equals(newQuery)))) {
+				if (currentPath != null
+						&& newPath != null
+						&& currentPath.equals(newPath)
+						&& (currentQuery == newQuery || (currentQuery != null && newQuery != null && currentQuery
+								.equals(newQuery)))) {
 					play();
 				} else {
 					stop();
@@ -243,8 +247,11 @@ public class DMRProcessorImpl implements DMRProcessor {
 				} catch (URISyntaxException e) {
 					current_uri = null;
 				}
-				if (currentPath != null && newPath != null && currentPath.equals(newPath)
-						&& (currentQuery == newQuery || (currentQuery != null && newQuery != null && currentQuery.equals(newQuery)))) {
+				if (currentPath != null
+						&& newPath != null
+						&& currentPath.equals(newPath)
+						&& (currentQuery == newQuery || (currentQuery != null && newQuery != null && currentQuery
+								.equals(newQuery)))) {
 					play();
 				} else {
 					Log.e(TAG, "set AV uri = " + uri);
