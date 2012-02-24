@@ -39,7 +39,7 @@ import android.widget.Toast;
 import com.app.dlna.dmc.R;
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.processor.http.HTTPServerData;
-import com.app.dlna.dmc.processor.http.HttpThread;
+import com.app.dlna.dmc.processor.http.MainHttpProcessor;
 import com.app.dlna.dmc.processor.impl.DMRProcessorImpl;
 import com.app.dlna.dmc.processor.impl.DMSProcessorImpl;
 import com.app.dlna.dmc.processor.impl.PlaylistProcessorImpl;
@@ -52,7 +52,7 @@ import com.app.dlna.dmc.utility.Utility;
 public class CoreUpnpService extends Service {
 	private static final int NOTIFICATION = 1500;
 	private static final String TAG = CoreUpnpService.class.getName();
-	private HttpThread m_httpThread;
+	private MainHttpProcessor m_httpThread;
 	private UpnpService upnpService;
 	private CoreUpnpServiceBinder binder = new CoreUpnpServiceBinder();
 	@SuppressWarnings("rawtypes")
@@ -88,7 +88,7 @@ public class CoreUpnpService extends Service {
 
 		m_notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-		m_httpThread = new HttpThread();
+		m_httpThread = new MainHttpProcessor();
 		m_httpThread.start();
 		// Create playlist with capacity = 100;
 		m_playlistProcessor = new PlaylistProcessorImpl(100);

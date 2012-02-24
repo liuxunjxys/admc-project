@@ -11,11 +11,11 @@ import java.util.List;
 
 import android.util.Log;
 
-public class HttpThread extends Thread {
+public class MainHttpProcessor extends Thread {
 	private static final String TAG = "HttpThreadLog";
 	private ServerSocket m_server;
 
-	public HttpThread() {
+	public MainHttpProcessor() {
 		HTTPServerData.RUNNING = true;
 	}
 
