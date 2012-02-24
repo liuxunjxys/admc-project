@@ -114,7 +114,8 @@ public class YoutubeActivity extends UpnpListenerActivity {
 	}
 
 	private void switchToDMRList(final String link, final String directlink) {
-		// Intent intent = new Intent(YoutubeActivity.this, DMRListActivity.class);
+		// Intent intent = new Intent(YoutubeActivity.this,
+		// DMRListActivity.class);
 		// intent.putExtra("URL", directlink);
 		// intent.putExtra("Title", link);
 		// YoutubeActivity.this.startActivity(intent);
@@ -128,12 +129,14 @@ public class YoutubeActivity extends UpnpListenerActivity {
 					item.setUrl(directlink);
 					item.setType(Type.VIDEO);
 					if (m_playlistProcessor.addItem(item))
-						Toast.makeText(YoutubeActivity.this, "Add item \"" + item.getTitle() + "\" to playlist sucess", Toast.LENGTH_SHORT).show();
+						Toast.makeText(YoutubeActivity.this, "Add item \"" + item.getTitle() + "\" to playlist sucess",
+								Toast.LENGTH_SHORT).show();
 					else {
 						if (m_playlistProcessor.isFull()) {
 							Toast.makeText(YoutubeActivity.this, "Current playlist is full", Toast.LENGTH_SHORT).show();
 						} else {
-							Toast.makeText(YoutubeActivity.this, "Item already exits in current Playlist", Toast.LENGTH_SHORT).show();
+							Toast.makeText(YoutubeActivity.this, "Item already exits in current Playlist", Toast.LENGTH_SHORT)
+									.show();
 						}
 					}
 				}
@@ -162,7 +165,8 @@ public class YoutubeActivity extends UpnpListenerActivity {
 					dissmissProgressDialog();
 					String generatedURL;
 					try {
-						generatedURL = new URI("http", HTTPServerData.HOST + ":" + HTTPServerData.PORT, result, null, null).toString();
+						generatedURL = new URI("http", HTTPServerData.HOST + ":" + HTTPServerData.PORT, result, null, null)
+								.toString();
 						Log.i(TAG, "Generated URL = " + generatedURL);
 						switchToDMRList(link, generatedURL);
 					} catch (URISyntaxException e) {
