@@ -46,7 +46,7 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 	private List<String> m_traceID;
 	private String m_currentDMSUDN;
 	private PlaylistProcessor m_playlistProcessor;
-	private EditText filterText;
+	private EditText m_filterText;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -64,8 +64,8 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 		m_traceID = new ArrayList<String>();
 		m_traceID.add("-1");
 
-		filterText = (EditText) findViewById(R.id.search_box);
-		filterText.addTextChangedListener(filterTextWatcher);
+		m_filterText = (EditText) findViewById(R.id.search_box);
+		m_filterText.addTextChangedListener(filterTextWatcher);
 
 	}
 
@@ -112,7 +112,7 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 	protected void onPause() {
 		Log.i(TAG, "Library onPause");
 		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-		imm.hideSoftInputFromWindow(filterText.getWindowToken(), 0);
+		imm.hideSoftInputFromWindow(m_filterText.getWindowToken(), 0);
 		if (m_upnpProcessor != null) {
 			m_upnpProcessor.removeListener(LibraryActivity.this);
 		}
@@ -123,7 +123,7 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 	protected void onDestroy() {
 		Log.i(TAG, "Library onDestroy");
 		m_upnpProcessor.unbindUpnpService();
-		filterText.removeTextChangedListener(filterTextWatcher);
+		m_filterText.removeTextChangedListener(filterTextWatcher);
 
 		super.onDestroy();
 	}
@@ -142,6 +142,7 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 	};
 
 	private void browse(String id) {
+		m_filterText.setText("");
 		Log.e(TAG, "Browse id = " + id);
 		m_traceID.add(id);
 		m_progressDlg = ProgressDialog.show(LibraryActivity.this, "Loading", "Loading...");
