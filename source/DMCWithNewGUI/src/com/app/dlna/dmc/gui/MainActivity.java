@@ -13,6 +13,7 @@ import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabSpec;
 import android.widget.Toast;
 
+import com.app.dlna.dmc.R;
 import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerTabActivity;
 import com.app.dlna.dmc.gui.devices.DevicesActivity;
 import com.app.dlna.dmc.gui.library.LibraryActivity;

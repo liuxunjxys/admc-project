@@ -36,8 +36,8 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.app.dlna.dmc.R;
 import com.app.dlna.dmc.gui.MainActivity;
-import com.app.dlna.dmc.gui.R;
 import com.app.dlna.dmc.processor.http.HTTPServerData;
 import com.app.dlna.dmc.processor.http.HttpThread;
 import com.app.dlna.dmc.processor.impl.DMRProcessorImpl;
@@ -99,9 +99,12 @@ public class CoreUpnpService extends Service {
 			@Override
 			protected Router createRouter(ProtocolFactory protocolFactory, Registry registry) {
 				// TODO: Add broadcast receiver here
-				AndroidWifiSwitchableRouter router = CoreUpnpService.this.createRouter(getConfiguration(), protocolFactory, wifiManager, m_connectivityManager);
-				// if (!ModelUtil.ANDROID_EMULATOR && isListeningForConnectivityChanges()) {
-				// registerReceiver(router.getBroadcastReceiver(), new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
+				AndroidWifiSwitchableRouter router = CoreUpnpService.this.createRouter(getConfiguration(), protocolFactory,
+						wifiManager, m_connectivityManager);
+				// if (!ModelUtil.ANDROID_EMULATOR &&
+				// isListeningForConnectivityChanges()) {
+				// registerReceiver(router.getBroadcastReceiver(), new
+				// IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
 				// }
 				return router;
 			}
@@ -115,16 +118,18 @@ public class CoreUpnpService extends Service {
 		return new AndroidUpnpServiceConfiguration(wifiManager, m_connectivityManager);
 	}
 
-	protected AndroidWifiSwitchableRouter createRouter(UpnpServiceConfiguration configuration, ProtocolFactory protocolFactory, WifiManager wifiManager,
-			ConnectivityManager connectivityManager) {
+	protected AndroidWifiSwitchableRouter createRouter(UpnpServiceConfiguration configuration, ProtocolFactory protocolFactory,
+			WifiManager wifiManager, ConnectivityManager connectivityManager) {
 		return new AndroidWifiSwitchableRouter(configuration, protocolFactory, wifiManager, connectivityManager);
 	}
 
 	@Override
 	public void onDestroy() {
 		// TODO: Remove broadcast receiver here
-		// if (!ModelUtil.ANDROID_EMULATOR && isListeningForConnectivityChanges())
-		// unregisterReceiver(((AndroidWifiSwitchableRouter) upnpService.getRouter()).getBroadcastReceiver());
+		// if (!ModelUtil.ANDROID_EMULATOR &&
+		// isListeningForConnectivityChanges())
+		// unregisterReceiver(((AndroidWifiSwitchableRouter)
+		// upnpService.getRouter()).getBroadcastReceiver());
 		try {
 			upnpService.shutdown();
 		} catch (Exception ex) {
@@ -168,11 +173,13 @@ public class CoreUpnpService extends Service {
 			m_currentDMS = upnpService.getRegistry().getDevice(uDN, true);
 			if (m_currentDMS != null) {
 				Log.d(TAG, "CURRENT DMS:" + m_currentDMS.toString());
-				Toast.makeText(getApplicationContext(), "Set DMS complete: " + m_currentDMS.getDisplayString(), Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), "Set DMS complete: " + m_currentDMS.getDisplayString(),
+						Toast.LENGTH_SHORT).show();
 				m_dmsProcessor = new DMSProcessorImpl(getControlPoint(), m_currentDMS);
 			} else {
 				Log.e(TAG, "GET DMS FAIL:" + uDN.toString());
-				Toast.makeText(getApplicationContext(), "Set DMS fail. Cannot get DMS info; UDN = " + uDN.toString(), Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), "Set DMS fail. Cannot get DMS info; UDN = " + uDN.toString(),
+						Toast.LENGTH_SHORT).show();
 				m_dmsProcessor = null;
 			}
 		}
@@ -183,11 +190,13 @@ public class CoreUpnpService extends Service {
 			m_currentDMR = upnpService.getRegistry().getRemoteDevice(uDN, true);
 			if (m_currentDMR != null) {
 				Log.d(TAG, "CURRENT DMR:" + m_currentDMR.toString());
-				Toast.makeText(getApplicationContext(), "Set DMR complete: " + m_currentDMR.getDisplayString(), Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), "Set DMR complete: " + m_currentDMR.getDisplayString(),
+						Toast.LENGTH_SHORT).show();
 				m_dmrProcessor = new DMRProcessorImpl(m_currentDMR, getControlPoint());
 			} else {
 				Log.e(TAG, "GET DMR FAIL:" + uDN.toString());
-				Toast.makeText(getApplicationContext(), "Set DMR fail. Cannot get DMR info; UDN = " + uDN.toString(), Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), "Set DMR fail. Cannot get DMR info; UDN = " + uDN.toString(),
+						Toast.LENGTH_SHORT).show();
 				m_dmrProcessor = null;
 			}
 		}
@@ -227,14 +236,17 @@ public class CoreUpnpService extends Service {
 			Log.i(TAG, "Local DMS: Device name = " + deviceName + ";MAC = " + MACAddress);
 			String hashUDN = Utility.getMD5(deviceName + "-" + MACAddress);
 			Log.i(TAG, "Hash UDN = " + hashUDN);
-			String uDNString = hashUDN.substring(0, 8) + "-" + hashUDN.substring(8, 12) + "-" + hashUDN.substring(12, 16) + "-" + hashUDN.substring(16, 20)
-					+ "-" + hashUDN.substring(20);
-			LocalService<LocalContentDirectoryService> localService = new AnnotationLocalServiceBinder().read(LocalContentDirectoryService.class);
-			localService.setManager(new DefaultServiceManager<LocalContentDirectoryService>(localService, LocalContentDirectoryService.class));
+			String uDNString = hashUDN.substring(0, 8) + "-" + hashUDN.substring(8, 12) + "-" + hashUDN.substring(12, 16) + "-"
+					+ hashUDN.substring(16, 20) + "-" + hashUDN.substring(20);
+			LocalService<LocalContentDirectoryService> localService = new AnnotationLocalServiceBinder()
+					.read(LocalContentDirectoryService.class);
+			localService.setManager(new DefaultServiceManager<LocalContentDirectoryService>(localService,
+					LocalContentDirectoryService.class));
 
 			DeviceIdentity identity = new DeviceIdentity(new UDN(uDNString));
 			DeviceType type = new DeviceType("schemas-upnp-org", "MediaServer");
-			DeviceDetails details = new DeviceDetails(deviceName, new ManufacturerDetails("Android Digital Controller"), new ModelDetails("v1.0"), "", "");
+			DeviceDetails details = new DeviceDetails(deviceName, new ManufacturerDetails("Android Digital Controller"),
+					new ModelDetails("v1.0"), "", "");
 
 			LocalDevice localDevice = new LocalDevice(identity, type, details, localService);
 
@@ -247,7 +259,8 @@ public class CoreUpnpService extends Service {
 	}
 
 	private void showNotification() {
-		Notification notification = new Notification(R.drawable.ic_launcher, "CoreUpnpService started", System.currentTimeMillis());
+		Notification notification = new Notification(R.drawable.ic_launcher, "CoreUpnpService started",
+				System.currentTimeMillis());
 
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(CoreUpnpService.this, MainActivity.class), 0);
 
