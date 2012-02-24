@@ -26,7 +26,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.app.dlna.dmc.gui.R;
+import com.app.dlna.dmc.R;
 import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerActivity;
 import com.app.dlna.dmc.processor.impl.UpnpProcessorImpl;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor;
@@ -236,7 +236,8 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 			m_traceID.remove(m_traceID.size() - 1);
 			m_traceID.remove(m_traceID.size() - 1);
 		} else {
-			Toast.makeText(LibraryActivity.this, "You are in the root of this MediaServer. Press Back again to chose other MediaServer", Toast.LENGTH_SHORT)
+			Toast.makeText(LibraryActivity.this,
+					"You are in the root of this MediaServer. Press Back again to chose other MediaServer", Toast.LENGTH_SHORT)
 					.show();
 			finish();
 		}

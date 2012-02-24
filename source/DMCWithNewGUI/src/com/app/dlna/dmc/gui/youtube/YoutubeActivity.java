@@ -11,7 +11,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.app.dlna.dmc.gui.R;
+import com.app.dlna.dmc.R;
 import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerActivity;
 import com.app.dlna.dmc.processor.http.HTTPServerData;
 import com.app.dlna.dmc.processor.impl.UpnpProcessorImpl;

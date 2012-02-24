@@ -20,7 +20,7 @@ import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
-import com.app.dlna.dmc.gui.R;
+import com.app.dlna.dmc.R;
 
 @SuppressWarnings("rawtypes")
 public class DeviceArrayAdapter extends ArrayAdapter<Device> {
