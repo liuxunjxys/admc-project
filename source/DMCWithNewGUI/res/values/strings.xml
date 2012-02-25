@@ -27,9 +27,11 @@
     <string name="proxy_enable_text">Act as a proxy to transport data from Internet (needed when renderer can\'t connect to internet)</string>
     <string name="youtubeContent">Youtube Content</string>
     <string name="youtube_host">youtube.com</string>
-    <string name="media_server">Media Server:</string>
+    <string name="media_server">Media Server</string>
     <string name="media_renderer">Media Renderer</string>
     <string name="change_dmr">Change</string>
     <string name="type_to_filter">type to filter</string>
+    <string name="dms_list">DMS List</string>
+    <string name="dmr_list">DMR List</string>
 
 </resources>

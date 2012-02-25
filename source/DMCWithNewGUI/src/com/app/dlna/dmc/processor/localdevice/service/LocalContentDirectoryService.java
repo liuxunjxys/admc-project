@@ -125,7 +125,6 @@ public class LocalContentDirectoryService extends AbstractContentDirectoryServic
 						fileExtension = fileExtension.toLowerCase();
 					}
 					String mimeType = URLConnection.getFileNameMap().getContentTypeFor("a" + fileExtension);
-					Log.i(TAG, "FILE EXT = " + fileExtension);
 					if (mimeType != null) {
 						Res res = new Res(new MimeType(mimeType.split("/")[0], mimeType.split("/")[1]), subFile.length(),
 								Utility.createLink(subFile));
