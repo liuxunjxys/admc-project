@@ -7,8 +7,12 @@ import org.teleal.cling.model.types.UDN;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.app.dlna.dmc.R;
@@ -24,6 +28,8 @@ public class DevicesActivity extends UpnpListenerActivity {
 	private ListView m_dmsList;
 	private DeviceArrayAdapter m_dmrAdapter;
 	private DeviceArrayAdapter m_dmsAdapter;
+	private LinearLayout m_ll_dms;
+	private LinearLayout m_ll_dmr;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +48,9 @@ public class DevicesActivity extends UpnpListenerActivity {
 
 		m_dmrList.setAdapter(m_dmrAdapter);
 		m_dmsList.setAdapter(m_dmsAdapter);
+
+		m_ll_dms = (LinearLayout) findViewById(R.id.ll_dms);
+		m_ll_dmr = (LinearLayout) findViewById(R.id.ll_dmr);
 
 		m_upnpProcessor = new UpnpProcessorImpl(DevicesActivity.this);
 		m_upnpProcessor.bindUpnpService();
@@ -169,16 +178,6 @@ public class DevicesActivity extends UpnpListenerActivity {
 			@Override
 			public void run() {
 				synchronized (m_dmrAdapter) {
-					// int count = m_dmrAdapter.getCount();
-					// for (int i = 0; i < count; ++i) {
-					// Device oldDevice = m_dmrAdapter.getItem(i);
-					// if (oldDevice.getIdentity().equals(device.getIdentity()))
-					// {
-					// m_dmrAdapter.remove(oldDevice);
-					// m_dmrAdapter.insert(oldDevice, i);
-					// return;
-					// }
-					// }
 					if (device instanceof LocalDevice)
 						m_dmrAdapter.insert(device, 0);
 					else
@@ -209,16 +208,6 @@ public class DevicesActivity extends UpnpListenerActivity {
 			@Override
 			public void run() {
 				synchronized (m_dmsAdapter) {
-					// int count = m_dmsAdapter.getCount();
-					// for (int i = 0; i < count; ++i) {
-					// Device oldDevice = m_dmsAdapter.getItem(i);
-					// if (oldDevice.getIdentity().equals(device.getIdentity()))
-					// {
-					// m_dmsAdapter.remove(oldDevice);
-					// m_dmsAdapter.insert(oldDevice, i);
-					// return;
-					// }
-					// }
 					if (device instanceof LocalDevice)
 						m_dmsAdapter.insert(device, 0);
 					else
@@ -242,4 +231,96 @@ public class DevicesActivity extends UpnpListenerActivity {
 		});
 	}
 
+	public void onDMSButtonClick(View view) {
+		if (m_ll_dms.getVisibility() == View.VISIBLE)
+			return;
+		AlphaAnimation dmsAnimation = new AlphaAnimation(0f, 1f);
+		dmsAnimation.setDuration(500);
+		dmsAnimation.setAnimationListener(new AnimationListener() {
+
+			@Override
+			public void onAnimationStart(Animation animation) {
+				m_ll_dms.setVisibility(View.VISIBLE);
+			}
+
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+
+			}
+
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				m_ll_dms.setVisibility(View.VISIBLE);
+			}
+		});
+		m_ll_dms.startAnimation(dmsAnimation);
+
+		AlphaAnimation dmrAnimation = new AlphaAnimation(1f, 0f);
+		dmrAnimation.setDuration(500);
+		dmrAnimation.setAnimationListener(new AnimationListener() {
+
+			@Override
+			public void onAnimationStart(Animation animation) {
+				m_ll_dmr.setVisibility(View.VISIBLE);
+			}
+
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+
+			}
+
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				m_ll_dmr.setVisibility(View.GONE);
+			}
+		});
+		m_ll_dmr.startAnimation(dmrAnimation);
+
+	}
+
+	public void onDMRButtonClick(View view) {
+		if (m_ll_dmr.getVisibility() == View.VISIBLE)
+			return;
+		AlphaAnimation dmsAnimation = new AlphaAnimation(1f, 0f);
+		dmsAnimation.setDuration(500);
+		dmsAnimation.setAnimationListener(new AnimationListener() {
+
+			@Override
+			public void onAnimationStart(Animation animation) {
+				m_ll_dms.setVisibility(View.VISIBLE);
+			}
+
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+
+			}
+
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				m_ll_dms.setVisibility(View.GONE);
+			}
+		});
+		m_ll_dms.startAnimation(dmsAnimation);
+
+		AlphaAnimation dmrAnimation = new AlphaAnimation(0f, 1f);
+		dmrAnimation.setDuration(500);
+		dmrAnimation.setAnimationListener(new AnimationListener() {
+
+			@Override
+			public void onAnimationStart(Animation animation) {
+				m_ll_dmr.setVisibility(View.VISIBLE);
+			}
+
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+
+			}
+
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				m_ll_dmr.setVisibility(View.VISIBLE);
+			}
+		});
+		m_ll_dmr.startAnimation(dmrAnimation);
+	}
 }

@@ -71,35 +71,40 @@ public class DeviceArrayAdapter extends ArrayAdapter<Device> {
 			holder.deviceIcon.setImageBitmap(m_cacheDMSIcon.get(udn));
 		} else {
 			if (device instanceof RemoteDevice) {
-				final Icon[] icons = device.getIcons();
-				if (icons != null && icons[0] != null && icons[0].getUri() != null) {
+				try {
+					final Icon[] icons = device.getIcons();
+					if (icons != null && icons[0] != null && icons[0].getUri() != null) {
 
-					new Thread(new Runnable() {
+						new Thread(new Runnable() {
 
-						@Override
-						public void run() {
-							try {
-								final RemoteDevice remoteDevice = (RemoteDevice) device;
+							@Override
+							public void run() {
+								try {
+									final RemoteDevice remoteDevice = (RemoteDevice) device;
 
-								String urlString = remoteDevice.getIdentity().getDescriptorURL().getProtocol() + "://"
-										+ remoteDevice.getIdentity().getDescriptorURL().getAuthority() + icons[0].getUri().toString();
-								URL url = new URL(urlString);
-								final Bitmap icon = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-								m_cacheDMSIcon.put(udn, icon);
-								m_mainActivity.runOnUiThread(new Runnable() {
+									String urlString = remoteDevice.getIdentity().getDescriptorURL().getProtocol() + "://"
+											+ remoteDevice.getIdentity().getDescriptorURL().getAuthority()
+											+ icons[0].getUri().toString();
+									URL url = new URL(urlString);
+									final Bitmap icon = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+									m_cacheDMSIcon.put(udn, icon);
+									m_mainActivity.runOnUiThread(new Runnable() {
 
-									@Override
-									public void run() {
-										DeviceArrayAdapter.this.notifyDataSetChanged();
-									}
-								});
+										@Override
+										public void run() {
+											DeviceArrayAdapter.this.notifyDataSetChanged();
+										}
+									});
 
-							} catch (Exception ex) {
-								holder.deviceIcon.setImageResource(R.drawable.icon_dms);
+								} catch (Exception ex) {
+									holder.deviceIcon.setImageResource(R.drawable.icon_dms);
+								}
 							}
-						}
-					}).start();
+						}).start();
 
+					}
+				} catch (Exception ex) {
+					ex.printStackTrace();
 				}
 			} else {
 				holder.deviceIcon.setImageResource(R.drawable.ic_launcher);
