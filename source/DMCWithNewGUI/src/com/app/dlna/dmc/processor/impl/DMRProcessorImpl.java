@@ -30,6 +30,8 @@ import org.teleal.cling.support.renderingcontrol.callback.SetVolume;
 import android.util.Log;
 
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
+import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
+import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 
 public class DMRProcessorImpl implements DMRProcessor {
 	private static final int UPDATE_INTERVAL = 1000;
@@ -43,6 +45,7 @@ public class DMRProcessorImpl implements DMRProcessor {
 	@SuppressWarnings("rawtypes")
 	private Service m_renderingControl = null;
 	private List<DMRProcessorListner> m_listeners;
+	private PlaylistProcessor m_playlistProcessor;
 	private boolean m_isRunning = true;
 	private int m_currentVolume;
 	private boolean m_isBusy = false;
@@ -74,7 +77,8 @@ public class DMRProcessorImpl implements DMRProcessor {
 						@SuppressWarnings("rawtypes")
 						@Override
 						public void received(ActionInvocation invocation, PositionInfo positionInfo) {
-							check1 = false;
+
+							Log.v(TAG, positionInfo.toString());
 							fireUpdatePositionEvent(positionInfo.getTrackElapsedSeconds(), positionInfo.getTrackDurationSeconds());
 							if ((positionInfo.getTrack().getValue() == 0 || positionInfo.getElapsedPercent() == 100)
 									&& m_state == PLAYING) {
@@ -86,6 +90,7 @@ public class DMRProcessorImpl implements DMRProcessor {
 								}
 								fireOnEndTrackEvent();
 							}
+							check1 = false;
 						}
 					});
 
@@ -426,8 +431,16 @@ public class DMRProcessorImpl implements DMRProcessor {
 		if (m_isBusy)
 			return;
 		synchronized (m_listeners) {
-			for (DMRProcessorListner listener : m_listeners) {
-				listener.onEndTrack();
+			if (m_listeners.size() > 0)
+				for (DMRProcessorListner listener : m_listeners) {
+					listener.onEndTrack();
+				}
+			else {
+				m_playlistProcessor.next();
+				final PlaylistItem item = m_playlistProcessor.getCurrentItem();
+				if (item != null) {
+					setURIandPlay(item.getUri());
+				}
 			}
 		}
 	}
@@ -502,6 +515,12 @@ public class DMRProcessorImpl implements DMRProcessor {
 	@Override
 	public String getName() {
 		return m_device != null ? m_device.getDetails().getFriendlyName() : "NULL";
+	}
+
+	@Override
+	public void setPlaylistProcessor(PlaylistProcessor playlistProcessor) {
+		m_playlistProcessor = playlistProcessor;
+
 	}
 
 }

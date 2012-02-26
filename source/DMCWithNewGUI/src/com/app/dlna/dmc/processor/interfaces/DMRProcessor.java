@@ -28,6 +28,8 @@ public interface DMRProcessor {
 
 	String getName();
 
+	void setPlaylistProcessor(PlaylistProcessor playlistProcessor);
+
 	public interface DMRProcessorListner {
 		void onUpdatePosition(long current, long max);
 

@@ -58,19 +58,25 @@ import org.teleal.common.util.Exceptions;
 /**
  * Default configuration data of a typical UPnP stack.
  * <p>
- * This configuration utilizes the default network transport implementation found in {@link org.teleal.cling.transport.impl}.
+ * This configuration utilizes the default network transport implementation
+ * found in {@link org.teleal.cling.transport.impl}.
  * </p>
  * <p>
- * This configuration utilizes the DOM default descriptor binders found in {@link org.teleal.cling.binding.xml}.
+ * This configuration utilizes the DOM default descriptor binders found in
+ * {@link org.teleal.cling.binding.xml}.
  * </p>
  * <p>
- * The thread <code>Executor</code> is an <code>Executors.newCachedThreadPool()</code> with a custom {@link ClingThreadFactory} (it only sets a thread name).
+ * The thread <code>Executor</code> is an
+ * <code>Executors.newCachedThreadPool()</code> with a custom
+ * {@link ClingThreadFactory} (it only sets a thread name).
  * </p>
  * <p>
- * Note that this pool is effectively unlimited, so the number of threads will grow (and shrink) as needed - or restricted by your JVM.
+ * Note that this pool is effectively unlimited, so the number of threads will
+ * grow (and shrink) as needed - or restricted by your JVM.
  * </p>
  * <p>
- * The default {@link org.teleal.cling.model.Namespace} is configured without any base path or prefix.
+ * The default {@link org.teleal.cling.model.Namespace} is configured without
+ * any base path or prefix.
  * </p>
  * 
  * @author Christian Bauer
@@ -209,7 +215,7 @@ public class DefaultUpnpServiceConfiguration implements UpnpServiceConfiguration
 
 	public void shutdown() {
 		if (getDefaultExecutor() instanceof ThreadPoolExecutor) {
-			log.fine("Shutting down thread pool");
+			log.info("Shutting down thread pool");
 			((ThreadPoolExecutor) getDefaultExecutor()).shutdown();
 		}
 	}
@@ -254,7 +260,8 @@ public class DefaultUpnpServiceConfiguration implements UpnpServiceConfiguration
 
 		public ClingExecutor() {
 			this(new ClingThreadFactory(), new ThreadPoolExecutor.DiscardPolicy() {
-				// The pool is unbounded but rejections will happen during shutdown
+				// The pool is unbounded but rejections will happen during
+				// shutdown
 				@Override
 				public void rejectedExecution(Runnable runnable, ThreadPoolExecutor threadPoolExecutor) {
 					// Log and discard
@@ -280,7 +287,8 @@ public class DefaultUpnpServiceConfiguration implements UpnpServiceConfiguration
 		}
 	}
 
-	// Executors.DefaultThreadFactory is package visibility (...no touching, you unworthy JDK user!)
+	// Executors.DefaultThreadFactory is package visibility (...no touching, you
+	// unworthy JDK user!)
 	public static class ClingThreadFactory implements ThreadFactory {
 
 		protected final ThreadGroup group;

@@ -83,9 +83,14 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 
 			if (m_upnpProcessor.getDMRProcessor() != null) {
 				m_dmrProcessor = m_upnpProcessor.getDMRProcessor();
+				m_dmrProcessor.setPlaylistProcessor(m_playlistProcessor);
 				m_dmrProcessor.addListener(PlaylistActivity.this);
 				m_tv_rendererName.setText(m_dmrProcessor.getName());
 				m_sb_playingProgress.setOnSeekBarChangeListener(playbackSeekListener);
+			}
+
+			if (m_dmrProcessor != null && m_playlistProcessor != null) {
+				updateCurrentPlaylistItem();
 			}
 
 			refreshPlaylist();
@@ -105,6 +110,7 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 	@Override
 	protected void onDestroy() {
 		Log.i(TAG, "Playlist onDestroy");
+		m_dmrProcessor.dispose();
 		m_upnpProcessor.unbindUpnpService();
 		super.onDestroy();
 	}
@@ -121,6 +127,7 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 
 			if (m_upnpProcessor.getDMRProcessor() != null) {
 				m_dmrProcessor = m_upnpProcessor.getDMRProcessor();
+				m_dmrProcessor.setPlaylistProcessor(m_playlistProcessor);
 				m_dmrProcessor.addListener(PlaylistActivity.this);
 				m_tv_rendererName.setText(m_dmrProcessor.getName());
 				m_sb_playingProgress.setOnSeekBarChangeListener(playbackSeekListener);
@@ -186,12 +193,16 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 	private void doNext() {
 		if (m_playlistProcessor != null && m_dmrProcessor != null) {
 			m_playlistProcessor.next();
-			final PlaylistItem item = m_playlistProcessor.getCurrentItem();
-			if (item != null) {
-				m_adapter.setCurrentItem(item);
-				validateListView(item);
-				m_dmrProcessor.setURIandPlay(item.getUri());
-			}
+			updateCurrentPlaylistItem();
+		}
+	}
+
+	private void updateCurrentPlaylistItem() {
+		final PlaylistItem item = m_playlistProcessor.getCurrentItem();
+		if (item != null) {
+			m_adapter.setCurrentItem(item);
+			validateListView(item);
+			m_dmrProcessor.setURIandPlay(item.getUri());
 		}
 	}
 
@@ -202,12 +213,7 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 	private void doPrevious() {
 		if (m_playlistProcessor != null && m_dmrProcessor != null) {
 			m_playlistProcessor.previous();
-			final PlaylistItem item = m_playlistProcessor.getCurrentItem();
-			if (item != null) {
-				m_adapter.setCurrentItem(item);
-				validateListView(item);
-				m_dmrProcessor.setURIandPlay(item.getUri());
-			}
+			updateCurrentPlaylistItem();
 		}
 	}
 
