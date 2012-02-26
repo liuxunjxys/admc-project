@@ -86,7 +86,7 @@ public class DatagramIOImpl implements DatagramIO<DatagramIOConfigurationImpl> {
             localAddress = new InetSocketAddress(bindAddress, 0);
             socket = new MulticastSocket(localAddress);
             socket.setTimeToLive(configuration.getTimeToLive());
-            socket.setReceiveBufferSize(32768); // Keep a backlog of incoming datagrams if we are not fast enough
+            socket.setReceiveBufferSize(262144); // Keep a backlog of incoming datagrams if we are not fast enough
 
         } catch (Exception ex) {
             throw new InitializationException("Could not initialize " + getClass().getSimpleName() + ": " + ex);

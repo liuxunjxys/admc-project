@@ -140,7 +140,7 @@ public class AndroidUpnpServiceConfiguration extends DefaultUpnpServiceConfigura
 	protected Executor createDefaultExecutor() {
 
 		// Smaller pool and larger queue on Android, devices do not have much resources...
-		ThreadPoolExecutor defaultExecutor = new ThreadPoolExecutor(8, 16, 5, TimeUnit.SECONDS, new ArrayBlockingQueue(512)) {
+		ThreadPoolExecutor defaultExecutor = new ThreadPoolExecutor(8, Integer.MAX_VALUE, 5, TimeUnit.SECONDS, new ArrayBlockingQueue(512)) {
 			@Override
 			protected void beforeExecute(Thread thread, Runnable runnable) {
 				super.beforeExecute(thread, runnable);

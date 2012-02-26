@@ -41,18 +41,26 @@ import org.teleal.common.util.Exceptions;
 /**
  * Default implementation of switchable network message router.
  * <p>
- * This implementation is actually wrapping a regular {@link org.teleal.cling.transport.RouterImpl}, making it on/off switchable.
+ * This implementation is actually wrapping a regular
+ * {@link org.teleal.cling.transport.RouterImpl}, making it on/off switchable.
  * </p>
  * <p>
- * If the router can't be enabled (e.g. an exception occurs during socket binding), a warning log message will be printed. You can customize this behavior by
- * overriding {@link #handleStartFailure(org.teleal.cling.transport.spi.InitializationException)}.
+ * If the router can't be enabled (e.g. an exception occurs during socket
+ * binding), a warning log message will be printed. You can customize this
+ * behavior by overriding
+ * {@link #handleStartFailure(org.teleal.cling.transport.spi.InitializationException)}
+ * .
  * </p>
  * <p>
- * You have to expect that {@link #disable()} and @{link #enable()} will throw a {@link RouterLockAcquisitionException}. We do not manually abort ongoing HTTP
- * stream connections, they might block access to the underlying synchronized router instance when you try to disable/enable it. However, the only situation in
- * which you should get this exception is when an the response from an HTTP server is taking longer than the timeout of this classes' lock acquisition routine,
- * see {@link #getLockTimeoutMillis()}. This might be the case if the response is large and/or the network connection is slow, but not slow enough to run into
- * connection/data read timeouts.
+ * You have to expect that {@link #disable()} and @{link #enable()} will throw a
+ * {@link RouterLockAcquisitionException}. We do not manually abort ongoing HTTP
+ * stream connections, they might block access to the underlying synchronized
+ * router instance when you try to disable/enable it. However, the only
+ * situation in which you should get this exception is when an the response from
+ * an HTTP server is taking longer than the timeout of this classes' lock
+ * acquisition routine, see {@link #getLockTimeoutMillis()}. This might be the
+ * case if the response is large and/or the network connection is slow, but not
+ * slow enough to run into connection/data read timeouts.
  * </p>
  * 
  * @author Christian Bauer
@@ -202,7 +210,8 @@ public class SwitchableRouterImpl implements SwitchableRouter {
 
 	protected void lock(Lock lock, int timeoutMilliseconds) throws RouterLockAcquisitionException {
 		try {
-			log.finest("Trying to obtain lock with timeout milliseconds '" + timeoutMilliseconds + "': " + lock.getClass().getSimpleName());
+			log.finest("Trying to obtain lock with timeout milliseconds '" + timeoutMilliseconds + "': "
+					+ lock.getClass().getSimpleName());
 			if (lock.tryLock(timeoutMilliseconds, TimeUnit.MILLISECONDS)) {
 				log.finest("Acquired router lock: " + lock.getClass().getSimpleName());
 			} else {
@@ -223,8 +232,9 @@ public class SwitchableRouterImpl implements SwitchableRouter {
 	}
 
 	/**
-	 * @return Defaults to 6 seconds, should be longer than the HTTP client request connection/data read timeouts. Should be longer than it takes the router to
-	 *         be started/shutdown.
+	 * @return Defaults to 6 seconds, should be longer than the HTTP client
+	 *         request connection/data read timeouts. Should be longer than it
+	 *         takes the router to be started/shutdown.
 	 */
 	protected int getLockTimeoutMillis() {
 		return 6000;
@@ -259,7 +269,8 @@ public class SwitchableRouterImpl implements SwitchableRouter {
 			return null;
 		}
 
-		public InetAddress getLocalAddress(NetworkInterface networkInterface, boolean isIPv6, InetAddress remoteAddress) throws IllegalStateException {
+		public InetAddress getLocalAddress(NetworkInterface networkInterface, boolean isIPv6, InetAddress remoteAddress)
+				throws IllegalStateException {
 			return null;
 		}
 	}

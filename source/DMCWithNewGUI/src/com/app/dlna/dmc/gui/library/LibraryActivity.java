@@ -257,4 +257,36 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 	public void onButtonBackClick(View view) {
 		upOneLevel();
 	}
+
+	public void onRefreshButtonClick(View view) {
+		int currentIdIdx = m_traceID.size() - 1;
+		String currentContainerId = m_traceID.get(currentIdIdx);
+		m_traceID.remove(currentIdIdx);
+		browse(currentContainerId);
+	}
+
+	public void onSelectAllButtonClick(View view) {
+		if (m_playlistProcessor == null) {
+			Toast.makeText(LibraryActivity.this, "Cannot get playlist processor", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		int count = m_adapter.getCount();
+		for (int i = 0; i < count; ++i) {
+			DIDLObject object = m_adapter.getItem(i);
+			if (object instanceof Item) {
+				PlaylistItem item = new PlaylistItem();
+				item.setTitle(object.getTitle());
+				item.setUrl(object.getResources().get(0).getValue());
+				if (object instanceof AudioItem) {
+					item.setType(Type.AUDIO);
+				} else if (object instanceof VideoItem) {
+					item.setType(Type.VIDEO);
+				} else {
+					item.setType(Type.IMAGE);
+				}
+				m_playlistProcessor.addItem(item);
+				m_adapter.notifyDataSetChanged();
+			}
+		}
+	}
 }
