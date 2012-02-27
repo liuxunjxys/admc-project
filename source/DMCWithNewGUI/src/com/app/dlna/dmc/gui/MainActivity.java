@@ -1,7 +1,6 @@
 package com.app.dlna.dmc.gui;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -27,7 +26,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 	private static final String TAG = MainActivity.class.getName();
 	private TabHost m_tabHost;
 	private UpnpProcessor m_processor = null;
-	private ProgressDialog m_progressDialog = null;
+	// private ProgressDialog m_progressDialog = null;
 	private static final int DEFAULT_TAB_INDEX = 0;
 
 	BroadcastReceiver m_mountedReceiver = new BroadcastReceiver() {
@@ -53,8 +52,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 
 		m_processor = new UpnpProcessorImpl(MainActivity.this);
 		m_processor.bindUpnpService();
-		m_progressDialog = ProgressDialog.show(MainActivity.this, "Starting Service", "");
-		m_progressDialog.setCancelable(true);
+		// m_progressDialog = ProgressDialog.show(MainActivity.this, "Starting Service", "");
+		// m_progressDialog.setCancelable(true);
 
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(Intent.ACTION_MEDIA_MOUNTED);
@@ -134,20 +133,20 @@ public class MainActivity extends UpnpListenerTabActivity {
 		m_tabHost.setCurrentTab(DEFAULT_TAB_INDEX);
 
 		m_tabHost.setOnTabChangedListener(changeListener);
-		m_progressDialog.setTitle("Scanning device");
-		new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(10000);
-					m_progressDialog.dismiss();
-				} catch (Exception ex) {
-					m_progressDialog.dismiss();
-				}
-
-			}
-		}).start();
+		// m_progressDialog.setTitle("Scanning device");
+		// new Thread(new Runnable() {
+		//
+		// @Override
+		// public void run() {
+		// try {
+		// Thread.sleep(10000);
+		// // m_progressDialog.dismiss();
+		// } catch (Exception ex) {
+		// // m_progressDialog.dismiss();
+		// }
+		//
+		// }
+		// }).start();
 	}
 
 	@Override

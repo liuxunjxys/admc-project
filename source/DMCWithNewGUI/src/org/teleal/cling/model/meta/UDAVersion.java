@@ -17,9 +17,6 @@
 
 package org.teleal.cling.model.meta;
 
-
-
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,48 +25,40 @@ import org.teleal.cling.model.ValidationError;
 
 /**
  * Version of the UPnP Device Architecture (UDA), defaults to 1.0.
- *
+ * 
  * @author Christian Bauer
  */
 public class UDAVersion implements Validatable {
-    
-    private int major = 1;
-    private int minor = 0;
 
-    public UDAVersion() {
-    }
+	private int major = 1;
+	private int minor = 0;
 
-    public UDAVersion(int major, int minor) {
-        this.major = major;
-        this.minor = minor;
-    }
+	public UDAVersion() {
+	}
 
-    public int getMajor() {
-        return major;
-    }
+	public UDAVersion(int major, int minor) {
+		this.major = major;
+		this.minor = minor;
+	}
 
-    public int getMinor() {
-        return minor;
-    }
+	public int getMajor() {
+		return major;
+	}
 
-    public List<ValidationError> validate() {
-        List<ValidationError> errors = new ArrayList();
+	public int getMinor() {
+		return minor;
+	}
 
-        if (getMajor() != 1) {
-            errors.add(new ValidationError(
-                    getClass(),
-                    "major",
-                    "UDA major spec version must be 1"
-            ));
-        }
-        if (getMajor() < 0) {
-            errors.add(new ValidationError(
-                    getClass(),
-                    "minor",
-                    "UDA minor spec version must be equal or greater 0"
-            ));
-        }
+	public List<ValidationError> validate() {
+		List<ValidationError> errors = new ArrayList();
 
-        return errors;
-    }
+		if (getMajor() != 1) {
+			errors.add(new ValidationError(getClass(), "major", "UDA major spec version must be 1"));
+		}
+		if (getMajor() < 0) {
+			errors.add(new ValidationError(getClass(), "minor", "UDA minor spec version must be equal or greater 0"));
+		}
+
+		return errors;
+	}
 }
