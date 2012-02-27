@@ -1,9 +1,16 @@
 package com.app.dlna.dmc.gui.devices;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.model.meta.LocalDevice;
+import org.teleal.cling.model.meta.RemoteDevice;
 import org.teleal.cling.model.types.UDN;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -54,6 +61,9 @@ public class DevicesActivity extends UpnpListenerActivity {
 
 		m_upnpProcessor = new UpnpProcessorImpl(DevicesActivity.this);
 		m_upnpProcessor.bindUpnpService();
+
+		// restoreState();
+
 	}
 
 	private OnItemClickListener onDMRClick = new OnItemClickListener() {
@@ -106,6 +116,7 @@ public class DevicesActivity extends UpnpListenerActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		// saveState();
 		Log.i(TAG, "Devices onDestroy");
 		m_upnpProcessor.unbindUpnpService();
 	}
@@ -323,4 +334,91 @@ public class DevicesActivity extends UpnpListenerActivity {
 		});
 		m_ll_dmr.startAnimation(dmrAnimation);
 	}
+
+	// @SuppressWarnings("rawtypes")
+	// private void saveState() {
+	// ObjectOutputStream outputStream = null;
+	//
+	// try {
+	// outputStream = new ObjectOutputStream(openFileOutput("devices_cache", Context.MODE_PRIVATE));
+	// if (m_dmsAdapter != null) {
+	// synchronized (m_dmsAdapter) {
+	// int dmsCount = m_dmsAdapter.getCount();
+	// for (int i = 0; i < dmsCount; ++i) {
+	// Device device = m_dmsAdapter.getItem(i);
+	// if (device instanceof RemoteDevice) {
+	// RemoteDevice remote = (RemoteDevice) device;
+	// outputStream.writeObject(remote);
+	// }
+	// }
+	// }
+	// }
+	//
+	// if (m_dmrAdapter != null) {
+	// synchronized (m_dmsAdapter) {
+	// int dmrCount = m_dmrAdapter.getCount();
+	// for (int i = 0; i < dmrCount; ++i) {
+	// Device device = m_dmrAdapter.getItem(i);
+	// if (device instanceof RemoteDevice) {
+	// RemoteDevice remote = (RemoteDevice) device;
+	// outputStream.writeObject((RemoteDevice) remote);
+	// }
+	// }
+	// }
+	// }
+	//
+	// } catch (FileNotFoundException ex) {
+	// ex.printStackTrace();
+	// } catch (IOException ex) {
+	// ex.printStackTrace();
+	// } finally {
+	// try {
+	// if (outputStream != null) {
+	// outputStream.flush();
+	// outputStream.close();
+	// }
+	// } catch (IOException ex) {
+	// ex.printStackTrace();
+	// }
+	// }
+	//
+	// }
+
+	// @SuppressWarnings("rawtypes")
+	// private void restoreState() {
+	// ObjectInputStream inputStream = null;
+	// m_dmsAdapter.clear();
+	// m_dmrAdapter.clear();
+	// try {
+	// inputStream = new ObjectInputStream(openFileInput("devices_cache"));
+	//
+	// while (true) {
+	// Object object = inputStream.readObject();
+	// if (object instanceof RemoteDevice) {
+	// RemoteDevice device = (RemoteDevice) object;
+	// if (device.getType().getNamespace().equals("schemas-upnp-org")) {
+	// if (device.getType().getType().equals("MediaServer")) {
+	// addDMS(device);
+	// } else if (device.getType().getType().equals("MediaRenderer")) {
+	// addDMR(device);
+	// }
+	// }
+	// }
+	// }
+	// } catch (FileNotFoundException ex) {
+	// ex.printStackTrace();
+	// } catch (IOException ex) {
+	// ex.printStackTrace();
+	// } catch (ClassNotFoundException e) {
+	// e.printStackTrace();
+	// } finally {
+	// try {
+	// if (inputStream != null) {
+	// inputStream.close();
+	// }
+	// } catch (IOException ex) {
+	// ex.printStackTrace();
+	// }
+	// }
+	// }
 }
