@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="1" >
+
+    <ListView
+        android:id="@+id/playList"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.65" >
+    </ListView>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.35"
+        android:background="#555555" >
+
+        <!--
+        <TextView
+            android:id="@+id/itemTitle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/progressTime"
+            android:layout_alignLeft="@+id/progressTime"
+            android:gravity="center"
+            android:textStyle="bold" />
+        -->
+
+        <SeekBar
+            android:id="@+id/volumeControl"
+            android:layout_width="200dp"
+            android:layout_height="30dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/ll_control_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/previous"
+                style="@style/MediaControlButton"
+                android:background="@drawable/previous"
+                android:onClick="onPreviousClick" />
+
+            <Button
+                android:id="@+id/playPause"
+                style="@style/MediaControlButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/play"
+                android:onClick="onPlayPauseClick" />
+
+            <Button
+                android:id="@+id/stop"
+                style="@style/MediaControlButton"
+                android:background="@drawable/stop"
+                android:onClick="onStopClick" />
+
+            <Button
+                android:id="@+id/next"
+                style="@style/MediaControlButton"
+                android:background="@drawable/next"
+                android:onClick="onNextClick" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/rl_seekbar"
+            android:layout_width="fill_parent"
+            android:layout_height="40dp"
+            android:layout_below="@id/ll_control_button" >
+
+            <TextView
+                android:id="@+id/progressTime"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/playingProgress"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="40dp"
+                android:gravity="center"
+                android:padding="0dp"
+                android:textColor="@android:color/black"
+                android:textSize="12sp" />
+
+            <SeekBar
+                android:id="@+id/playingProgress"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="20dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_marginRight="40dp" />
+
+            <Button
+                android:id="@+id/sound"
+                style="@style/MediaControlButton"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/sound"
+                android:onClick="onSoundClick" />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/rendererName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_below="@id/rl_seekbar"
+            android:background="@android:color/white"
+            android:gravity="center"
+            android:maxLines="1"
+            android:textColor="@android:color/black"
+            android:textSize="25sp" />
+    </RelativeLayout>
+
+</LinearLayout>
