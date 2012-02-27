@@ -16,6 +16,10 @@
  */
 package org.teleal.cling.support.contentdirectory;
 
+import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.teleal.cling.binding.annotations.UpnpAction;
 import org.teleal.cling.binding.annotations.UpnpInputArgument;
 import org.teleal.cling.binding.annotations.UpnpOutputArgument;
@@ -32,10 +36,6 @@ import org.teleal.cling.support.model.BrowseFlag;
 import org.teleal.cling.support.model.BrowseResult;
 import org.teleal.cling.support.model.DIDLContent;
 import org.teleal.cling.support.model.SortCriterion;
-
-import java.beans.PropertyChangeSupport;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Simple ContentDirectory service skeleton.

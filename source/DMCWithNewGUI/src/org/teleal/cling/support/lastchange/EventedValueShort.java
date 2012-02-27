@@ -17,9 +17,9 @@
 
 package org.teleal.cling.support.lastchange;
 
-import org.teleal.cling.model.types.Datatype;
-
 import java.util.Map;
+
+import org.teleal.cling.model.types.Datatype;
 
 /**
  * @author Christian Bauer

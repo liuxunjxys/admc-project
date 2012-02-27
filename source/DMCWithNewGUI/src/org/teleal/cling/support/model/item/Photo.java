@@ -17,10 +17,9 @@
 
 package org.teleal.cling.support.model.item;
 
+import org.teleal.cling.support.model.DIDLObject.Property.UPNP;
 import org.teleal.cling.support.model.Res;
 import org.teleal.cling.support.model.container.Container;
-
-import static org.teleal.cling.support.model.DIDLObject.Property.UPNP;
 
 /**
  * @author Christian Bauer

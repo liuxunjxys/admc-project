@@ -17,10 +17,10 @@
 
 package org.teleal.cling.support.shared;
 
-import org.teleal.common.swingfwk.logging.LogCategory;
-
 import java.util.ArrayList;
 import java.util.logging.Level;
+
+import org.teleal.common.swingfwk.logging.LogCategory;
 
 /**
  * @author Christian Bauer

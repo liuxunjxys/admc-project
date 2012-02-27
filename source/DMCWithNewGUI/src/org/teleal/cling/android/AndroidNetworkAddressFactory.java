@@ -26,7 +26,6 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -38,7 +37,6 @@ import org.teleal.cling.transport.spi.NetworkAddressFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
-import android.util.Log;
 
 /**
  * Implementation appropriate for Android environment, avoids unavailable methods.

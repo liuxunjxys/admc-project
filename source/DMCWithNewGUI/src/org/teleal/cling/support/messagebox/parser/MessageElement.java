@@ -17,10 +17,10 @@
 
 package org.teleal.cling.support.messagebox.parser;
 
+import javax.xml.xpath.XPath;
+
 import org.teleal.common.xml.DOMElement;
 import org.w3c.dom.Element;
-
-import javax.xml.xpath.XPath;
 
 /**
  * @author Christian Bauer

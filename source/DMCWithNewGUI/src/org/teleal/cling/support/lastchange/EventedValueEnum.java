@@ -17,10 +17,10 @@
 
 package org.teleal.cling.support.lastchange;
 
+import java.util.Map;
+
 import org.teleal.cling.model.types.Datatype;
 import org.teleal.cling.model.types.InvalidValueException;
-
-import java.util.Map;
 
 /**
  * @author Christian Bauer

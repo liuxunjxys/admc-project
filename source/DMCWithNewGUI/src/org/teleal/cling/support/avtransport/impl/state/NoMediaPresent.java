@@ -17,14 +17,14 @@
 
 package org.teleal.cling.support.avtransport.impl.state;
 
+import java.net.URI;
+import java.util.logging.Logger;
+
 import org.teleal.cling.support.avtransport.lastchange.AVTransportVariable;
 import org.teleal.cling.support.model.AVTransport;
 import org.teleal.cling.support.model.TransportAction;
 import org.teleal.cling.support.model.TransportInfo;
 import org.teleal.cling.support.model.TransportState;
-
-import java.net.URI;
-import java.util.logging.Logger;
 
 /**
  * @author Christian Bauer

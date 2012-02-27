@@ -17,6 +17,13 @@
 
 package org.teleal.cling.support.igd;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+
 import org.teleal.cling.model.action.ActionInvocation;
 import org.teleal.cling.model.message.UpnpResponse;
 import org.teleal.cling.model.meta.Device;
@@ -30,13 +37,6 @@ import org.teleal.cling.registry.Registry;
 import org.teleal.cling.support.igd.callback.PortMappingAdd;
 import org.teleal.cling.support.igd.callback.PortMappingDelete;
 import org.teleal.cling.support.model.PortMapping;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  * Maintains UPnP port mappings on an InternetGatewayDevice automatically.

@@ -17,12 +17,12 @@
 
 package org.teleal.cling.support.messagebox.model;
 
+import java.util.Random;
+
 import org.teleal.cling.support.messagebox.parser.MessageDOM;
 import org.teleal.cling.support.messagebox.parser.MessageDOMParser;
 import org.teleal.cling.support.messagebox.parser.MessageElement;
 import org.teleal.common.xml.ParserException;
-
-import java.util.Random;
 
 /**
  * https://sourceforge.net/apps/mediawiki/samygo/index.php?title=MessageBoxService_request_format

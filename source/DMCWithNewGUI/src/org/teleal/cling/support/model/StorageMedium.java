@@ -17,10 +17,10 @@
 
 package org.teleal.cling.support.model;
 
-import org.teleal.cling.model.ModelUtil;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import org.teleal.cling.model.ModelUtil;
 
 /**
  * @author Christian Bauer

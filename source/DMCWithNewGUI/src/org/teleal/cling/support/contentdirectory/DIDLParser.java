@@ -17,6 +17,23 @@
 
 package org.teleal.cling.support.contentdirectory;
 
+import static org.teleal.cling.model.XMLUtil.appendNewElement;
+import static org.teleal.cling.model.XMLUtil.appendNewElementIfNotNull;
+
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.URI;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.teleal.cling.model.types.Datatype;
 import org.teleal.cling.model.types.InvalidValueException;
 import org.teleal.cling.support.model.DIDLAttribute;
@@ -41,22 +58,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.URI;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static org.teleal.cling.model.XMLUtil.appendNewElement;
-import static org.teleal.cling.model.XMLUtil.appendNewElementIfNotNull;
 
 /**
  * DIDL parser based on SAX for reading and DOM for writing.

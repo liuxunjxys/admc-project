@@ -17,24 +17,24 @@
 
 package org.teleal.cling.support.avtransport.lastchange;
 
-import org.teleal.cling.model.types.UnsignedIntegerFourBytes;
-import org.teleal.cling.support.model.PlayMode;
-import org.teleal.cling.support.model.RecordQualityMode;
-import org.teleal.cling.support.model.TransportAction;
-import org.teleal.cling.support.model.StorageMedium;
-import org.teleal.cling.support.lastchange.EventedValue;
-import org.teleal.cling.support.lastchange.EventedValueEnum;
-import org.teleal.cling.support.lastchange.EventedValueEnumArray;
-import org.teleal.cling.support.lastchange.EventedValueString;
-import org.teleal.cling.support.lastchange.EventedValueURI;
-import org.teleal.cling.support.lastchange.EventedValueUnsignedIntegerFourBytes;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.teleal.cling.model.types.UnsignedIntegerFourBytes;
+import org.teleal.cling.support.lastchange.EventedValue;
+import org.teleal.cling.support.lastchange.EventedValueEnum;
+import org.teleal.cling.support.lastchange.EventedValueEnumArray;
+import org.teleal.cling.support.lastchange.EventedValueString;
+import org.teleal.cling.support.lastchange.EventedValueURI;
+import org.teleal.cling.support.lastchange.EventedValueUnsignedIntegerFourBytes;
+import org.teleal.cling.support.model.PlayMode;
+import org.teleal.cling.support.model.RecordQualityMode;
+import org.teleal.cling.support.model.StorageMedium;
+import org.teleal.cling.support.model.TransportAction;
 
 /**
  * @author Christian Bauer

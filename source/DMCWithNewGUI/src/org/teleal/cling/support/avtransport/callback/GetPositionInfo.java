@@ -17,13 +17,13 @@
 
 package org.teleal.cling.support.avtransport.callback;
 
+import java.util.logging.Logger;
+
 import org.teleal.cling.controlpoint.ActionCallback;
 import org.teleal.cling.model.action.ActionInvocation;
 import org.teleal.cling.model.meta.Service;
 import org.teleal.cling.model.types.UnsignedIntegerFourBytes;
 import org.teleal.cling.support.model.PositionInfo;
-
-import java.util.logging.Logger;
 
 /**
  *

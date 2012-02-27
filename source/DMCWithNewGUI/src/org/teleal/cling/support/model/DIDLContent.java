@@ -17,6 +17,9 @@
 
 package org.teleal.cling.support.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.teleal.cling.support.model.container.Album;
 import org.teleal.cling.support.model.container.Container;
 import org.teleal.cling.support.model.container.GenreContainer;
@@ -43,9 +46,6 @@ import org.teleal.cling.support.model.item.PlaylistItem;
 import org.teleal.cling.support.model.item.TextItem;
 import org.teleal.cling.support.model.item.VideoBroadcast;
 import org.teleal.cling.support.model.item.VideoItem;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Christian Bauer

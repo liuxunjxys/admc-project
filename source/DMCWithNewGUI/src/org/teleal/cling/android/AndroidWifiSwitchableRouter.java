@@ -20,22 +20,13 @@ package org.teleal.cling.android;
 import java.util.logging.Logger;
 
 import org.teleal.cling.UpnpServiceConfiguration;
-import org.teleal.cling.model.ModelUtil;
 import org.teleal.cling.protocol.ProtocolFactory;
 import org.teleal.cling.transport.Router;
 import org.teleal.cling.transport.SwitchableRouterImpl;
 import org.teleal.cling.transport.spi.InitializationException;
 
-import com.app.dlna.dmc.processor.http.HTTPServerData;
-import com.app.dlna.dmc.utility.Utility;
-
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
-import android.util.Log;
 
 /**
  * Switches the network transport layer on/off by monitoring WiFi connectivity.

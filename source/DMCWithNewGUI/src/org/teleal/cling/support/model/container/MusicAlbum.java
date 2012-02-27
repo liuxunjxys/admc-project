@@ -17,16 +17,15 @@
 
 package org.teleal.cling.support.model.container;
 
-import org.teleal.cling.support.model.Person;
-import org.teleal.cling.support.model.PersonWithRole;
-import org.teleal.cling.support.model.item.Item;
-import org.teleal.cling.support.model.item.MusicTrack;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.teleal.cling.support.model.DIDLObject.Property.UPNP;
+import org.teleal.cling.support.model.DIDLObject.Property.UPNP;
+import org.teleal.cling.support.model.Person;
+import org.teleal.cling.support.model.PersonWithRole;
+import org.teleal.cling.support.model.item.Item;
+import org.teleal.cling.support.model.item.MusicTrack;
 
 /**
  * @author Christian Bauer

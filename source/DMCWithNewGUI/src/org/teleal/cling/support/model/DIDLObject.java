@@ -17,12 +17,12 @@
 
 package org.teleal.cling.support.model;
 
-import org.w3c.dom.Element;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import org.w3c.dom.Element;
 
 /**
  * @author Christian Bauer

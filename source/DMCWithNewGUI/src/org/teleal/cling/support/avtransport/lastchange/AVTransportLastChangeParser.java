@@ -17,13 +17,14 @@
 
 package org.teleal.cling.support.avtransport.lastchange;
 
-import org.teleal.cling.model.ModelUtil;
-import org.teleal.cling.support.lastchange.EventedValue;
-import org.teleal.cling.support.lastchange.LastChangeParser;
+import java.util.Set;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import java.util.Set;
+
+import org.teleal.cling.model.ModelUtil;
+import org.teleal.cling.support.lastchange.EventedValue;
+import org.teleal.cling.support.lastchange.LastChangeParser;
 
 /**
  * @author Christian Bauer

@@ -24,7 +24,7 @@
     <string name="submit">Submit</string>
     <string name="enter_video_link_">Enter video link:</string>
     <string name="youtube_predefine_link">http://www.youtube.com/watch?v=e47TNTAz2tY</string>
-    <string name="proxy_enable_text">Act as a proxy to transport data from Internet (needed when renderer can\'t connect to internet)</string>
+    <string name="proxy_enable_text">Proxy mode</string>
     <string name="youtubeContent">Youtube Content</string>
     <string name="youtube_host">youtube.com</string>
     <string name="media_server">Media Server</string>
@@ -34,5 +34,6 @@
     <string name="dms_list">DMS List</string>
     <string name="dmr_list">DMR List</string>
     <string name="select_all">Select All</string>
+    <string name="enter_keyword_here">Enter keyword here</string>
 
 </resources>

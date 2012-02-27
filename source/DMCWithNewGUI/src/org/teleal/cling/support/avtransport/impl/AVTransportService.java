@@ -17,6 +17,11 @@
 
 package org.teleal.cling.support.avtransport.impl;
 
+import java.net.URI;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
+
 import org.teleal.cling.model.ModelUtil;
 import org.teleal.cling.model.types.ErrorCode;
 import org.teleal.cling.model.types.UnsignedIntegerFourBytes;
@@ -38,11 +43,6 @@ import org.teleal.cling.support.model.TransportInfo;
 import org.teleal.cling.support.model.TransportSettings;
 import org.teleal.common.statemachine.StateMachineBuilder;
 import org.teleal.common.statemachine.TransitionException;
-
-import java.net.URI;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 
 /**
  * State-machine based implementation of AVTransport service.

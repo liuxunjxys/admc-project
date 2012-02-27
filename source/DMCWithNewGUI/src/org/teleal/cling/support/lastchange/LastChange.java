@@ -17,12 +17,11 @@
 
 package org.teleal.cling.support.lastchange;
 
-import org.teleal.cling.model.types.UnsignedIntegerFourBytes;
-
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+
+import org.teleal.cling.model.types.UnsignedIntegerFourBytes;
 
 /**
  * Collects all state changes per logical instance.

@@ -17,6 +17,19 @@
 
 package org.teleal.cling.support.lastchange;
 
+import static org.teleal.cling.model.XMLUtil.appendNewElement;
+
+import java.io.InputStream;
+import java.io.StringReader;
+import java.lang.reflect.Constructor;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.teleal.cling.model.XMLUtil;
 import org.teleal.cling.model.types.UnsignedIntegerFourBytes;
 import org.teleal.cling.support.shared.AbstractMap;
@@ -28,18 +41,6 @@ import org.w3c.dom.Element;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.lang.reflect.Constructor;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static org.teleal.cling.model.XMLUtil.appendNewElement;
 
 /**
  * Reads and writes the "LastChange" XML content.

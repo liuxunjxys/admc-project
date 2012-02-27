@@ -17,11 +17,12 @@
 
 package org.teleal.cling.support.model;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import java.net.URI;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.net.URI;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 /**

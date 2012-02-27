@@ -17,12 +17,12 @@
 
 package org.teleal.cling.support.model;
 
+import java.util.Map;
+
 import org.teleal.cling.model.action.ActionArgumentValue;
 import org.teleal.cling.model.meta.Service;
 import org.teleal.cling.model.types.UnsignedIntegerFourBytes;
 import org.teleal.cling.model.types.UnsignedIntegerTwoBytes;
-
-import java.util.Map;
 
 /**
  * @author Christian Bauer
