@@ -17,11 +17,11 @@
 
 package org.teleal.cling.support.lastchange;
 
+import java.util.Map;
+
 import org.teleal.cling.model.types.Datatype;
 import org.teleal.cling.model.types.InvalidValueException;
 import org.teleal.cling.support.shared.AbstractMap;
-
-import java.util.Map;
 
 public abstract class EventedValue<V> {
 

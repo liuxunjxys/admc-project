@@ -17,6 +17,9 @@
 
 package org.teleal.cling.support.connectionmanager;
 
+import java.beans.PropertyChangeSupport;
+import java.util.logging.Logger;
+
 import org.teleal.cling.binding.annotations.UpnpAction;
 import org.teleal.cling.binding.annotations.UpnpInputArgument;
 import org.teleal.cling.binding.annotations.UpnpOutputArgument;
@@ -34,9 +37,6 @@ import org.teleal.cling.support.connectionmanager.callback.PrepareForConnection;
 import org.teleal.cling.support.model.ConnectionInfo;
 import org.teleal.cling.support.model.ProtocolInfo;
 import org.teleal.cling.support.model.ProtocolInfos;
-
-import java.beans.PropertyChangeSupport;
-import java.util.logging.Logger;
 
 /**
  * Support for setup and teardown of an arbitrary number of connections with a manager peer.

@@ -17,6 +17,8 @@
 
 package org.teleal.cling.support.contentdirectory.callback;
 
+import java.util.logging.Logger;
+
 import org.teleal.cling.controlpoint.ActionCallback;
 import org.teleal.cling.model.action.ActionException;
 import org.teleal.cling.model.action.ActionInvocation;
@@ -28,8 +30,6 @@ import org.teleal.cling.support.model.BrowseFlag;
 import org.teleal.cling.support.model.BrowseResult;
 import org.teleal.cling.support.model.DIDLContent;
 import org.teleal.cling.support.model.SortCriterion;
-
-import java.util.logging.Logger;
 
 /**
  * Invokes a "Browse" action, parses the result.

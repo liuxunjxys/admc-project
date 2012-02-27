@@ -17,10 +17,10 @@
 
 package org.teleal.cling.support.messagebox.model;
 
-import org.teleal.cling.support.messagebox.parser.MessageElement;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import org.teleal.cling.support.messagebox.parser.MessageElement;
 
 /**
  * @author Christian Bauer

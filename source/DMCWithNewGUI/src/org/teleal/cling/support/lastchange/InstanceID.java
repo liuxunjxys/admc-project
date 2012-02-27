@@ -17,10 +17,10 @@
 
 package org.teleal.cling.support.lastchange;
 
-import org.teleal.cling.model.types.UnsignedIntegerFourBytes;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.teleal.cling.model.types.UnsignedIntegerFourBytes;
 
 /**
  * @author Christian Bauer

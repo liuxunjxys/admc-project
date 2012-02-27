@@ -17,13 +17,13 @@
 
 package org.teleal.cling.support.lastchange;
 
-import org.teleal.cling.model.types.Datatype;
-import org.teleal.cling.model.types.InvalidValueException;
-import org.teleal.common.util.Exceptions;
-
 import java.net.URI;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import org.teleal.cling.model.types.Datatype;
+import org.teleal.cling.model.types.InvalidValueException;
+import org.teleal.common.util.Exceptions;
 
 /**
  * @author Christian Bauer

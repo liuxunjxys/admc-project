@@ -17,9 +17,9 @@
 
 package org.teleal.cling.support.model;
 
-import org.teleal.cling.model.action.ActionArgumentValue;
-
 import java.util.Map;
+
+import org.teleal.cling.model.action.ActionArgumentValue;
 
 /**
  *

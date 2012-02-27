@@ -17,11 +17,11 @@
 
 package org.teleal.cling.support.avtransport.impl;
 
+import java.net.URI;
+
 import org.teleal.cling.support.avtransport.impl.state.AbstractState;
 import org.teleal.cling.support.model.SeekMode;
 import org.teleal.common.statemachine.StateMachine;
-
-import java.net.URI;
 
 public interface AVTransportStateMachine extends StateMachine<AbstractState> {
 

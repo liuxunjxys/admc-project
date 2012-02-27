@@ -17,9 +17,9 @@
 
 package org.teleal.cling.support.model;
 
-import org.teleal.common.util.MimeType;
-
 import java.net.URI;
+
+import org.teleal.common.util.MimeType;
 
 /**
  * @author Christian Bauer

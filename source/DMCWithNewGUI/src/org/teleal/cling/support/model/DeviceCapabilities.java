@@ -17,10 +17,10 @@
 
 package org.teleal.cling.support.model;
 
+import java.util.Map;
+
 import org.teleal.cling.model.ModelUtil;
 import org.teleal.cling.model.action.ActionArgumentValue;
-
-import java.util.Map;
 
 /**
  * @author Christian Bauer

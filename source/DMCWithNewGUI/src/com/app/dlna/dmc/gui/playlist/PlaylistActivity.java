@@ -155,8 +155,7 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 
 		@Override
 		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-			m_tv_progressTime.setText(getTimeString(m_sb_playingProgress.getProgress()) + " / "
-					+ getTimeString(m_sb_playingProgress.getMax()));
+			m_tv_progressTime.setText(getTimeString(m_sb_playingProgress.getProgress()) + " / " + getTimeString(m_sb_playingProgress.getMax()));
 		}
 	};
 
@@ -202,7 +201,8 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 		if (item != null) {
 			m_adapter.setCurrentItem(item);
 			validateListView(item);
-			m_dmrProcessor.setURIandPlay(item.getUri());
+			if (m_dmrProcessor != null)
+				m_dmrProcessor.setURIandPlay(item.getUri());
 		}
 	}
 
@@ -248,8 +248,7 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 				if (!m_isFailed) {
 					m_isFailed = true;
 					try {
-						new AlertDialog.Builder(PlaylistActivity.this).setTitle("Error")
-								.setMessage("Remote Device Error: " + cause)
+						new AlertDialog.Builder(PlaylistActivity.this).setTitle("Error").setMessage("Remote Device Error: " + cause)
 								.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 
 									@Override
@@ -278,8 +277,7 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 				if (!m_isFailed) {
 					m_isFailed = true;
 					try {
-						new AlertDialog.Builder(PlaylistActivity.this).setTitle("Error")
-								.setMessage("Remote Device Error: " + error)
+						new AlertDialog.Builder(PlaylistActivity.this).setTitle("Error").setMessage("Remote Device Error: " + error)
 								.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 
 									@Override
@@ -434,26 +432,25 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 			final String actionList[] = new String[2];
 			actionList[0] = "Play";
 			actionList[1] = "Remove";
-			new AlertDialog.Builder(PlaylistActivity.this).setTitle("Select action").setCancelable(false)
-					.setItems(actionList, new OnClickListener() {
+			new AlertDialog.Builder(PlaylistActivity.this).setTitle("Select action").setCancelable(false).setItems(actionList, new OnClickListener() {
 
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							switch (which) {
-							case 0:
-								playItem(position);
-								break;
-							case 1:
-								PlaylistItem item = m_adapter.getItem(position);
-								m_playlistProcessor.removeItem(item);
-								m_adapter.remove(item);
-								m_adapter.notifyDataSetChanged();
-								break;
-							default:
-								break;
-							}
-						}
-					}).setNegativeButton("Cancel", null).create().show();
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					switch (which) {
+					case 0:
+						playItem(position);
+						break;
+					case 1:
+						PlaylistItem item = m_adapter.getItem(position);
+						m_playlistProcessor.removeItem(item);
+						m_adapter.remove(item);
+						m_adapter.notifyDataSetChanged();
+						break;
+					default:
+						break;
+					}
+				}
+			}).setNegativeButton("Cancel", null).create().show();
 
 			return true;
 

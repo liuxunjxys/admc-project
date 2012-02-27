@@ -17,11 +17,11 @@
 
 package org.teleal.cling.support.model.container;
 
-import org.teleal.cling.support.model.item.Item;
-import org.teleal.cling.support.model.item.Photo;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.teleal.cling.support.model.item.Item;
+import org.teleal.cling.support.model.item.Photo;
 
 /**
  * @author Christian Bauer

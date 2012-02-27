@@ -17,6 +17,8 @@
 
 package org.teleal.cling.support.avtransport;
 
+import java.beans.PropertyChangeSupport;
+
 import org.teleal.cling.binding.annotations.UpnpAction;
 import org.teleal.cling.binding.annotations.UpnpInputArgument;
 import org.teleal.cling.binding.annotations.UpnpOutputArgument;
@@ -26,7 +28,8 @@ import org.teleal.cling.binding.annotations.UpnpServiceType;
 import org.teleal.cling.binding.annotations.UpnpStateVariable;
 import org.teleal.cling.binding.annotations.UpnpStateVariables;
 import org.teleal.cling.model.types.UnsignedIntegerFourBytes;
-import org.teleal.cling.support.model.TransportState;
+import org.teleal.cling.support.avtransport.lastchange.AVTransportLastChangeParser;
+import org.teleal.cling.support.lastchange.LastChange;
 import org.teleal.cling.support.model.DeviceCapabilities;
 import org.teleal.cling.support.model.MediaInfo;
 import org.teleal.cling.support.model.PlayMode;
@@ -34,14 +37,11 @@ import org.teleal.cling.support.model.PositionInfo;
 import org.teleal.cling.support.model.RecordMediumWriteStatus;
 import org.teleal.cling.support.model.RecordQualityMode;
 import org.teleal.cling.support.model.SeekMode;
+import org.teleal.cling.support.model.StorageMedium;
 import org.teleal.cling.support.model.TransportInfo;
 import org.teleal.cling.support.model.TransportSettings;
+import org.teleal.cling.support.model.TransportState;
 import org.teleal.cling.support.model.TransportStatus;
-import org.teleal.cling.support.avtransport.lastchange.AVTransportLastChangeParser;
-import org.teleal.cling.support.model.StorageMedium;
-import org.teleal.cling.support.lastchange.LastChange;
-
-import java.beans.PropertyChangeSupport;
 
 /**
  * Skeleton of service with "LastChange" eventing support.

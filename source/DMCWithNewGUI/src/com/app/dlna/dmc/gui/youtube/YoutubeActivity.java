@@ -2,17 +2,22 @@ package com.app.dlna.dmc.gui.youtube;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
 
 import com.app.dlna.dmc.R;
 import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerActivity;
+import com.app.dlna.dmc.gui.youtube.model.YoutubeItem;
 import com.app.dlna.dmc.processor.http.HTTPServerData;
 import com.app.dlna.dmc.processor.impl.UpnpProcessorImpl;
 import com.app.dlna.dmc.processor.impl.YoutubeProcessorImpl;
@@ -27,18 +32,20 @@ public class YoutubeActivity extends UpnpListenerActivity {
 	private static final String TAG = YoutubeActivity.class.getName();
 
 	private CheckBox m_cb_enable_proxy;
-	private EditText m_ed_link;
+	private EditText m_ed_keyword;
 	private YoutubeProcessor m_youtubeProcessor;
 	private ProgressDialog m_progressDialog;
 	private PlaylistProcessor m_playlistProcessor;
 	private UpnpProcessor m_upnpProcessor;
+	private ListView m_listView;
+	private YoutubeItemArrayAdapter m_adapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.ytcontent_activitiy);
 		m_cb_enable_proxy = (CheckBox) findViewById(R.id.enable_proxy_mode);
-		m_ed_link = (EditText) findViewById(R.id.youtube_link);
+		m_ed_keyword = (EditText) findViewById(R.id.youtube_link);
 
 		m_upnpProcessor = new UpnpProcessorImpl(YoutubeActivity.this);
 		m_upnpProcessor.bindUpnpService();
@@ -47,8 +54,26 @@ public class YoutubeActivity extends UpnpListenerActivity {
 		m_progressDialog = new ProgressDialog(YoutubeActivity.this);
 		m_progressDialog.setMessage("Contact to Youtube server");
 		m_progressDialog.setTitle("Loading...");
-		m_progressDialog.setCancelable(false);
+		m_progressDialog.setCancelable(true);
+
+		m_listView = (ListView) findViewById(R.id.listView);
+		m_adapter = new YoutubeItemArrayAdapter(YoutubeActivity.this, 0);
+		m_listView.setAdapter(m_adapter);
+		m_listView.setOnItemClickListener(itemClickListener);
 	}
+
+	private OnItemClickListener itemClickListener = new OnItemClickListener() {
+
+		@Override
+		public void onItemClick(AdapterView<?> adapter, View view, int position, long arg3) {
+			String link = m_adapter.getItem(position).getUrl();
+			if (m_cb_enable_proxy.isChecked()) {
+				executeEnableProxy(link);
+			} else {
+				executeNoProxy(link);
+			}
+		}
+	};
 
 	@Override
 	protected void onResume() {
@@ -87,6 +112,11 @@ public class YoutubeActivity extends UpnpListenerActivity {
 					dissmissProgressDialog();
 				}
 
+				@Override
+				public void onSearchComplete(List<YoutubeItem> result) {
+
+				}
+
 			});
 		} catch (Exception ex) {
 			Toast.makeText(YoutubeActivity.this, ex.getMessage(), Toast.LENGTH_SHORT).show();
@@ -114,11 +144,6 @@ public class YoutubeActivity extends UpnpListenerActivity {
 	}
 
 	private void switchToDMRList(final String link, final String directlink) {
-		// Intent intent = new Intent(YoutubeActivity.this,
-		// DMRListActivity.class);
-		// intent.putExtra("URL", directlink);
-		// intent.putExtra("Title", link);
-		// YoutubeActivity.this.startActivity(intent);
 		runOnUiThread(new Runnable() {
 
 			@Override
@@ -129,14 +154,12 @@ public class YoutubeActivity extends UpnpListenerActivity {
 					item.setUrl(directlink);
 					item.setType(Type.VIDEO);
 					if (m_playlistProcessor.addItem(item))
-						Toast.makeText(YoutubeActivity.this, "Add item \"" + item.getTitle() + "\" to playlist sucess",
-								Toast.LENGTH_SHORT).show();
+						Toast.makeText(YoutubeActivity.this, "Add item \"" + item.getTitle() + "\" to playlist sucess", Toast.LENGTH_SHORT).show();
 					else {
 						if (m_playlistProcessor.isFull()) {
 							Toast.makeText(YoutubeActivity.this, "Current playlist is full", Toast.LENGTH_SHORT).show();
 						} else {
-							Toast.makeText(YoutubeActivity.this, "Item already exits in current Playlist", Toast.LENGTH_SHORT)
-									.show();
+							Toast.makeText(YoutubeActivity.this, "Item already exits in current Playlist", Toast.LENGTH_SHORT).show();
 						}
 					}
 				}
@@ -165,13 +188,17 @@ public class YoutubeActivity extends UpnpListenerActivity {
 					dissmissProgressDialog();
 					String generatedURL;
 					try {
-						generatedURL = new URI("http", HTTPServerData.HOST + ":" + HTTPServerData.PORT, result, null, null)
-								.toString();
+						generatedURL = new URI("http", HTTPServerData.HOST + ":" + HTTPServerData.PORT, result, null, null).toString();
 						Log.i(TAG, "Generated URL = " + generatedURL);
 						switchToDMRList(link, generatedURL);
 					} catch (URISyntaxException e) {
 						e.printStackTrace();
 					}
+
+				}
+
+				@Override
+				public void onSearchComplete(List<YoutubeItem> result) {
 
 				}
 			});
@@ -182,12 +209,42 @@ public class YoutubeActivity extends UpnpListenerActivity {
 	}
 
 	public void onSubmitClick(View view) {
-		String link = m_ed_link.getText().toString();
-		if (m_cb_enable_proxy.isChecked()) {
-			executeEnableProxy(link);
-		} else {
-			executeNoProxy(link);
-		}
+
+		if (m_ed_keyword.getText() != null && !m_ed_keyword.getText().toString().trim().isEmpty())
+			m_youtubeProcessor.executeQuery(m_ed_keyword.getText().toString().trim(), new IYoutubeProcessorListener() {
+
+				@Override
+				public void onStartPorcess() {
+					showProgressDialog();
+				}
+
+				@Override
+				public void onSearchComplete(final List<YoutubeItem> result) {
+					dissmissProgressDialog();
+					runOnUiThread(new Runnable() {
+
+						@Override
+						public void run() {
+							synchronized (m_adapter) {
+								m_adapter.clear();
+								for (YoutubeItem item : result) {
+									m_adapter.add(item);
+								}
+							}
+						}
+					});
+				}
+
+				@Override
+				public void onFail(Exception ex) {
+					dissmissProgressDialog();
+				}
+
+				@Override
+				public void onComplete(String result) {
+					dissmissProgressDialog();
+				}
+			});
 	}
 
 	@Override

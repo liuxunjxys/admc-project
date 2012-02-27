@@ -17,15 +17,15 @@
 
 package org.teleal.cling.support.renderingcontrol.lastchange;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.teleal.cling.model.types.UnsignedIntegerTwoBytes;
 import org.teleal.cling.support.lastchange.EventedValue;
 import org.teleal.cling.support.lastchange.EventedValueShort;
 import org.teleal.cling.support.lastchange.EventedValueString;
 import org.teleal.cling.support.lastchange.EventedValueUnsignedIntegerTwoBytes;
-
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Christian Bauer

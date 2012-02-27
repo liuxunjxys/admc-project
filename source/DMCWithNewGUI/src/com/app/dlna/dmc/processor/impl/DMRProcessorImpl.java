@@ -54,6 +54,8 @@ public class DMRProcessorImpl implements DMRProcessor {
 	private static final int PAUSE = 1;
 	private static final int STOP = 2;
 	private boolean check1 = false;
+	private boolean check2 = false;
+	private boolean check3 = false;
 
 	private Thread m_updateThread = new Thread(new Runnable() {
 
@@ -77,11 +79,9 @@ public class DMRProcessorImpl implements DMRProcessor {
 						@SuppressWarnings("rawtypes")
 						@Override
 						public void received(ActionInvocation invocation, PositionInfo positionInfo) {
-
 							Log.v(TAG, positionInfo.toString());
 							fireUpdatePositionEvent(positionInfo.getTrackElapsedSeconds(), positionInfo.getTrackDurationSeconds());
-							if ((positionInfo.getTrack().getValue() == 0 || positionInfo.getElapsedPercent() == 100)
-									&& m_state == PLAYING) {
+							if ((positionInfo.getTrack().getValue() == 0 || positionInfo.getElapsedPercent() == 100) && m_state == PLAYING) {
 								try {
 									m_state = STOP;
 									Thread.sleep(2000);
@@ -96,45 +96,56 @@ public class DMRProcessorImpl implements DMRProcessor {
 
 				}
 
-				m_controlPoint.execute(new GetTransportInfo(m_avtransportService) {
-					@SuppressWarnings("rawtypes")
-					@Override
-					public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
-						fireOnFailEvent(invocation.getAction(), operation, defaultMsg);
-					}
-
-					@SuppressWarnings("rawtypes")
-					@Override
-					public void received(ActionInvocation invocation, TransportInfo transportInfo) {
-						switch (transportInfo.getCurrentTransportState()) {
-						case PLAYING:
-							fireOnPlayingEvent();
-							break;
-						case PAUSED_PLAYBACK:
-							fireOnPausedEvent();
-							break;
-						case STOPPED:
-							fireOnStopedEvent();
-							break;
-						default:
-							break;
+				if (!check2) {
+					check2 = true;
+					m_controlPoint.execute(new GetTransportInfo(m_avtransportService) {
+						@SuppressWarnings("rawtypes")
+						@Override
+						public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
+							fireOnFailEvent(invocation.getAction(), operation, defaultMsg);
+							check2 = false;
 						}
-					}
 
-				});
-				m_controlPoint.execute(new GetVolume(m_renderingControl) {
-					@SuppressWarnings("rawtypes")
-					@Override
-					public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
-						fireOnFailEvent(invocation.getAction(), operation, defaultMsg);
-					}
+						@SuppressWarnings("rawtypes")
+						@Override
+						public void received(ActionInvocation invocation, TransportInfo transportInfo) {
+							switch (transportInfo.getCurrentTransportState()) {
+							case PLAYING:
+								fireOnPlayingEvent();
+								break;
+							case PAUSED_PLAYBACK:
+								fireOnPausedEvent();
+								break;
+							case STOPPED:
+								fireOnStopedEvent();
+								break;
+							default:
+								break;
+							}
+							check2 = false;
+						}
 
-					@SuppressWarnings("rawtypes")
-					@Override
-					public void received(ActionInvocation actionInvocation, int currentVolume) {
-						m_currentVolume = currentVolume;
-					}
-				});
+					});
+				}
+
+				if (!check3) {
+					check3 = true;
+					m_controlPoint.execute(new GetVolume(m_renderingControl) {
+						@SuppressWarnings("rawtypes")
+						@Override
+						public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
+							fireOnFailEvent(invocation.getAction(), operation, defaultMsg);
+							check3 = false;
+						}
+
+						@SuppressWarnings("rawtypes")
+						@Override
+						public void received(ActionInvocation actionInvocation, int currentVolume) {
+							m_currentVolume = currentVolume;
+							check3 = false;
+						}
+					});
+				}
 
 				try {
 					Thread.sleep(UPDATE_INTERVAL);
@@ -158,6 +169,8 @@ public class DMRProcessorImpl implements DMRProcessor {
 	@SuppressWarnings({ "rawtypes" })
 	@Override
 	public void setURI(final String uri) {
+		if (m_controlPoint == null || m_avtransportService == null)
+			return;
 		m_isBusy = true;
 		m_controlPoint.execute(new GetMediaInfo(m_avtransportService) {
 
@@ -190,11 +203,8 @@ public class DMRProcessorImpl implements DMRProcessor {
 				} catch (URISyntaxException e) {
 					current_uri = null;
 				}
-				if (currentPath != null
-						&& newPath != null
-						&& currentPath.equals(newPath)
-						&& (currentQuery == newQuery || (currentQuery != null && newQuery != null && currentQuery
-								.equals(newQuery)))) {
+				if (currentPath != null && newPath != null && currentPath.equals(newPath)
+						&& (currentQuery == newQuery || (currentQuery != null && newQuery != null && currentQuery.equals(newQuery)))) {
 					play();
 				} else {
 					stop();
@@ -220,6 +230,8 @@ public class DMRProcessorImpl implements DMRProcessor {
 	@SuppressWarnings({ "rawtypes" })
 	@Override
 	public void setURIandPlay(final String uri) {
+		if (m_controlPoint == null || m_avtransportService == null)
+			return;
 		m_isBusy = true;
 		m_controlPoint.execute(new GetMediaInfo(m_avtransportService) {
 
@@ -252,11 +264,8 @@ public class DMRProcessorImpl implements DMRProcessor {
 				} catch (URISyntaxException e) {
 					current_uri = null;
 				}
-				if (currentPath != null
-						&& newPath != null
-						&& currentPath.equals(newPath)
-						&& (currentQuery == newQuery || (currentQuery != null && newQuery != null && currentQuery
-								.equals(newQuery)))) {
+				if (currentPath != null && newPath != null && currentPath.equals(newPath)
+						&& (currentQuery == newQuery || (currentQuery != null && newQuery != null && currentQuery.equals(newQuery)))) {
 					play();
 				} else {
 					Log.e(TAG, "set AV uri = " + uri);
@@ -294,6 +303,8 @@ public class DMRProcessorImpl implements DMRProcessor {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void play() {
+		if (m_controlPoint == null || m_avtransportService == null)
+			return;
 		m_isBusy = true;
 		Play play = new Play(m_avtransportService) {
 
@@ -318,6 +329,8 @@ public class DMRProcessorImpl implements DMRProcessor {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void pause() {
+		if (m_controlPoint == null || m_avtransportService == null)
+			return;
 		m_isBusy = true;
 		Pause pause = new Pause(m_avtransportService) {
 
@@ -341,6 +354,8 @@ public class DMRProcessorImpl implements DMRProcessor {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void stop() {
+		if (m_controlPoint == null || m_avtransportService == null)
+			return;
 		m_isBusy = true;
 		Stop stop = new Stop(m_avtransportService) {
 			@Override

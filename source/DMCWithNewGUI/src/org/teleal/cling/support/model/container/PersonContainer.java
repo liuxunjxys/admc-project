@@ -17,7 +17,7 @@
 
 package org.teleal.cling.support.model.container;
 
-import static org.teleal.cling.support.model.DIDLObject.Property.DC;
+import org.teleal.cling.support.model.DIDLObject.Property.DC;
 
 /**
  * @author Christian Bauer

@@ -17,14 +17,14 @@
 
 package org.teleal.cling.support.model.container;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.teleal.cling.support.model.DIDLObject;
 import org.teleal.cling.support.model.DescMeta;
 import org.teleal.cling.support.model.Res;
 import org.teleal.cling.support.model.WriteStatus;
 import org.teleal.cling.support.model.item.Item;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A container in DIDL content.

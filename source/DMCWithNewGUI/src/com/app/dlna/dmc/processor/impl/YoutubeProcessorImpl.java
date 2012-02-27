@@ -1,13 +1,22 @@
 package com.app.dlna.dmc.processor.impl;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import android.util.Log;
 
+import com.app.dlna.dmc.gui.youtube.model.YoutubeItem;
 import com.app.dlna.dmc.processor.http.HTTPLinkManager;
 import com.app.dlna.dmc.processor.interfaces.YoutubeProcessor;
 import com.app.dlna.dmc.utility.Utility;
@@ -42,8 +51,8 @@ public class YoutubeProcessorImpl implements YoutubeProcessor {
 						System.out.println(inputLine);
 						if (inputLine.contains("img.src")) {
 							System.out.println(" Line = " + inputLine);
-							directlink = inputLine.substring(inputLine.indexOf('"') + 1, inputLine.lastIndexOf('"'))
-									.replace("\\u0026", "&").replace("\\", "").replace("generate_204", "videoplayback");
+							directlink = inputLine.substring(inputLine.indexOf('"') + 1, inputLine.lastIndexOf('"')).replace("\\u0026", "&").replace("\\", "")
+									.replace("generate_204", "videoplayback");
 							System.out.println(" Direct Link = " + directlink);
 							// TODO: find out what is crossdomain.xml
 							// if (!directlink.contains("crossdomain.xml"))
@@ -70,13 +79,11 @@ public class YoutubeProcessorImpl implements YoutubeProcessor {
 
 			@Override
 			public void onStartPorcess() {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void onFail(Exception ex) {
-				// TODO Auto-generated method stub
 
 			}
 
@@ -95,7 +102,59 @@ public class YoutubeProcessorImpl implements YoutubeProcessor {
 				}
 
 			}
+
+			@Override
+			public void onSearchComplete(List<YoutubeItem> result) {
+
+			}
 		});
+
+	}
+
+	@Override
+	public void executeQuery(final String query, final IYoutubeProcessorListener callback) {
+		callback.onStartPorcess();
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					URL jsonURL = new URL("http://gdata.youtube.com/feeds/api/videos?q=" + query + "&orderby=updated&v=2&alt=jsonc");
+					URLConnection jc = jsonURL.openConnection();
+					InputStream is = jc.getInputStream();
+					String jsonTxt = IOUtils.toString(is);
+
+					JSONObject jj = new JSONObject(jsonTxt);
+
+					JSONObject jdata = jj.getJSONObject("data");
+					JSONArray aitems = jdata.getJSONArray("items");
+					List<YoutubeItem> youtubeItems = new ArrayList<YoutubeItem>();
+					for (int i = 0; i < aitems.length(); ++i) {
+						JSONObject item = aitems.getJSONObject(i);
+						YoutubeItem youtubeItem = new YoutubeItem();
+						youtubeItem.setTitle(item.getString("title"));
+						youtubeItem.setDescription(item.getString("description"));
+						youtubeItem.setThumbnail(item.getJSONObject("thumbnail").getString("sqDefault"));
+						youtubeItem.setUrl(item.getJSONObject("player").getString("default"));
+						youtubeItem.setDuration(item.getString("duration"));
+						youtubeItems.add(youtubeItem);
+					}
+
+					for (YoutubeItem item : youtubeItems) {
+						Log.i(TAG, item.getTitle());
+						Log.i(TAG, item.getDescription());
+						Log.i(TAG, item.getUrl());
+						Log.i(TAG, item.getThumbnail());
+						Log.i(TAG, item.getDuration());
+
+					}
+					callback.onSearchComplete(youtubeItems);
+				} catch (Exception ex) {
+					callback.onFail(ex);
+				}
+
+			}
+		}).start();
 
 	}
 

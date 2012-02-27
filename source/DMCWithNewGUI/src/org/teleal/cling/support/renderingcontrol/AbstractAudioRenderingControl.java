@@ -17,6 +17,8 @@
 
 package org.teleal.cling.support.renderingcontrol;
 
+import java.beans.PropertyChangeSupport;
+
 import org.teleal.cling.binding.annotations.UpnpAction;
 import org.teleal.cling.binding.annotations.UpnpInputArgument;
 import org.teleal.cling.binding.annotations.UpnpOutputArgument;
@@ -33,8 +35,6 @@ import org.teleal.cling.support.model.Channel;
 import org.teleal.cling.support.model.PresetName;
 import org.teleal.cling.support.model.VolumeDBRange;
 import org.teleal.cling.support.renderingcontrol.lastchange.RenderingControlLastChangeParser;
-
-import java.beans.PropertyChangeSupport;
 
 /**
  *

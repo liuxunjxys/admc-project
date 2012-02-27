@@ -17,13 +17,12 @@
 
 package org.teleal.cling.support.model.item;
 
+import java.util.List;
+
+import org.teleal.cling.support.model.DIDLObject.Property.UPNP;
 import org.teleal.cling.support.model.Res;
 import org.teleal.cling.support.model.StorageMedium;
 import org.teleal.cling.support.model.container.Container;
-
-import java.util.List;
-
-import static org.teleal.cling.support.model.DIDLObject.Property.UPNP;
 
 /**
  * @author Christian Bauer
