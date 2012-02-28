@@ -23,7 +23,6 @@ import org.teleal.cling.support.model.item.Item;
 import android.util.Log;
 
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor;
-import com.app.dlna.dmc.processor.interfaces.UpnpProcessor;
 
 public class DMSProcessorImpl implements DMSProcessor {
 
@@ -34,14 +33,8 @@ public class DMSProcessorImpl implements DMSProcessor {
 	private Map<String, List<? extends DIDLObject>> result;
 	private List<DMSProcessorListner> m_listeners;
 
-	public DMSProcessorImpl(UpnpProcessor upnpProcessor) {
-		m_server = upnpProcessor.getCurrentDMS();
-		m_controlPoint = upnpProcessor.getControlPoint();
-		m_listeners = new ArrayList<DMSProcessor.DMSProcessorListner>();
-	}
-
 	@SuppressWarnings("rawtypes")
-	public DMSProcessorImpl(ControlPoint controlPoint, Device device) {
+	public DMSProcessorImpl(Device device, ControlPoint controlPoint) {
 		m_server = device;
 		m_controlPoint = controlPoint;
 		m_listeners = new ArrayList<DMSProcessor.DMSProcessorListner>();

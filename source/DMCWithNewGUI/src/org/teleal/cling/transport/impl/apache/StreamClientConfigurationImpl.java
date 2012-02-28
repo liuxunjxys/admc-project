@@ -28,7 +28,7 @@ import org.teleal.cling.transport.spi.StreamClientConfiguration;
 public class StreamClientConfigurationImpl implements StreamClientConfiguration {
 
     private int maxTotalConnections = 1024;
-    private int connectionTimeoutSeconds = 5;
+    private int connectionTimeoutSeconds = 10;
     private int dataReadTimeoutSeconds = 5;
     private String contentCharset = "UTF-8"; // UDA spec says it's always UTF-8 entity content
 

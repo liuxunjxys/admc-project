@@ -50,4 +50,12 @@ public class Utility {
 			return null;
 		}
 	}
+
+	public static String converTimeToString(int time) {
+		String format = String.format("%%0%dd", 2);
+		String seconds = String.format(format, time % 60);
+		String minutes = String.format(format, (time % 3600) / 60);
+		String hours = String.format(format, time / 3600);
+		return hours + ":" + minutes + ":" + seconds;
+	}
 }

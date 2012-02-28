@@ -15,6 +15,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 
 import com.app.dlna.dmc.R;
 import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerActivity;
+import com.app.dlna.dmc.processor.impl.LocalDMRProcessorImpl;
 import com.app.dlna.dmc.processor.impl.UpnpProcessorImpl;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor.DMRProcessorListner;
@@ -49,6 +51,7 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 	private SeekBar m_sb_volume;
 	protected boolean m_isFailed = false;
 	private TextView m_tv_rendererName;
+	private RelativeLayout m_rl_dmrController;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +63,7 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 		m_listView = (ListView) findViewById(R.id.playList);
 		m_adapter = new PlaylistItemArrayAdapter(PlaylistActivity.this, 0);
 		m_listView.setAdapter(m_adapter);
+		m_rl_dmrController = (RelativeLayout) findViewById(R.id.rl_dmrController);
 
 		m_btn_PlayPause = (Button) findViewById(R.id.playPause);
 		m_btn_Stop = (Button) findViewById(R.id.stop);
@@ -76,21 +80,29 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 	protected void onResume() {
 		Log.i(TAG, "Playlist onResume");
 		super.onResume();
+		prepareView();
+	}
+
+	private void prepareView() {
 		if (m_upnpProcessor != null) {
 			if (m_upnpProcessor.getPlaylistProcessor() != null) {
 				m_playlistProcessor = m_upnpProcessor.getPlaylistProcessor();
+				m_listView.setOnItemClickListener(onPlaylistItemClick);
+				m_listView.setOnItemLongClickListener(onPlaylistItemLongClick);
 			}
 
 			if (m_upnpProcessor.getDMRProcessor() != null) {
 				m_dmrProcessor = m_upnpProcessor.getDMRProcessor();
-				m_dmrProcessor.setPlaylistProcessor(m_playlistProcessor);
-				m_dmrProcessor.addListener(PlaylistActivity.this);
-				m_tv_rendererName.setText(m_dmrProcessor.getName());
-				m_sb_playingProgress.setOnSeekBarChangeListener(playbackSeekListener);
-			}
-
-			if (m_dmrProcessor != null && m_playlistProcessor != null) {
-				updateCurrentPlaylistItem();
+				if (m_dmrProcessor instanceof LocalDMRProcessorImpl) {
+					m_rl_dmrController.setVisibility(View.GONE);
+				} else {
+					m_rl_dmrController.setVisibility(View.VISIBLE);
+					m_dmrProcessor.setPlaylistProcessor(m_playlistProcessor);
+					m_dmrProcessor.addListener(PlaylistActivity.this);
+					m_tv_rendererName.setText(m_dmrProcessor.getName());
+					m_sb_playingProgress.setOnSeekBarChangeListener(playbackSeekListener);
+					m_sb_volume.setOnSeekBarChangeListener(volumeSeekListener);
+				}
 			}
 
 			refreshPlaylist();
@@ -118,24 +130,7 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 	@Override
 	public void onStartComplete() {
 		super.onStartComplete();
-		if (m_upnpProcessor != null) {
-			if (m_upnpProcessor.getPlaylistProcessor() != null) {
-				m_playlistProcessor = m_upnpProcessor.getPlaylistProcessor();
-				m_listView.setOnItemClickListener(onPlaylistItemClick);
-				m_listView.setOnItemLongClickListener(onPlaylistItemLongClick);
-			}
-
-			if (m_upnpProcessor.getDMRProcessor() != null) {
-				m_dmrProcessor = m_upnpProcessor.getDMRProcessor();
-				m_dmrProcessor.setPlaylistProcessor(m_playlistProcessor);
-				m_dmrProcessor.addListener(PlaylistActivity.this);
-				m_tv_rendererName.setText(m_dmrProcessor.getName());
-				m_sb_playingProgress.setOnSeekBarChangeListener(playbackSeekListener);
-				m_sb_volume.setOnSeekBarChangeListener(volumeSeekListener);
-			}
-
-			refreshPlaylist();
-		}
+		prepareView();
 	}
 
 	private OnSeekBarChangeListener playbackSeekListener = new OnSeekBarChangeListener() {
@@ -419,16 +414,6 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 
 		@Override
 		public boolean onItemLongClick(AdapterView<?> adapter, View view, final int position, long arg3) {
-			// new
-			// AlertDialog.Builder(PlaylistActivity.this).setMessage("Confirm to delete this item").setTitle("Confirm").setCancelable(false)
-			// .setPositiveButton("Delete", new OnClickListener() {
-			//
-			// @Override
-			// public void onClick(DialogInterface dialog, int which) {
-			// m_playlistProcessor.removeItem(m_adapter.getItem(position));
-			// m_adapter.notifyDataSetChanged();
-			// }
-			// }).setNegativeButton("Cancel", null).create().show();
 			final String actionList[] = new String[2];
 			actionList[0] = "Play";
 			actionList[1] = "Remove";

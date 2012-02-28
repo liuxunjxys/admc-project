@@ -4,7 +4,6 @@ import org.teleal.cling.model.message.UpnpResponse;
 import org.teleal.cling.model.meta.Action;
 
 public interface DMRProcessor {
-	void setURI(String uri);
 
 	void setURIandPlay(String uri);
 

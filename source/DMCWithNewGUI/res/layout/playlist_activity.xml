@@ -1,33 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:weightSum="1" >
 
-    <ListView
-        android:id="@+id/playList"
-        android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.65" >
-    </ListView>
-
     <RelativeLayout
+        android:id="@+id/rl_dmrController"
         android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.35"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:background="#555555" >
-
-        <!--
-        <TextView
-            android:id="@+id/itemTitle"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/progressTime"
-            android:layout_alignLeft="@+id/progressTime"
-            android:gravity="center"
-            android:textStyle="bold" />
-        -->
 
         <SeekBar
             android:id="@+id/volumeControl"
@@ -113,7 +96,6 @@
             android:id="@+id/rendererName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
             android:layout_below="@id/rl_seekbar"
             android:background="@android:color/white"
             android:gravity="center"
@@ -122,4 +104,12 @@
             android:textSize="25sp" />
     </RelativeLayout>
 
-</LinearLayout>
+    <ListView
+        android:id="@+id/playList"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/rl_dmrController"
+        android:layout_alignParentTop="true" >
+    </ListView>
+
+</RelativeLayout>
