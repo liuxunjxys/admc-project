@@ -1,16 +1,9 @@
 package com.app.dlna.dmc.gui.devices;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
 import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.model.meta.LocalDevice;
-import org.teleal.cling.model.meta.RemoteDevice;
 import org.teleal.cling.model.types.UDN;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -74,7 +67,7 @@ public class DevicesActivity extends UpnpListenerActivity {
 				UDN udn = m_dmrAdapter.getItem(position).getIdentity().getUdn();
 				m_upnpProcessor.setCurrentDMR(udn);
 				synchronized (m_dmrAdapter) {
-					m_dmrAdapter.setCurrentDMSUDN(udn.getIdentifierString());
+					m_dmrAdapter.setCurrentDeviceUDN(udn.getIdentifierString());
 					m_dmrAdapter.notifyDataSetChanged();
 				}
 			}
@@ -90,7 +83,7 @@ public class DevicesActivity extends UpnpListenerActivity {
 				UDN udn = m_dmsAdapter.getItem(position).getIdentity().getUdn();
 				m_upnpProcessor.setCurrentDMS(udn);
 				synchronized (m_dmsAdapter) {
-					m_dmsAdapter.setCurrentDMSUDN(udn.getIdentifierString());
+					m_dmsAdapter.setCurrentDeviceUDN(udn.getIdentifierString());
 					m_dmsAdapter.notifyDataSetChanged();
 				}
 			}
@@ -158,18 +151,18 @@ public class DevicesActivity extends UpnpListenerActivity {
 		synchronized (m_dmsAdapter) {
 			m_dmsAdapter.clear();
 			if (m_upnpProcessor.getCurrentDMS() != null) {
-				m_dmsAdapter.setCurrentDMSUDN(m_upnpProcessor.getCurrentDMS().getIdentity().getUdn().getIdentifierString());
+				m_dmsAdapter.setCurrentDeviceUDN(m_upnpProcessor.getCurrentDMS().getIdentity().getUdn().getIdentifierString());
 			} else {
-				m_dmsAdapter.setCurrentDMSUDN("");
+				m_dmsAdapter.setCurrentDeviceUDN("");
 			}
 		}
 
 		synchronized (m_dmrAdapter) {
 			m_dmrAdapter.clear();
 			if (m_upnpProcessor.getCurrentDMR() != null) {
-				m_dmrAdapter.setCurrentDMSUDN(m_upnpProcessor.getCurrentDMR().getIdentity().getUdn().getIdentifierString());
+				m_dmrAdapter.setCurrentDeviceUDN(m_upnpProcessor.getCurrentDMR().getIdentity().getUdn().getIdentifierString());
 			} else {
-				m_dmrAdapter.setCurrentDMSUDN("");
+				m_dmrAdapter.setCurrentDeviceUDN("");
 			}
 		}
 

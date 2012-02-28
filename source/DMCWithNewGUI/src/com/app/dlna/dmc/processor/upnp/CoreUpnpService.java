@@ -42,6 +42,7 @@ import com.app.dlna.dmc.processor.http.HTTPServerData;
 import com.app.dlna.dmc.processor.http.MainHttpProcessor;
 import com.app.dlna.dmc.processor.impl.DMRProcessorImpl;
 import com.app.dlna.dmc.processor.impl.DMSProcessorImpl;
+import com.app.dlna.dmc.processor.impl.LocalDMRProcessorImpl;
 import com.app.dlna.dmc.processor.impl.PlaylistProcessorImpl;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor;
@@ -111,6 +112,7 @@ public class CoreUpnpService extends Service {
 		LocalContentDirectoryService.scanMedia();
 		showNotification();
 		startLocalDMS();
+		startLocalDMR();
 	}
 
 	protected AndroidUpnpServiceConfiguration createConfiguration(WifiManager wifiManager) {
@@ -173,10 +175,10 @@ public class CoreUpnpService extends Service {
 			if (m_currentDMS != null) {
 				Log.d(TAG, "CURRENT DMS:" + m_currentDMS.toString());
 				Toast.makeText(getApplicationContext(), "Set DMS complete: " + m_currentDMS.getDisplayString(), Toast.LENGTH_SHORT).show();
-				m_dmsProcessor = new DMSProcessorImpl(getControlPoint(), m_currentDMS);
+				m_dmsProcessor = new DMSProcessorImpl(m_currentDMS, getControlPoint());
 			} else {
 				Log.e(TAG, "GET DMS FAIL:" + uDN.toString());
-				Toast.makeText(getApplicationContext(), "Set DMS fail. Cannot get DMS info; UDN = " + uDN.toString(), Toast.LENGTH_SHORT).show();
+				// Toast.makeText(getApplicationContext(), "Set DMS fail. Cannot get DMS info; UDN = " + uDN.toString(), Toast.LENGTH_SHORT).show();
 				m_dmsProcessor = null;
 			}
 		}
@@ -184,11 +186,14 @@ public class CoreUpnpService extends Service {
 		public void setCurrentDMR(UDN uDN) {
 			if (m_dmrProcessor != null)
 				m_dmrProcessor.dispose();
-			m_currentDMR = upnpService.getRegistry().getRemoteDevice(uDN, true);
+			m_currentDMR = upnpService.getRegistry().getDevice(uDN, true);
 			if (m_currentDMR != null) {
 				Log.d(TAG, "CURRENT DMR:" + m_currentDMR.toString());
-				Toast.makeText(getApplicationContext(), "Set DMR complete: " + m_currentDMR.getDisplayString(), Toast.LENGTH_SHORT).show();
-				m_dmrProcessor = new DMRProcessorImpl(m_currentDMR, getControlPoint());
+				// Toast.makeText(getApplicationContext(), "Set DMR complete: " + m_currentDMR.getDisplayString(), Toast.LENGTH_SHORT).show();
+				if (m_currentDMR instanceof LocalDevice)
+					m_dmrProcessor = new LocalDMRProcessorImpl(CoreUpnpService.this);
+				else
+					m_dmrProcessor = new DMRProcessorImpl(m_currentDMR, getControlPoint());
 			} else {
 				Log.e(TAG, "GET DMR FAIL:" + uDN.toString());
 				Toast.makeText(getApplicationContext(), "Set DMR fail. Cannot get DMR info; UDN = " + uDN.toString(), Toast.LENGTH_SHORT).show();
@@ -226,10 +231,10 @@ public class CoreUpnpService extends Service {
 	@SuppressWarnings("unchecked")
 	private void startLocalDMS() {
 		try {
-			String deviceName = Build.MODEL.toUpperCase() + " " + Build.DEVICE.toUpperCase();
+			String deviceName = Build.MODEL.toUpperCase() + " " + Build.DEVICE.toUpperCase() + " - DMS";
 			String MACAddress = m_wifiManager.getConnectionInfo().getMacAddress();
 			Log.i(TAG, "Local DMS: Device name = " + deviceName + ";MAC = " + MACAddress);
-			String hashUDN = Utility.getMD5(deviceName + "-" + MACAddress);
+			String hashUDN = Utility.getMD5(deviceName + "-" + MACAddress + "-LocalDMS");
 			Log.i(TAG, "Hash UDN = " + hashUDN);
 			String uDNString = hashUDN.substring(0, 8) + "-" + hashUDN.substring(8, 12) + "-" + hashUDN.substring(12, 16) + "-" + hashUDN.substring(16, 20)
 					+ "-" + hashUDN.substring(20);
@@ -241,6 +246,30 @@ public class CoreUpnpService extends Service {
 			DeviceDetails details = new DeviceDetails(deviceName, new ManufacturerDetails("Android Digital Controller"), new ModelDetails("v1.0"), "", "");
 
 			LocalDevice localDevice = new LocalDevice(identity, type, details, localService);
+
+			upnpService.getRegistry().addDevice(localDevice);
+			Log.d(TAG, "Create Local Device complete");
+		} catch (Exception ex) {
+			Log.d(TAG, "Cannot create Local Device");
+			ex.printStackTrace();
+		}
+	}
+
+	private void startLocalDMR() {
+		try {
+			String deviceName = Build.MODEL.toUpperCase() + " " + Build.DEVICE.toUpperCase() + " - DMR";
+			String MACAddress = m_wifiManager.getConnectionInfo().getMacAddress();
+			Log.i(TAG, "Local DMS: Device name = " + deviceName + ";MAC = " + MACAddress);
+			String hashUDN = Utility.getMD5(deviceName + "-" + MACAddress + "-LocalDMR");
+			Log.i(TAG, "Hash UDN = " + hashUDN);
+			String uDNString = hashUDN.substring(0, 8) + "-" + hashUDN.substring(8, 12) + "-" + hashUDN.substring(12, 16) + "-" + hashUDN.substring(16, 20)
+					+ "-" + hashUDN.substring(20);
+
+			DeviceIdentity identity = new DeviceIdentity(new UDN(uDNString));
+			DeviceType type = new DeviceType("schemas-upnp-org", "MediaRenderer");
+			DeviceDetails details = new DeviceDetails(deviceName, new ManufacturerDetails("Android Digital Controller"), new ModelDetails("v1.0"), "", "");
+
+			LocalDevice localDevice = new LocalDevice(identity, type, details, new LocalService[0]);
 
 			upnpService.getRegistry().addDevice(localDevice);
 			Log.d(TAG, "Create Local Device complete");

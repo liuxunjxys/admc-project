@@ -28,7 +28,7 @@ public class DeviceArrayAdapter extends ArrayAdapter<Device> {
 	// private static final String TAG = DeviceArrayAdapter.class.getName();
 	private LayoutInflater m_inflater;
 	private Map<String, Bitmap> m_cacheDMSIcon;
-	private String m_currentDMSUDN = "";
+	private String m_currentUDN = "";
 	private Activity m_mainActivity;
 
 	public DeviceArrayAdapter(Context context, int textViewResourceId) {
@@ -38,8 +38,8 @@ public class DeviceArrayAdapter extends ArrayAdapter<Device> {
 		m_mainActivity = (Activity) context;
 	}
 
-	public void setCurrentDMSUDN(String uDN) {
-		m_currentDMSUDN = uDN;
+	public void setCurrentDeviceUDN(String uDN) {
+		m_currentUDN = uDN;
 	}
 
 	@Override
@@ -55,7 +55,7 @@ public class DeviceArrayAdapter extends ArrayAdapter<Device> {
 		final ViewHolder holder = (ViewHolder) convertView.getTag();
 		holder.deviceName.setText(device.getDetails().getFriendlyName());
 		final String udn = device.getIdentity().getUdn().getIdentifierString();
-		if (udn.equals(m_currentDMSUDN)) {
+		if (udn.equals(m_currentUDN)) {
 			holder.selected.setChecked(true);
 		} else {
 			holder.selected.setChecked(false);
@@ -83,8 +83,7 @@ public class DeviceArrayAdapter extends ArrayAdapter<Device> {
 									final RemoteDevice remoteDevice = (RemoteDevice) device;
 
 									String urlString = remoteDevice.getIdentity().getDescriptorURL().getProtocol() + "://"
-											+ remoteDevice.getIdentity().getDescriptorURL().getAuthority()
-											+ icons[0].getUri().toString();
+											+ remoteDevice.getIdentity().getDescriptorURL().getAuthority() + icons[0].getUri().toString();
 									URL url = new URL(urlString);
 									final Bitmap icon = BitmapFactory.decodeStream(url.openConnection().getInputStream());
 									m_cacheDMSIcon.put(udn, icon);
