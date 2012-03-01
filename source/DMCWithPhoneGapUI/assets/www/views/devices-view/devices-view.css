@@ -1,0 +1,86 @@
+@CHARSET "UTF-8";
+
+#page_devices {
+	height: auto;
+}
+
+#page_content {
+	height: 100%;
+	padding-left: 10px;
+	padding-right: 10px;
+	padding-top: 0px;
+}
+
+.tr_itemcontent {
+	width: 100%;
+	padding-top: 0px;
+	padding-bottom: 0px;
+	background: white;
+}
+
+.td_listitem_left {
+	width: auto;
+	color: black;
+	padding: 0px;
+	margin: 0px;
+}
+
+.td_listitem_middle {
+	width: auto;
+	color: black;
+	padding: 0px;
+	margin: 0px;
+}
+
+.img_imgoflistitem {
+	padding-top: 0px;
+	padding-bottom: 0px;
+	padding-left: 0px;
+	padding-right: 5px;
+	width: 32px;
+	height: 32px;
+}
+
+#dms_content {
+	padding-top: 0px;
+	padding-bottom: 0px;
+}
+
+#dmr_content {
+	padding-top: 0px;
+	padding-bottom: 0px;
+}
+
+.dms_listitem {
+	background-color: white;
+}
+
+.device_icon {
+	width: 30%;
+	height: 100%;
+	position: relative;
+	top: 0px;
+	left: 0px;
+}
+
+.device_info {
+	width: 70%;
+	height: 100%;
+	position: absolute;
+	top: 0px;
+	left: 30%;
+	color: black;
+}
+
+.device_list_item {
+	width: 100%;
+	background-color: white;
+	height: 64px;
+	padding: 0dx;
+	margin: 0px;
+}
+
+.li_device_item {
+	padding: 0px;
+	margin: 0px;
+}
