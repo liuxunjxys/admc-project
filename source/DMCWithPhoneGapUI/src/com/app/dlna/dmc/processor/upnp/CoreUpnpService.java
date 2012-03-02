@@ -1,8 +1,6 @@
 package com.app.dlna.dmc.processor.upnp;
 
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 
 import org.teleal.cling.UpnpService;
 import org.teleal.cling.UpnpServiceConfiguration;
@@ -33,7 +31,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources.NotFoundException;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
