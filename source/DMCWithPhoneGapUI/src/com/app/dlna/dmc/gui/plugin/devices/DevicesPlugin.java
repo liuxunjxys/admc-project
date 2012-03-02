@@ -1,5 +1,8 @@
 package com.app.dlna.dmc.gui.plugin.devices;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.json.JSONArray;
 import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.model.meta.Icon;
@@ -7,7 +10,6 @@ import org.teleal.cling.model.meta.RemoteDevice;
 import org.teleal.cling.model.types.UDN;
 import org.teleal.common.util.Base64Coder;
 
-import android.util.Base64;
 import android.util.Log;
 
 import com.app.dlna.dmc.gui.UIWithPhonegapActivity;
@@ -22,6 +24,10 @@ public class DevicesPlugin extends Plugin implements UpnpProcessorListener {
 	private static final String ACTION_STOP = "stop";
 	private static final String ACTION_SET_DMS = "setDMS";
 	private static final String ACTION_SET_DMR = "setDMR";
+	@SuppressWarnings("rawtypes")
+	private List<Device> m_dms_list = new ArrayList<Device>();
+	@SuppressWarnings("rawtypes")
+	private List<Device> m_dmr_list = new ArrayList<Device>();
 
 	@SuppressWarnings("rawtypes")
 	@Override
@@ -36,6 +42,8 @@ public class DevicesPlugin extends Plugin implements UpnpProcessorListener {
 			for (Device device : UIWithPhonegapActivity.UPNP_PROCESSOR.getDMRList()) {
 				addDMR(device);
 			}
+		} else if (ACTION_STOP.equals(action)) {
+			UIWithPhonegapActivity.UPNP_PROCESSOR.removeListener(this);
 		} else if (ACTION_SET_DMS.equals(action)) {
 			try {
 				setDMS(data.getString(0));
@@ -74,14 +82,20 @@ public class DevicesPlugin extends Plugin implements UpnpProcessorListener {
 
 	@SuppressWarnings("rawtypes")
 	private void addDMR(Device device) {
-		String dms_html = createDeviceElement(device, "dmr");
-		sendJavascript("add_device(" + dms_html + ",'dmr');");
+		if (!m_dmr_list.contains(device)) {
+			m_dmr_list.add(device);
+			String dmr_html = createDeviceElement(device, "dmr");
+			sendJavascript("add_device(" + dmr_html + ",'dmr');");
+		}
 	}
 
 	@SuppressWarnings("rawtypes")
 	private void addDMS(Device device) {
-		String dms_html = createDeviceElement(device, "dms");
-		sendJavascript("add_device(" + dms_html + ",'dms');");
+		if (!m_dms_list.contains(device)) {
+			m_dms_list.add(device);
+			String dms_html = createDeviceElement(device, "dms");
+			sendJavascript("add_device(" + dms_html + ",'dms');");
+		}
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -103,15 +117,13 @@ public class DevicesPlugin extends Plugin implements UpnpProcessorListener {
 						+ remoteDevice.getIdentity().getDescriptorURL().getAuthority() + icons[0].getUri().toString();
 			}
 		} else {
-			final Icon[] icons = device.getIcons();
-			if (icons != null && icons[0] != null && icons[0].getUri() != null) {
-				Icon icon = icons[0];
-				byte[] bytes = icon.getData();
+			deviceAddress = "Local Device";
+			byte[] bytes = device.getIcons()[0].getData();
+			if (bytes.length != 0) {
 				String base64String = new String(Base64Coder.encode(bytes));
 				Log.e(TAG, base64String);
 				deviceImage = "data:image/png;base64," + base64String;
 			}
-			deviceAddress = "Local Device";
 		}
 
 		StringBuilder result = new StringBuilder();
