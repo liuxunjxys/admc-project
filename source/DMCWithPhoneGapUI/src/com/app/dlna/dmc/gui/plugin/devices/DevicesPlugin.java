@@ -4,7 +4,10 @@ import org.json.JSONArray;
 import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.model.meta.Icon;
 import org.teleal.cling.model.meta.RemoteDevice;
+import org.teleal.cling.model.types.UDN;
+import org.teleal.common.util.Base64Coder;
 
+import android.util.Base64;
 import android.util.Log;
 
 import com.app.dlna.dmc.gui.UIWithPhonegapActivity;
@@ -17,14 +20,44 @@ public class DevicesPlugin extends Plugin implements UpnpProcessorListener {
 	private static final String TAG = DevicesPlugin.class.getSimpleName();
 	private static final String ACTION_START = "start";
 	private static final String ACTION_STOP = "stop";
+	private static final String ACTION_SET_DMS = "setDMS";
+	private static final String ACTION_SET_DMR = "setDMR";
 
+	@SuppressWarnings("rawtypes")
 	@Override
-	public PluginResult execute(String arg0, JSONArray arg1, String arg2) {
+	public PluginResult execute(String action, JSONArray data, String callID) {
 		Log.e(TAG, "Call start");
-		if (ACTION_START.equals(arg0)) {
+		PluginResult result = new PluginResult(Status.OK);
+		if (ACTION_START.equals(action)) {
 			UIWithPhonegapActivity.UPNP_PROCESSOR.addListener(this);
+			for (Device device : UIWithPhonegapActivity.UPNP_PROCESSOR.getDMSList()) {
+				addDMS(device);
+			}
+			for (Device device : UIWithPhonegapActivity.UPNP_PROCESSOR.getDMRList()) {
+				addDMR(device);
+			}
+		} else if (ACTION_SET_DMS.equals(action)) {
+			try {
+				setDMS(data.getString(0));
+			} catch (Exception ex) {
+				result = new PluginResult(Status.JSON_EXCEPTION);
+			}
+		} else if (ACTION_SET_DMR.equals(action)) {
+			try {
+				setDMR(data.getString(0));
+			} catch (Exception ex) {
+				result = new PluginResult(Status.JSON_EXCEPTION);
+			}
 		}
-		return new PluginResult(Status.OK);
+		return result;
+	}
+
+	private void setDMR(String udn) {
+		UIWithPhonegapActivity.UPNP_PROCESSOR.setCurrentDMR(new UDN(udn));
+	}
+
+	private void setDMS(String udn) {
+		UIWithPhonegapActivity.UPNP_PROCESSOR.setCurrentDMS(new UDN(udn));
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -41,54 +74,58 @@ public class DevicesPlugin extends Plugin implements UpnpProcessorListener {
 
 	@SuppressWarnings("rawtypes")
 	private void addDMR(Device device) {
-
+		String dms_html = createDeviceElement(device, "dmr");
+		sendJavascript("add_device(" + dms_html + ",'dmr');");
 	}
 
 	@SuppressWarnings("rawtypes")
 	private void addDMS(Device device) {
-		String dms_html = createDMS(device);
-		sendJavascript("add_dms(" + dms_html + ");");
+		String dms_html = createDeviceElement(device, "dms");
+		sendJavascript("add_device(" + dms_html + ",'dms');");
 	}
 
 	@SuppressWarnings("rawtypes")
-	private String createDMS(Device device) {
+	private String createDeviceElement(Device device, String type) {
 
 		final String udn = device.getIdentity().getUdn().getIdentifierString();
-		// if (udn.equals(m_currentUDN)) {
-		// holder.selected.setChecked(true);
-		// } else {
-		// holder.selected.setChecked(false);
-		// }
 		String deviceImage = "";
 		String deviceAddress = "";
+		String deviceName = "";
+		deviceName = device.getDetails().getFriendlyName();
 		if (device instanceof RemoteDevice) {
 			deviceAddress = ((RemoteDevice) device).getIdentity().getDescriptorURL().getAuthority();
-			try {
-				final Icon[] icons = device.getIcons();
-				if (icons != null && icons[0] != null && icons[0].getUri() != null) {
+			final Icon[] icons = device.getIcons();
+			if (icons != null && icons[0] != null && icons[0].getUri() != null) {
 
-					final RemoteDevice remoteDevice = (RemoteDevice) device;
+				final RemoteDevice remoteDevice = (RemoteDevice) device;
 
-					deviceImage = remoteDevice.getIdentity().getDescriptorURL().getProtocol() + "://"
-							+ remoteDevice.getIdentity().getDescriptorURL().getAuthority() + icons[0].getUri().toString();
-				}
-			} catch (Exception ex) {
-				ex.printStackTrace();
+				deviceImage = remoteDevice.getIdentity().getDescriptorURL().getProtocol() + "://"
+						+ remoteDevice.getIdentity().getDescriptorURL().getAuthority() + icons[0].getUri().toString();
 			}
 		} else {
+			final Icon[] icons = device.getIcons();
+			if (icons != null && icons[0] != null && icons[0].getUri() != null) {
+				Icon icon = icons[0];
+				byte[] bytes = icon.getData();
+				String base64String = new String(Base64Coder.encode(bytes));
+				Log.e(TAG, base64String);
+				deviceImage = "data:image/png;base64," + base64String;
+			}
 			deviceAddress = "Local Device";
 		}
 
 		StringBuilder result = new StringBuilder();
 		result.append("\"");
-		result.append("<div class='device_list_item'>");
-		result.append("<div align='center' class='device_icon'><img style='width: 48px; height: 48px;' src='" + deviceImage + "'/></div>");
-		result.append("<div class='device_info'/>");
+		result.append("<div class='device_list_item' type='" + type + "' udn='" + udn + "' onclick='onDeviceClick(this);'>");
+		result.append("<div align='center' class='device_icon'>");
+		result.append("<img class='img_device_icon' src='" + deviceImage + "'/>");
+		result.append("</div>");
+		result.append("<div class='device_info'>");
+		result.append("<div class='div_device_name'>" + deviceName + "</div>");
+		result.append("<div class='div_device_address'>" + deviceAddress + "</div>");
+		result.append("</div>");
 		result.append("</div>\"");
 		return result.toString();
-		// return "\"<table>" + "<tr class='tr_itemcontent'>" + "<td class='td_listitem_left'>" + "<img class='img_imgoflistitem' alt='Server image' src='"
-		// + deviceImage + "'/>" + "</td>" + "<td class='td_listitem_middle'>" + "<h5>" + device.getDetails().getFriendlyName() + "</h5>" + "<p>"
-		// + deviceAddress + "</p>" + "</td>" + "</tr>" + "</table>\"";
 	}
 
 	@SuppressWarnings("rawtypes")
