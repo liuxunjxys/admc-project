@@ -51,36 +51,61 @@
 	padding-bottom: 0px;
 }
 
-.dms_listitem {
-	background-color: white;
-}
-
 .device_icon {
-	width: 30%;
+	width: 20%;
 	height: 100%;
 	position: relative;
 	top: 0px;
 	left: 0px;
+	padding: 0px;
+	margin: 0px;
+}
+
+.img_device_icon {
+	width: 64px;
+	height: 64px;
 }
 
 .device_info {
-	width: 70%;
+	width: 80%;
 	height: 100%;
-	position: absolute;
-	top: 0px;
-	left: 30%;
+	position: relative;
+	top: -100%;
+	left: 20%;
 	color: black;
+	padding: 0px;
+	margin: 0px;
 }
 
 .device_list_item {
 	width: 100%;
 	background-color: white;
 	height: 64px;
-	padding: 0dx;
-	margin: 0px;
+	border-width: 5px;
+	border-color: black;
+	margin: 2px;
+	padding: 2px;
+	margin: 2px;
 }
 
 .li_device_item {
 	padding: 0px;
 	margin: 0px;
+}
+
+.div_device_name {
+	color: black;
+	font-size: large;
+	font-weight: bolder;
+	height: 70%;
+	margin: 3px;
+}
+
+.div_device_address {
+	color: black;
+	font-size: medium;
+	font-weight: normal;
+	position: absolute;
+	top: 70%;
+	left: 3px;
 }

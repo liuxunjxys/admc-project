@@ -1,5 +1,9 @@
 package com.app.dlna.dmc.processor.upnp;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.teleal.cling.UpnpService;
 import org.teleal.cling.UpnpServiceConfiguration;
 import org.teleal.cling.UpnpServiceImpl;
@@ -12,6 +16,7 @@ import org.teleal.cling.model.DefaultServiceManager;
 import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.model.meta.DeviceDetails;
 import org.teleal.cling.model.meta.DeviceIdentity;
+import org.teleal.cling.model.meta.Icon;
 import org.teleal.cling.model.meta.LocalDevice;
 import org.teleal.cling.model.meta.LocalService;
 import org.teleal.cling.model.meta.ManufacturerDetails;
@@ -28,6 +33,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources.NotFoundException;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
@@ -36,8 +42,8 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.app.dlna.dmc.R;
 import com.app.dlna.dmc.gui.UIWithPhonegapActivity;
+import com.app.dlna.dmc.phonegapversion.R;
 import com.app.dlna.dmc.processor.http.HTTPServerData;
 import com.app.dlna.dmc.processor.http.MainHttpProcessor;
 import com.app.dlna.dmc.processor.impl.DMRProcessorImpl;
@@ -67,6 +73,7 @@ public class CoreUpnpService extends Service {
 	private WifiLock m_wifiLock;
 	private WifiManager m_wifiManager;
 	private ConnectivityManager m_connectivityManager;
+	private Icon m_localDeviceIcon;
 
 	@Override
 	public void onCreate() {
@@ -244,8 +251,8 @@ public class CoreUpnpService extends Service {
 			DeviceIdentity identity = new DeviceIdentity(new UDN(uDNString));
 			DeviceType type = new DeviceType("schemas-upnp-org", "MediaServer");
 			DeviceDetails details = new DeviceDetails(deviceName, new ManufacturerDetails("Android Digital Controller"), new ModelDetails("v1.0"), "", "");
-
-			LocalDevice localDevice = new LocalDevice(identity, type, details, localService);
+			m_localDeviceIcon = new Icon("image/png", 48, 48, 64, new URI(""), getResources().openRawResource(R.drawable.ic_launcher));
+			LocalDevice localDevice = new LocalDevice(identity, type, details, m_localDeviceIcon, localService);
 
 			upnpService.getRegistry().addDevice(localDevice);
 			Log.d(TAG, "Create Local Device complete");
@@ -268,8 +275,8 @@ public class CoreUpnpService extends Service {
 			DeviceIdentity identity = new DeviceIdentity(new UDN(uDNString));
 			DeviceType type = new DeviceType("schemas-upnp-org", "MediaRenderer");
 			DeviceDetails details = new DeviceDetails(deviceName, new ManufacturerDetails("Android Digital Controller"), new ModelDetails("v1.0"), "", "");
-
-			LocalDevice localDevice = new LocalDevice(identity, type, details, new LocalService[0]);
+			m_localDeviceIcon = new Icon("image/png", 48, 48, 64, new URI(""), getResources().openRawResource(R.drawable.ic_launcher));
+			LocalDevice localDevice = new LocalDevice(identity, type, details, m_localDeviceIcon, new LocalService[0]);
 
 			upnpService.getRegistry().addDevice(localDevice);
 			Log.d(TAG, "Create Local Device complete");
