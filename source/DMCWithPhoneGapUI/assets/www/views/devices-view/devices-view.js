@@ -1,6 +1,7 @@
 document.addEventListener('deviceready', function() {
 	window.plugins.DevicesPlugin.start();
 }, true);
+
 var dms_listview;
 var dmr_listview;
 
