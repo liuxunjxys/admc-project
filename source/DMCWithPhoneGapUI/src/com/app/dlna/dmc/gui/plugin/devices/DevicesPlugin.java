@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.model.meta.Icon;
 import org.teleal.cling.model.meta.RemoteDevice;
@@ -32,9 +34,10 @@ public class DevicesPlugin extends Plugin implements UpnpProcessorListener {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public PluginResult execute(String action, JSONArray data, String callID) {
-		Log.e(TAG, "Call start");
+
 		PluginResult result = new PluginResult(Status.OK);
 		if (ACTION_START.equals(action)) {
+			Log.i(TAG, "Call start");
 			UIWithPhonegapActivity.UPNP_PROCESSOR.addListener(this);
 			for (Device device : UIWithPhonegapActivity.UPNP_PROCESSOR.getDMSList()) {
 				addDMS(device);
@@ -43,14 +46,17 @@ public class DevicesPlugin extends Plugin implements UpnpProcessorListener {
 				addDMR(device);
 			}
 		} else if (ACTION_STOP.equals(action)) {
+			Log.e(TAG, "Call stop");
 			UIWithPhonegapActivity.UPNP_PROCESSOR.removeListener(this);
 		} else if (ACTION_SET_DMS.equals(action)) {
+			Log.e(TAG, "Call SetDMS");
 			try {
 				setDMS(data.getString(0));
 			} catch (Exception ex) {
 				result = new PluginResult(Status.JSON_EXCEPTION);
 			}
 		} else if (ACTION_SET_DMR.equals(action)) {
+			Log.e(TAG, "Call SetDMR");
 			try {
 				setDMR(data.getString(0));
 			} catch (Exception ex) {
@@ -80,12 +86,21 @@ public class DevicesPlugin extends Plugin implements UpnpProcessorListener {
 		}
 	}
 
+	// @SuppressWarnings("rawtypes")
+	// private void addDMR(Device device) {
+	// if (!m_dmr_list.contains(device)) {
+	// m_dmr_list.add(device);
+	// String dmr_html = createDeviceElement(device, "dmr");
+	// sendJavascript("add_device(" + dmr_html + ",'dmr');");
+	// }
+	// }
+
 	@SuppressWarnings("rawtypes")
 	private void addDMR(Device device) {
 		if (!m_dmr_list.contains(device)) {
 			m_dmr_list.add(device);
-			String dmr_html = createDeviceElement(device, "dmr");
-			sendJavascript("add_device(" + dmr_html + ",'dmr');");
+			String jsonString = createDeviceElement(device, "dmr");
+			sendJavascript("add_device(" + jsonString + ",'dmr');");
 		}
 	}
 
@@ -93,14 +108,15 @@ public class DevicesPlugin extends Plugin implements UpnpProcessorListener {
 	private void addDMS(Device device) {
 		if (!m_dms_list.contains(device)) {
 			m_dms_list.add(device);
-			String dms_html = createDeviceElement(device, "dms");
-			sendJavascript("add_device(" + dms_html + ",'dms');");
+			String jsonString = createDeviceElement(device, "dms");
+			Log.e(TAG, "JsonString = " + jsonString);
+			sendJavascript("add_device(" + jsonString + ",'dms');");
 		}
 	}
 
 	@SuppressWarnings("rawtypes")
 	private String createDeviceElement(Device device, String type) {
-
+		JSONObject jsonDevice = new JSONObject();
 		final String udn = device.getIdentity().getUdn().getIdentifierString();
 		String deviceImage = "";
 		String deviceAddress = "";
@@ -125,19 +141,16 @@ public class DevicesPlugin extends Plugin implements UpnpProcessorListener {
 				deviceImage = "data:image/png;base64," + base64String;
 			}
 		}
-
-		StringBuilder result = new StringBuilder();
-		result.append("\"");
-		result.append("<div class='device_list_item' type='" + type + "' udn='" + udn + "' onclick='onDeviceClick(this);'>");
-		result.append("<div align='center' class='device_icon'>");
-		result.append("<img class='img_device_icon' src='" + deviceImage + "'/>");
-		result.append("</div>");
-		result.append("<div class='device_info'>");
-		result.append("<div class='div_device_name'>" + deviceName + "</div>");
-		result.append("<div class='div_device_address'>" + deviceAddress + "</div>");
-		result.append("</div>");
-		result.append("</div>\"");
-		return result.toString();
+		try {
+			jsonDevice.put("name", deviceName);
+			jsonDevice.put("type", type);
+			jsonDevice.put("udn", udn);
+			jsonDevice.put("icon", deviceImage);
+			jsonDevice.put("address", deviceAddress);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return jsonDevice.toString();
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -154,12 +167,14 @@ public class DevicesPlugin extends Plugin implements UpnpProcessorListener {
 
 	@SuppressWarnings("rawtypes")
 	private void removeDMR(Device device) {
-
+		sendJavascript("remove_device('" + device.getIdentity().getUdn().getIdentifierString() + "');");
+		m_dmr_list.remove(device);
 	}
 
 	@SuppressWarnings("rawtypes")
 	private void removeDMS(Device device) {
-
+		sendJavascript("remove_device('" + device.getIdentity().getUdn().getIdentifierString() + "');");
+		m_dms_list.remove(device);
 	}
 
 	@Override
