@@ -50,5 +50,14 @@ public interface UpnpProcessor {
 		void onStartComplete();
 
 		void onStartFailed();
+
+		void onNetworkChanged();
+
+		void onRouterError(String cause);
+
+		void onRouterEnabledEvent();
+
+		void onRouterDisabledEvent();
+
 	}
 }

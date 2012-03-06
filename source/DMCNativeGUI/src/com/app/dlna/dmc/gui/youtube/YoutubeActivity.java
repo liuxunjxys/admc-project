@@ -15,13 +15,12 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerActivity;
 import com.app.dlna.dmc.nativeui.R;
 import com.app.dlna.dmc.processor.http.HTTPServerData;
-import com.app.dlna.dmc.processor.impl.UpnpProcessorImpl;
 import com.app.dlna.dmc.processor.impl.YoutubeProcessorImpl;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
-import com.app.dlna.dmc.processor.interfaces.UpnpProcessor;
 import com.app.dlna.dmc.processor.interfaces.YoutubeProcessor;
 import com.app.dlna.dmc.processor.interfaces.YoutubeProcessor.IYoutubeProcessorListener;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
@@ -35,7 +34,6 @@ public class YoutubeActivity extends UpnpListenerActivity {
 	private YoutubeProcessor m_youtubeProcessor;
 	private ProgressDialog m_progressDialog;
 	private PlaylistProcessor m_playlistProcessor;
-	private UpnpProcessor m_upnpProcessor;
 	private ListView m_listView;
 	private YoutubeItemArrayAdapter m_adapter;
 
@@ -45,9 +43,6 @@ public class YoutubeActivity extends UpnpListenerActivity {
 		setContentView(R.layout.ytcontent_activitiy);
 		m_cb_enable_proxy = (CheckBox) findViewById(R.id.enable_proxy_mode);
 		m_ed_keyword = (EditText) findViewById(R.id.youtube_link);
-
-		m_upnpProcessor = new UpnpProcessorImpl(YoutubeActivity.this);
-		m_upnpProcessor.bindUpnpService();
 
 		m_youtubeProcessor = new YoutubeProcessorImpl();
 		m_progressDialog = new ProgressDialog(YoutubeActivity.this);
@@ -59,6 +54,7 @@ public class YoutubeActivity extends UpnpListenerActivity {
 		m_adapter = new YoutubeItemArrayAdapter(YoutubeActivity.this, 0);
 		m_listView.setAdapter(m_adapter);
 		m_listView.setOnItemClickListener(itemClickListener);
+
 	}
 
 	private OnItemClickListener itemClickListener = new OnItemClickListener() {
@@ -79,7 +75,7 @@ public class YoutubeActivity extends UpnpListenerActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		m_playlistProcessor = m_upnpProcessor.getPlaylistProcessor();
+		m_playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
 	}
 
 	@Override
@@ -90,7 +86,6 @@ public class YoutubeActivity extends UpnpListenerActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		m_upnpProcessor.unbindUpnpService();
 	}
 
 	private void executeNoProxy(final String title, final String link) {
@@ -248,9 +243,4 @@ public class YoutubeActivity extends UpnpListenerActivity {
 			});
 	}
 
-	@Override
-	public void onStartComplete() {
-		super.onStartComplete();
-		m_playlistProcessor = m_upnpProcessor.getPlaylistProcessor();
-	}
 }

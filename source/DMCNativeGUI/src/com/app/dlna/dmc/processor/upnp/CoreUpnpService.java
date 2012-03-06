@@ -1,5 +1,7 @@
 package com.app.dlna.dmc.processor.upnp;
 
+import java.net.NetworkInterface;
+
 import org.teleal.cling.UpnpService;
 import org.teleal.cling.UpnpServiceConfiguration;
 import org.teleal.cling.UpnpServiceImpl;
@@ -67,6 +69,7 @@ public class CoreUpnpService extends Service {
 	private NotificationManager m_notificationManager;
 	private DMSProcessor m_dmsProcessor;
 	private DMRProcessor m_dmrProcessor;
+	private CoreUpnpServiceListener m_upnpProcessor;
 	private WifiLock m_wifiLock;
 	private WifiManager m_wifiManager;
 	private ConnectivityManager m_connectivityManager;
@@ -82,14 +85,34 @@ public class CoreUpnpService extends Service {
 			upnpService = new UpnpServiceImpl(createConfiguration(m_wifiManager)) {
 				@Override
 				protected Router createRouter(ProtocolFactory protocolFactory, Registry registry) {
-					// TODO: Add broadcast receiver here
 					AndroidWifiSwitchableRouter router = CoreUpnpService.this.createRouter(getConfiguration(), protocolFactory, m_wifiManager,
 							m_connectivityManager);
 					router.setRouterStateListener(new RouterStateListener() {
 
 						@Override
+						public void onRouterError(String cause) {
+							Log.e(TAG, "Router error: " + cause);
+							if (m_upnpProcessor != null)
+								m_upnpProcessor.onRouterError("No network found");
+						}
+
+						@Override
+						public void onNetworkChanged(NetworkInterface ni) {
+							Log.w(TAG, "Network interface changed");
+							if (m_upnpProcessor != null)
+								m_upnpProcessor.onNetworkChanged(ni);
+						}
+
+						@Override
+						public void onRouterEnabled() {
+							if (m_upnpProcessor != null)
+								m_upnpProcessor.onRouterEnabled();
+						}
+
+						@Override
 						public void onRouterDisabled() {
-							Log.e(TAG, "On router disabled");
+							if (m_upnpProcessor != null)
+								m_upnpProcessor.onRouterDisabled();
 						}
 					});
 					if (!ModelUtil.ANDROID_EMULATOR) {
@@ -173,6 +196,7 @@ public class CoreUpnpService extends Service {
 
 	@Override
 	public IBinder onBind(Intent intent) {
+		Log.e(TAG, "Service on Bind");
 		return binder;
 	}
 
@@ -250,6 +274,10 @@ public class CoreUpnpService extends Service {
 		public ControlPoint getControlPoint() {
 			return upnpService.getControlPoint();
 		}
+
+		public void setProcessor(CoreUpnpServiceListener upnpProcessor) {
+			m_upnpProcessor = upnpProcessor;
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -312,5 +340,15 @@ public class CoreUpnpService extends Service {
 		notification.flags = Notification.FLAG_NO_CLEAR;
 
 		m_notificationManager.notify(NOTIFICATION, notification);
+	}
+
+	public interface CoreUpnpServiceListener {
+		void onNetworkChanged(NetworkInterface ni);
+
+		void onRouterError(String message);
+
+		void onRouterDisabled();
+
+		void onRouterEnabled();
 	}
 }

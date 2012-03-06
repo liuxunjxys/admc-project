@@ -1,5 +1,6 @@
 package com.app.dlna.dmc.processor.impl;
 
+import java.net.NetworkInterface;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -29,8 +30,9 @@ import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.interfaces.UpnpProcessor;
 import com.app.dlna.dmc.processor.upnp.CoreUpnpService;
 import com.app.dlna.dmc.processor.upnp.CoreUpnpService.CoreUpnpServiceBinder;
+import com.app.dlna.dmc.processor.upnp.CoreUpnpService.CoreUpnpServiceListener;
 
-public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener {
+public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener, CoreUpnpServiceListener {
 	private static String TAG = UpnpProcessorImpl.class.getName();
 
 	private Activity m_activity;
@@ -67,6 +69,7 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener {
 					m_upnpService.getRegistry().addListener(UpnpProcessorImpl.this);
 					Log.i(TAG, "Upnp Service Ready");
 					fireOnStartCompleteEvent();
+					m_upnpService.setProcessor(UpnpProcessorImpl.this);
 					m_upnpService.getControlPoint().search();
 				} else {
 					m_upnpService = null;
@@ -136,6 +139,38 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener {
 		synchronized (m_listeners) {
 			for (UpnpProcessorListener listener : m_listeners) {
 				listener.onStartFailed();
+			}
+		}
+	}
+
+	private void fireOnRouterErrorEvent(String cause) {
+		synchronized (m_listeners) {
+			for (UpnpProcessorListener listener : m_listeners) {
+				listener.onRouterError(cause);
+			}
+		}
+	}
+
+	private void fireOnNetworkChangedEvent() {
+		synchronized (m_listeners) {
+			for (UpnpProcessorListener listener : m_listeners) {
+				listener.onNetworkChanged();
+			}
+		}
+	}
+
+	private void fireOnRouterDisabledEvent() {
+		synchronized (m_listeners) {
+			for (UpnpProcessorListener listener : m_listeners) {
+				listener.onRouterDisabledEvent();
+			}
+		}
+	}
+
+	private void fireOnRouterEnabledEvent() {
+		synchronized (m_listeners) {
+			for (UpnpProcessorListener listener : m_listeners) {
+				listener.onRouterEnabledEvent();
 			}
 		}
 	}
@@ -266,4 +301,27 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener {
 	public DMRProcessor getDMRProcessor() {
 		return m_upnpService != null ? m_upnpService.getDMRProcessor() : null;
 	}
+
+	@Override
+	public void onNetworkChanged(NetworkInterface ni) {
+		Log.w(TAG, "NetworkInterface changed to: " + ni.getDisplayName());
+		fireOnNetworkChangedEvent();
+	}
+
+	@Override
+	public void onRouterError(String message) {
+		Log.e(TAG, "Router error " + message);
+		fireOnRouterErrorEvent(message);
+	}
+
+	@Override
+	public void onRouterDisabled() {
+		fireOnRouterDisabledEvent();
+	}
+
+	@Override
+	public void onRouterEnabled() {
+		fireOnRouterEnabledEvent();
+	}
+
 }

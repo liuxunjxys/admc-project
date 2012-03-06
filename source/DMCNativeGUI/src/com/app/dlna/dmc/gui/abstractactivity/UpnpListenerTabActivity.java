@@ -32,4 +32,28 @@ public class UpnpListenerTabActivity extends TabActivity implements UpnpProcesso
 
 	}
 
+	@Override
+	public void onNetworkChanged() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onRouterError(String cause) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onRouterEnabledEvent() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onRouterDisabledEvent() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

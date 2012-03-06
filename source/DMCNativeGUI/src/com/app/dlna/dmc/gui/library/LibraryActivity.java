@@ -26,19 +26,17 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerActivity;
 import com.app.dlna.dmc.nativeui.R;
-import com.app.dlna.dmc.processor.impl.UpnpProcessorImpl;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor.DMSProcessorListner;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
-import com.app.dlna.dmc.processor.interfaces.UpnpProcessor;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem.Type;
 
 public class LibraryActivity extends UpnpListenerActivity implements DMSProcessorListner {
 	private static final String TAG = LibraryActivity.class.getName();
-	private UpnpProcessor m_upnpProcessor;
 	private DMSProcessor m_dmsProcessor;
 	private DIDLObjectArrayAdapter m_adapter;
 	private ListView m_listView;
@@ -59,8 +57,6 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 		m_listView.setAdapter(m_adapter);
 		m_listView.setOnItemClickListener(itemClickListener);
 
-		m_upnpProcessor = new UpnpProcessorImpl(LibraryActivity.this);
-		m_upnpProcessor.bindUpnpService();
 		m_traceID = new ArrayList<String>();
 		m_traceID.add("-1");
 
@@ -87,20 +83,20 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 	protected void onResume() {
 		Log.i(TAG, "Library onResume");
 		super.onResume();
-		if (m_upnpProcessor != null && m_upnpProcessor.getCurrentDMS() != null) {
-			m_playlistProcessor = m_upnpProcessor.getPlaylistProcessor();
+		if (MainActivity.UPNP_PROCESSOR != null && MainActivity.UPNP_PROCESSOR.getCurrentDMS() != null) {
+			m_playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
 			m_adapter.setPlaylistProcessor(m_playlistProcessor);
 			browseRootContainer();
 		}
 	}
 
 	private void browseRootContainer() {
-		String newUDN = m_upnpProcessor.getCurrentDMS().getIdentity().getUdn().toString();
+		String newUDN = MainActivity.UPNP_PROCESSOR.getCurrentDMS().getIdentity().getUdn().toString();
 		if (m_currentDMSUDN == null || !m_currentDMSUDN.equals(newUDN)) {
 			m_currentDMSUDN = newUDN;
 			m_traceID = new ArrayList<String>();
 			m_traceID.add("-1");
-			m_dmsProcessor = m_upnpProcessor.getDMSProcessor();
+			m_dmsProcessor = MainActivity.UPNP_PROCESSOR.getDMSProcessor();
 			m_dmsProcessor.addListener(LibraryActivity.this);
 			browse("0");
 		} else {
@@ -113,8 +109,8 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 		Log.i(TAG, "Library onPause");
 		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(m_filterText.getWindowToken(), 0);
-		if (m_upnpProcessor != null) {
-			m_upnpProcessor.removeListener(LibraryActivity.this);
+		if (MainActivity.UPNP_PROCESSOR != null) {
+			MainActivity.UPNP_PROCESSOR.removeListener(LibraryActivity.this);
 		}
 		super.onPause();
 	}
@@ -122,9 +118,7 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 	@Override
 	protected void onDestroy() {
 		Log.i(TAG, "Library onDestroy");
-		m_upnpProcessor.unbindUpnpService();
 		m_filterText.removeTextChangedListener(filterTextWatcher);
-
 		super.onDestroy();
 	}
 
@@ -240,16 +234,6 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 			Toast.makeText(LibraryActivity.this, "You are in the root of this MediaServer. Press Back again to chose other MediaServer", Toast.LENGTH_SHORT)
 					.show();
 			finish();
-		}
-	}
-
-	@Override
-	public void onStartComplete() {
-		super.onStartComplete();
-		if (m_upnpProcessor != null && m_upnpProcessor.getCurrentDMS() != null) {
-			m_playlistProcessor = m_upnpProcessor.getPlaylistProcessor();
-			m_adapter.setPlaylistProcessor(m_playlistProcessor);
-			browseRootContainer();
 		}
 	}
 

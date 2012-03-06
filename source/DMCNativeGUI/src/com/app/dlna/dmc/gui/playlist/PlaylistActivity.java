@@ -21,20 +21,18 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerActivity;
 import com.app.dlna.dmc.nativeui.R;
 import com.app.dlna.dmc.processor.impl.LocalDMRProcessorImpl;
-import com.app.dlna.dmc.processor.impl.UpnpProcessorImpl;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor.DMRProcessorListner;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
-import com.app.dlna.dmc.processor.interfaces.UpnpProcessor;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 
 public class PlaylistActivity extends UpnpListenerActivity implements DMRProcessorListner {
 
 	private static final String TAG = PlaylistActivity.class.getName();
-	private UpnpProcessor m_upnpProcessor;
 	private ListView m_listView;
 	private PlaylistItemArrayAdapter m_adapter;
 	private DMRProcessor m_dmrProcessor;
@@ -58,8 +56,6 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 		Log.i(TAG, "Playlist onCreate");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.playlist_activity);
-		m_upnpProcessor = new UpnpProcessorImpl(PlaylistActivity.this);
-		m_upnpProcessor.bindUpnpService();
 		m_listView = (ListView) findViewById(R.id.playList);
 		m_adapter = new PlaylistItemArrayAdapter(PlaylistActivity.this, 0);
 		m_listView.setAdapter(m_adapter);
@@ -84,15 +80,15 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 	}
 
 	private void prepareView() {
-		if (m_upnpProcessor != null) {
-			if (m_upnpProcessor.getPlaylistProcessor() != null) {
-				m_playlistProcessor = m_upnpProcessor.getPlaylistProcessor();
+		if (MainActivity.UPNP_PROCESSOR != null) {
+			if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor() != null) {
+				m_playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
 				m_listView.setOnItemClickListener(onPlaylistItemClick);
 				m_listView.setOnItemLongClickListener(onPlaylistItemLongClick);
 			}
 
-			if (m_upnpProcessor.getDMRProcessor() != null) {
-				m_dmrProcessor = m_upnpProcessor.getDMRProcessor();
+			if (MainActivity.UPNP_PROCESSOR.getDMRProcessor() != null) {
+				m_dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
 				if (m_dmrProcessor instanceof LocalDMRProcessorImpl) {
 					m_rl_dmrController.setVisibility(View.GONE);
 				} else {
@@ -122,15 +118,9 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 	@Override
 	protected void onDestroy() {
 		Log.i(TAG, "Playlist onDestroy");
-		m_dmrProcessor.dispose();
-		m_upnpProcessor.unbindUpnpService();
+		if (m_dmrProcessor != null)
+			m_dmrProcessor.dispose();
 		super.onDestroy();
-	}
-
-	@Override
-	public void onStartComplete() {
-		super.onStartComplete();
-		prepareView();
 	}
 
 	private OnSeekBarChangeListener playbackSeekListener = new OnSeekBarChangeListener() {
@@ -239,7 +229,7 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 			@Override
 			public void run() {
 				m_dmrProcessor.dispose();
-				m_upnpProcessor.setCurrentDMR(new UDN("null"));
+				MainActivity.UPNP_PROCESSOR.setCurrentDMR(new UDN("null"));
 				if (!m_isFailed) {
 					m_isFailed = true;
 					try {
@@ -268,7 +258,7 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 			@Override
 			public void run() {
 				m_dmrProcessor.dispose();
-				m_upnpProcessor.setCurrentDMR(new UDN("null"));
+				MainActivity.UPNP_PROCESSOR.setCurrentDMR(new UDN("null"));
 				if (!m_isFailed) {
 					m_isFailed = true;
 					try {
