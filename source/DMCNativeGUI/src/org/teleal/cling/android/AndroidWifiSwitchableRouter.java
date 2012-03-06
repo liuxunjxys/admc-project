@@ -62,6 +62,7 @@ public class AndroidWifiSwitchableRouter extends SwitchableRouterImpl {
 			if (ni == null) {
 				Log.i(TAG, "Disable router");
 				disable();
+				m_routerStateListener.onRouterDisabled();
 				m_disableWifiPending = true;
 				new Thread(new Runnable() {
 					@Override
@@ -72,7 +73,7 @@ public class AndroidWifiSwitchableRouter extends SwitchableRouterImpl {
 								if (m_disableWifiPending) {
 									if (i == DISABLE_STATE_TIMEOUT - 1)
 										if (m_routerStateListener != null)
-											m_routerStateListener.onRouterDisabled();
+											m_routerStateListener.onRouterError("No network found");
 								} else {
 									break;
 								}
@@ -85,6 +86,8 @@ public class AndroidWifiSwitchableRouter extends SwitchableRouterImpl {
 			} else {
 				Log.i(TAG, "Enable router");
 				enable();
+				m_routerStateListener.onRouterEnabled();
+				m_routerStateListener.onNetworkChanged(ni);
 				m_disableWifiPending = false;
 			}
 		}
@@ -166,6 +169,12 @@ public class AndroidWifiSwitchableRouter extends SwitchableRouterImpl {
 	}
 
 	public interface RouterStateListener {
+		void onRouterError(String cause);
+
+		void onNetworkChanged(NetworkInterface ni);
+
+		void onRouterEnabled();
+
 		void onRouterDisabled();
 	}
 

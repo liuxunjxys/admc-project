@@ -15,14 +15,12 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
+import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerActivity;
 import com.app.dlna.dmc.nativeui.R;
-import com.app.dlna.dmc.processor.impl.UpnpProcessorImpl;
-import com.app.dlna.dmc.processor.interfaces.UpnpProcessor;
 
 public class DevicesActivity extends UpnpListenerActivity {
 	private static final String TAG = DevicesActivity.class.getName();
-	private UpnpProcessor m_upnpProcessor = null;
 
 	private ListView m_dmrList;
 	private ListView m_dmsList;
@@ -52,9 +50,6 @@ public class DevicesActivity extends UpnpListenerActivity {
 		m_ll_dms = (LinearLayout) findViewById(R.id.ll_dms);
 		m_ll_dmr = (LinearLayout) findViewById(R.id.ll_dmr);
 
-		m_upnpProcessor = new UpnpProcessorImpl(DevicesActivity.this);
-		m_upnpProcessor.bindUpnpService();
-
 		// restoreState();
 
 	}
@@ -65,7 +60,7 @@ public class DevicesActivity extends UpnpListenerActivity {
 		public void onItemClick(AdapterView<?> adapter, View view, int position, long arg3) {
 			synchronized (m_dmrAdapter) {
 				UDN udn = m_dmrAdapter.getItem(position).getIdentity().getUdn();
-				m_upnpProcessor.setCurrentDMR(udn);
+				MainActivity.UPNP_PROCESSOR.setCurrentDMR(udn);
 				synchronized (m_dmrAdapter) {
 					m_dmrAdapter.setCurrentDeviceUDN(udn.getIdentifierString());
 					m_dmrAdapter.notifyDataSetChanged();
@@ -81,7 +76,7 @@ public class DevicesActivity extends UpnpListenerActivity {
 		public void onItemClick(AdapterView<?> adapter, View view, int position, long arg3) {
 			synchronized (m_dmsAdapter) {
 				UDN udn = m_dmsAdapter.getItem(position).getIdentity().getUdn();
-				m_upnpProcessor.setCurrentDMS(udn);
+				MainActivity.UPNP_PROCESSOR.setCurrentDMS(udn);
 				synchronized (m_dmsAdapter) {
 					m_dmsAdapter.setCurrentDeviceUDN(udn.getIdentifierString());
 					m_dmsAdapter.notifyDataSetChanged();
@@ -95,7 +90,7 @@ public class DevicesActivity extends UpnpListenerActivity {
 	protected void onResume() {
 		super.onResume();
 		Log.i(TAG, "Devices onResume");
-		m_upnpProcessor.addListener(DevicesActivity.this);
+		MainActivity.UPNP_PROCESSOR.addListener(DevicesActivity.this);
 		refresh();
 	}
 
@@ -103,15 +98,13 @@ public class DevicesActivity extends UpnpListenerActivity {
 	protected void onPause() {
 		super.onPause();
 		Log.i(TAG, "Devices onPause");
-		m_upnpProcessor.removeListener(DevicesActivity.this);
+		MainActivity.UPNP_PROCESSOR.removeListener(DevicesActivity.this);
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		// saveState();
 		Log.i(TAG, "Devices onDestroy");
-		m_upnpProcessor.unbindUpnpService();
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -140,18 +133,12 @@ public class DevicesActivity extends UpnpListenerActivity {
 		}
 	}
 
-	@Override
-	public void onStartComplete() {
-		super.onStartComplete();
-		refresh();
-	}
-
 	@SuppressWarnings("rawtypes")
 	private void refresh() {
 		synchronized (m_dmsAdapter) {
 			m_dmsAdapter.clear();
-			if (m_upnpProcessor.getCurrentDMS() != null) {
-				m_dmsAdapter.setCurrentDeviceUDN(m_upnpProcessor.getCurrentDMS().getIdentity().getUdn().getIdentifierString());
+			if (MainActivity.UPNP_PROCESSOR.getCurrentDMS() != null) {
+				m_dmsAdapter.setCurrentDeviceUDN(MainActivity.UPNP_PROCESSOR.getCurrentDMS().getIdentity().getUdn().getIdentifierString());
 			} else {
 				m_dmsAdapter.setCurrentDeviceUDN("");
 			}
@@ -159,18 +146,18 @@ public class DevicesActivity extends UpnpListenerActivity {
 
 		synchronized (m_dmrAdapter) {
 			m_dmrAdapter.clear();
-			if (m_upnpProcessor.getCurrentDMR() != null) {
-				m_dmrAdapter.setCurrentDeviceUDN(m_upnpProcessor.getCurrentDMR().getIdentity().getUdn().getIdentifierString());
+			if (MainActivity.UPNP_PROCESSOR.getCurrentDMR() != null) {
+				m_dmrAdapter.setCurrentDeviceUDN(MainActivity.UPNP_PROCESSOR.getCurrentDMR().getIdentity().getUdn().getIdentifierString());
 			} else {
 				m_dmrAdapter.setCurrentDeviceUDN("");
 			}
 		}
 
-		for (Device device : m_upnpProcessor.getDMSList()) {
+		for (Device device : MainActivity.UPNP_PROCESSOR.getDMSList()) {
 			addDMS(device);
 		}
 
-		for (Device device : m_upnpProcessor.getDMRList()) {
+		for (Device device : MainActivity.UPNP_PROCESSOR.getDMRList()) {
 			addDMR(device);
 		}
 	}

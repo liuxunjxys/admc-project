@@ -53,9 +53,9 @@ public class DMRProcessorImpl implements DMRProcessor {
 	private static final int PLAYING = 0;
 	private static final int PAUSE = 1;
 	private static final int STOP = 2;
-	private boolean check1 = false;
-	private boolean check2 = false;
-	private boolean check3 = false;
+	private boolean m_checkGetPositionInfo = false;
+	private boolean m_checkGetTransportInfo = false;
+	private boolean m_checkGetVolumeInfo = false;
 
 	private Thread m_updateThread = new Thread(new Runnable() {
 
@@ -65,15 +65,15 @@ public class DMRProcessorImpl implements DMRProcessor {
 			while (m_isRunning) {
 				if (m_avtransportService == null)
 					return;
-				if (!check1) {
-					check1 = true;
+				if (!m_checkGetPositionInfo) {
+					m_checkGetPositionInfo = true;
 					m_controlPoint.execute(new GetPositionInfo(m_avtransportService) {
 
 						@SuppressWarnings("rawtypes")
 						@Override
 						public void failure(ActionInvocation invocation, UpnpResponse response, String defaultMsg) {
 							fireOnFailEvent(invocation.getAction(), response, defaultMsg);
-							check1 = false;
+							m_checkGetPositionInfo = false;
 						}
 
 						@SuppressWarnings("rawtypes")
@@ -98,20 +98,20 @@ public class DMRProcessorImpl implements DMRProcessor {
 									}
 								}).start();
 							}
-							check1 = false;
+							m_checkGetPositionInfo = false;
 						}
 					});
 
 				}
 
-				if (!check2) {
-					check2 = true;
+				if (!m_checkGetTransportInfo) {
+					m_checkGetTransportInfo = true;
 					m_controlPoint.execute(new GetTransportInfo(m_avtransportService) {
 						@SuppressWarnings("rawtypes")
 						@Override
 						public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
 							fireOnFailEvent(invocation.getAction(), operation, defaultMsg);
-							check2 = false;
+							m_checkGetTransportInfo = false;
 						}
 
 						@SuppressWarnings("rawtypes")
@@ -133,27 +133,27 @@ public class DMRProcessorImpl implements DMRProcessor {
 							default:
 								break;
 							}
-							check2 = false;
+							m_checkGetTransportInfo = false;
 						}
 
 					});
 				}
 
-				if (!check3) {
-					check3 = true;
+				if (!m_checkGetVolumeInfo) {
+					m_checkGetVolumeInfo = true;
 					m_controlPoint.execute(new GetVolume(m_renderingControl) {
 						@SuppressWarnings("rawtypes")
 						@Override
 						public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
 							fireOnFailEvent(invocation.getAction(), operation, defaultMsg);
-							check3 = false;
+							m_checkGetVolumeInfo = false;
 						}
 
 						@SuppressWarnings("rawtypes")
 						@Override
 						public void received(ActionInvocation actionInvocation, int currentVolume) {
 							m_currentVolume = currentVolume;
-							check3 = false;
+							m_checkGetVolumeInfo = false;
 						}
 					});
 				}

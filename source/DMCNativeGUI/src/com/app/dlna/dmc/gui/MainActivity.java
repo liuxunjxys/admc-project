@@ -2,6 +2,7 @@ package com.app.dlna.dmc.gui;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -24,13 +25,15 @@ import com.app.dlna.dmc.nativeui.R;
 import com.app.dlna.dmc.processor.impl.UpnpProcessorImpl;
 import com.app.dlna.dmc.processor.interfaces.UpnpProcessor;
 import com.app.dlna.dmc.processor.localdevice.service.LocalContentDirectoryService;
+import com.app.dlna.dmc.processor.systemservice.RestartService;
 
 public class MainActivity extends UpnpListenerTabActivity {
 	private static final String TAG = MainActivity.class.getName();
 	private TabHost m_tabHost;
-	private UpnpProcessor m_processor = null;
+	public static UpnpProcessor UPNP_PROCESSOR = null;
 	// private ProgressDialog m_progressDialog = null;
 	private static final int DEFAULT_TAB_INDEX = 0;
+	private ProgressDialog m_routerProgressDialog;
 
 	BroadcastReceiver m_mountedReceiver = new BroadcastReceiver() {
 
@@ -53,8 +56,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 		m_tabHost = getTabHost();
 		m_tabHost.setup();
 
-		m_processor = new UpnpProcessorImpl(MainActivity.this);
-		m_processor.bindUpnpService();
+		UPNP_PROCESSOR = new UpnpProcessorImpl(MainActivity.this);
+		UPNP_PROCESSOR.bindUpnpService();
 		// m_progressDialog = ProgressDialog.show(MainActivity.this, "Starting Service", "");
 		// m_progressDialog.setCancelable(true);
 
@@ -71,12 +74,12 @@ public class MainActivity extends UpnpListenerTabActivity {
 		@Override
 		public void onTabChanged(String tabId) {
 			Log.d(TAG, "Select tab = " + tabId);
-			if (tabId.equals("Library") && m_processor.getCurrentDMS() == null) {
+			if (tabId.equals("Library") && UPNP_PROCESSOR.getCurrentDMS() == null) {
 				Toast.makeText(MainActivity.this, "Please select a MediaServer to browse", Toast.LENGTH_SHORT).show();
 				m_tabHost.setCurrentTab(DEFAULT_TAB_INDEX);
 				return;
 			}
-			if (tabId.equals("NowPlaying") && m_processor.getCurrentDMR() == null) {
+			if (tabId.equals("NowPlaying") && UPNP_PROCESSOR.getCurrentDMR() == null) {
 				Toast.makeText(MainActivity.this, "Please select a MediaRenderer to control", Toast.LENGTH_SHORT).show();
 				m_tabHost.setCurrentTab(DEFAULT_TAB_INDEX);
 				return;
@@ -97,15 +100,19 @@ public class MainActivity extends UpnpListenerTabActivity {
 	}
 
 	protected void onDestroy() {
-		Log.i(TAG, "MainActivity onDestroy");
-		m_processor.unbindUpnpService();
 		super.onDestroy();
+		Log.i(TAG, "MainActivity onDestroy");
+		UPNP_PROCESSOR.unbindUpnpService();
 		unregisterReceiver(m_mountedReceiver);
 	};
 
 	@Override
 	public void onStartComplete() {
 		super.onStartComplete();
+		createTabs();
+	}
+
+	private void createTabs() {
 		TabSpec devicesTabSpec = m_tabHost.newTabSpec("Devices");
 
 		Intent intent = null;
@@ -136,20 +143,9 @@ public class MainActivity extends UpnpListenerTabActivity {
 		m_tabHost.setCurrentTab(DEFAULT_TAB_INDEX);
 
 		m_tabHost.setOnTabChangedListener(changeListener);
-		// m_progressDialog.setTitle("Scanning device");
-		// new Thread(new Runnable() {
-		//
-		// @Override
-		// public void run() {
-		// try {
-		// Thread.sleep(10000);
-		// // m_progressDialog.dismiss();
-		// } catch (Exception ex) {
-		// // m_progressDialog.dismiss();
-		// }
-		//
-		// }
-		// }).start();
+
+		m_tabHost.refreshDrawableState();
+
 	}
 
 	@Override
@@ -173,5 +169,80 @@ public class MainActivity extends UpnpListenerTabActivity {
 		} else {
 			m_tabHost.setCurrentTab(DEFAULT_TAB_INDEX);
 		}
+	}
+
+	@Override
+	public void onNetworkChanged() {
+		super.onNetworkChanged();
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				Toast.makeText(getApplicationContext(), "Network interface changed", Toast.LENGTH_SHORT).show();
+				restartActivity();
+			}
+		});
+	}
+
+	@Override
+	public void onRouterError(final String cause) {
+		super.onRouterError(cause);
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				if (m_routerProgressDialog != null)
+					m_routerProgressDialog.dismiss();
+				new AlertDialog.Builder(MainActivity.this).setTitle("Network error").setMessage(cause).setCancelable(false)
+						.setPositiveButton("OK", new OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								MainActivity.this.finish();
+							}
+						}).create().show();
+			}
+		});
+
+	}
+
+	@Override
+	public void onRouterDisabledEvent() {
+		super.onRouterDisabledEvent();
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				if (m_routerProgressDialog != null)
+					m_routerProgressDialog.dismiss();
+				m_routerProgressDialog = ProgressDialog.show(MainActivity.this, "Router disabled", "Router disabled, try to enabled router");
+			}
+		});
+
+	}
+
+	@Override
+	public void onRouterEnabledEvent() {
+		super.onRouterEnabledEvent();
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				m_routerProgressDialog.dismiss();
+			}
+		});
+	}
+
+	private void restartActivity() {
+		new AlertDialog.Builder(this).setTitle("Restart Required").setMessage("Network interface changed. Application must restart.")
+				.setPositiveButton("OK", new OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						MainActivity.this.startService(new Intent(MainActivity.this, RestartService.class));
+						MainActivity.this.finish();
+					}
+				}).setCancelable(false).create().show();
+
 	}
 }
