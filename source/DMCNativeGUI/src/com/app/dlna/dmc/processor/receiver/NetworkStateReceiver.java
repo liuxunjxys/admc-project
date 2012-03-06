@@ -18,6 +18,7 @@ public class NetworkStateReceiver extends BroadcastReceiver {
 	private RouterStateListener m_routerStateListener;
 	private boolean m_disableWifiPending;
 	protected int DISABLE_STATE_TIMEOUT = 10; // seconds
+	private NetworkInterface m_interfaceCache = null;
 
 	public NetworkStateReceiver(SwitchableRouter router, RouterStateListener routerStateListener) {
 		m_router = router;
@@ -58,7 +59,11 @@ public class NetworkStateReceiver extends BroadcastReceiver {
 			Log.i(TAG, "Enable router");
 			m_router.enable();
 			m_routerStateListener.onRouterEnabled();
-			m_routerStateListener.onNetworkChanged(ni);
+
+			if (m_interfaceCache == null || !ni.equals(m_interfaceCache)) {
+				m_routerStateListener.onNetworkChanged(ni);
+			}
+			m_interfaceCache = ni;
 			m_disableWifiPending = false;
 		}
 	}

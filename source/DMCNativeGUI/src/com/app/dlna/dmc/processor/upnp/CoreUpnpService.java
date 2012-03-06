@@ -120,7 +120,7 @@ public class CoreUpnpService extends Service {
 					if (!ModelUtil.ANDROID_EMULATOR) {
 						IntentFilter filter = new IntentFilter();
 						filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-						filter.addAction("android.net.conn.TETHER_STATE_CHANGED");
+						filter.addAction("	");
 						registerReceiver(m_networkReceiver, filter);
 					}
 					return router;
