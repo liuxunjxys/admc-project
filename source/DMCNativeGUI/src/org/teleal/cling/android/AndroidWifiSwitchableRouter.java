@@ -17,11 +17,9 @@
 
 package org.teleal.cling.android;
 
-import java.net.NetworkInterface;
 import java.util.logging.Logger;
 
 import org.teleal.cling.UpnpServiceConfiguration;
-import org.teleal.cling.android.AndroidWifiSwitchableRouter.RouterStateListener;
 import org.teleal.cling.protocol.ProtocolFactory;
 import org.teleal.cling.transport.Router;
 import org.teleal.cling.transport.SwitchableRouterImpl;
@@ -32,7 +30,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
-import android.util.Log;
+
+import com.app.dlna.dmc.processor.receiver.NetworkStateReceiver.RouterStateListener;
 
 /**
  * Switches the network transport layer on/off by monitoring WiFi connectivity.
@@ -54,45 +53,6 @@ public class AndroidWifiSwitchableRouter extends SwitchableRouterImpl {
 	private static Logger log = Logger.getLogger(Router.class.getName());
 	// TODO: remake the broadcast receiver to listen the connection state change event
 
-	final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			NetworkInterface ni = AndroidNetworkAddressFactory.getWifiNetworkInterface(wifiManager, connectivityManager);
-			if (ni == null) {
-				Log.i(TAG, "Disable router");
-				disable();
-				m_routerStateListener.onRouterDisabled();
-				m_disableWifiPending = true;
-				new Thread(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							for (int i = 0; i < DISABLE_STATE_TIMEOUT; ++i) {
-								Thread.sleep(1000);
-								if (m_disableWifiPending) {
-									if (i == DISABLE_STATE_TIMEOUT - 1)
-										if (m_routerStateListener != null)
-											m_routerStateListener.onRouterError("No network found");
-								} else {
-									break;
-								}
-							}
-						} catch (InterruptedException e) {
-						}
-
-					}
-				}).start();
-			} else {
-				Log.i(TAG, "Enable router");
-				enable();
-				m_routerStateListener.onRouterEnabled();
-				m_routerStateListener.onNetworkChanged(ni);
-				m_disableWifiPending = false;
-			}
-		}
-	};
-
 	final private WifiManager wifiManager;
 	final private ConnectivityManager connectivityManager;
 	private WifiManager.MulticastLock multicastLock;
@@ -105,10 +65,6 @@ public class AndroidWifiSwitchableRouter extends SwitchableRouterImpl {
 		this.connectivityManager = connectivityManager;
 
 		enable();
-	}
-
-	public BroadcastReceiver getBroadcastReceiver() {
-		return broadcastReceiver;
 	}
 
 	protected WifiManager getWifiManager() {
@@ -166,16 +122,6 @@ public class AndroidWifiSwitchableRouter extends SwitchableRouterImpl {
 
 	public void setRouterStateListener(RouterStateListener listener) {
 		m_routerStateListener = listener;
-	}
-
-	public interface RouterStateListener {
-		void onRouterError(String cause);
-
-		void onNetworkChanged(NetworkInterface ni);
-
-		void onRouterEnabled();
-
-		void onRouterDisabled();
 	}
 
 }

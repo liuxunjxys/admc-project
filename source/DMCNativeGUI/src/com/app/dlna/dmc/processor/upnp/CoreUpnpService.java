@@ -8,7 +8,6 @@ import org.teleal.cling.UpnpServiceImpl;
 import org.teleal.cling.android.AndroidUpnpService;
 import org.teleal.cling.android.AndroidUpnpServiceConfiguration;
 import org.teleal.cling.android.AndroidWifiSwitchableRouter;
-import org.teleal.cling.android.AndroidWifiSwitchableRouter.RouterStateListener;
 import org.teleal.cling.binding.annotations.AnnotationLocalServiceBinder;
 import org.teleal.cling.controlpoint.ControlPoint;
 import org.teleal.cling.model.DefaultServiceManager;
@@ -53,6 +52,8 @@ import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.localdevice.service.LocalContentDirectoryService;
+import com.app.dlna.dmc.processor.receiver.NetworkStateReceiver;
+import com.app.dlna.dmc.processor.receiver.NetworkStateReceiver.RouterStateListener;
 import com.app.dlna.dmc.utility.Utility;
 
 public class CoreUpnpService extends Service {
@@ -74,6 +75,7 @@ public class CoreUpnpService extends Service {
 	private WifiManager m_wifiManager;
 	private ConnectivityManager m_connectivityManager;
 	private boolean m_isInitialized;
+	private NetworkStateReceiver m_networkReceiver;
 
 	@Override
 	public void onCreate() {
@@ -87,7 +89,7 @@ public class CoreUpnpService extends Service {
 				protected Router createRouter(ProtocolFactory protocolFactory, Registry registry) {
 					AndroidWifiSwitchableRouter router = CoreUpnpService.this.createRouter(getConfiguration(), protocolFactory, m_wifiManager,
 							m_connectivityManager);
-					router.setRouterStateListener(new RouterStateListener() {
+					m_networkReceiver = new NetworkStateReceiver(router, new RouterStateListener() {
 
 						@Override
 						public void onRouterError(String cause) {
@@ -119,7 +121,7 @@ public class CoreUpnpService extends Service {
 						IntentFilter filter = new IntentFilter();
 						filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 						filter.addAction("android.net.conn.TETHER_STATE_CHANGED");
-						registerReceiver(router.getBroadcastReceiver(), filter);
+						registerReceiver(m_networkReceiver, filter);
 					}
 					return router;
 				}
@@ -172,7 +174,7 @@ public class CoreUpnpService extends Service {
 		// isListeningForConnectivityChanges())
 		Log.d(TAG, "onDestroy()");
 		try {
-			unregisterReceiver(((AndroidWifiSwitchableRouter) upnpService.getRouter()).getBroadcastReceiver());
+			unregisterReceiver(m_networkReceiver);
 		} catch (Exception ex) {
 
 		}
