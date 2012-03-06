@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -24,7 +23,7 @@ import com.app.dlna.dmc.gui.youtube.YoutubeActivity;
 import com.app.dlna.dmc.nativeui.R;
 import com.app.dlna.dmc.processor.impl.UpnpProcessorImpl;
 import com.app.dlna.dmc.processor.interfaces.UpnpProcessor;
-import com.app.dlna.dmc.processor.localdevice.service.LocalContentDirectoryService;
+import com.app.dlna.dmc.processor.receiver.SDCardReceiver;
 import com.app.dlna.dmc.processor.systemservice.RestartService;
 
 public class MainActivity extends UpnpListenerTabActivity {
@@ -35,18 +34,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 	private static final int DEFAULT_TAB_INDEX = 0;
 	private ProgressDialog m_routerProgressDialog;
 
-	BroadcastReceiver m_mountedReceiver = new BroadcastReceiver() {
-
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			String action = intent.getAction();
-			if (action.equals(Intent.ACTION_MEDIA_UNMOUNTED)) {
-				LocalContentDirectoryService.removeAllContent();
-			} else if (action.equals(Intent.ACTION_MEDIA_MOUNTED)) {
-				LocalContentDirectoryService.scanMedia();
-			}
-		}
-	};
+	BroadcastReceiver m_mountedReceiver = new SDCardReceiver();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -228,7 +216,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 
 			@Override
 			public void run() {
-				m_routerProgressDialog.dismiss();
+				if (m_routerProgressDialog != null)
+					m_routerProgressDialog.dismiss();
 			}
 		});
 	}
