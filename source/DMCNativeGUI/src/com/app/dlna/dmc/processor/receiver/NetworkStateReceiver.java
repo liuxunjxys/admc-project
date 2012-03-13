@@ -5,6 +5,8 @@ import java.net.NetworkInterface;
 import org.teleal.cling.android.AndroidNetworkAddressFactory;
 import org.teleal.cling.transport.SwitchableRouter;
 
+import com.app.dlna.dmc.processor.http.HTTPServerData;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -27,9 +29,11 @@ public class NetworkStateReceiver extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		if (!intent.getAction().equals("android.net.conn.TETHER_STATE_CHANGED") && !intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION))
+		if (!intent.getAction().equals("android.net.conn.TETHER_STATE_CHANGED")
+				&& !intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION))
 			return;
-		NetworkInterface ni = AndroidNetworkAddressFactory.getWifiNetworkInterface((WifiManager) context.getSystemService(Context.WIFI_SERVICE),
+		NetworkInterface ni = AndroidNetworkAddressFactory.getWifiNetworkInterface(
+				(WifiManager) context.getSystemService(Context.WIFI_SERVICE),
 				(ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
 		if (ni == null) {
 			Log.i(TAG, "Disable router");
@@ -64,6 +68,8 @@ public class NetworkStateReceiver extends BroadcastReceiver {
 				m_routerStateListener.onNetworkChanged(ni);
 			}
 			m_interfaceCache = ni;
+			HTTPServerData.HOST = ni.getInetAddresses().nextElement().getHostAddress();
+			Log.i(TAG, "HOST = " + HTTPServerData.HOST);
 			m_disableWifiPending = false;
 		}
 	}

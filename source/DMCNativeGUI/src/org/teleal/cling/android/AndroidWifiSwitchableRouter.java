@@ -36,30 +36,26 @@ import com.app.dlna.dmc.processor.receiver.NetworkStateReceiver.RouterStateListe
 /**
  * Switches the network transport layer on/off by monitoring WiFi connectivity.
  * <p>
- * This implementation listens to connectivity changes in an Android environment. Register the {@link #getBroadcastReceiver()} instance with intent
- * <code>android.net.conn.CONNECTIVITY_CHANGE</code>.
+ * This implementation listens to connectivity changes in an Android
+ * environment. Register the {@link #getBroadcastReceiver()} instance with
+ * intent <code>android.net.conn.CONNECTIVITY_CHANGE</code>.
  * </p>
  * 
  * @author Christian Bauer
  */
 public class AndroidWifiSwitchableRouter extends SwitchableRouterImpl {
 
-	private static final String TAG = "AndroidWifiSwitchableRouter";
-	private static final int DISABLE_STATE_TIMEOUT = 15; // second
-
-	// ndphu
-	private boolean m_disableWifiPending = false;
-
 	private static Logger log = Logger.getLogger(Router.class.getName());
-	// TODO: remake the broadcast receiver to listen the connection state change event
+	// TODO: remake the broadcast receiver to listen the connection state change
+	// event
 
 	final private WifiManager wifiManager;
 	final private ConnectivityManager connectivityManager;
 	private WifiManager.MulticastLock multicastLock;
 	private RouterStateListener m_routerStateListener;
 
-	public AndroidWifiSwitchableRouter(UpnpServiceConfiguration configuration, ProtocolFactory protocolFactory, WifiManager wifiManager,
-			ConnectivityManager connectivityManager) {
+	public AndroidWifiSwitchableRouter(UpnpServiceConfiguration configuration, ProtocolFactory protocolFactory,
+			WifiManager wifiManager, ConnectivityManager connectivityManager) {
 		super(configuration, protocolFactory);
 		this.wifiManager = wifiManager;
 		this.connectivityManager = connectivityManager;
@@ -82,7 +78,8 @@ public class AndroidWifiSwitchableRouter extends SwitchableRouterImpl {
 			boolean enabled;
 			if ((enabled = super.enable())) {
 
-				// Enable multicast on the WiFi network interface, requires android.permission.CHANGE_WIFI_MULTICAST_STATE
+				// Enable multicast on the WiFi network interface, requires
+				// android.permission.CHANGE_WIFI_MULTICAST_STATE
 				multicastLock = getWifiManager().createMulticastLock(getClass().getSimpleName());
 				multicastLock.acquire();
 			}
