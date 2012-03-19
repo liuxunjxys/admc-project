@@ -30,9 +30,13 @@ import org.teleal.common.util.Exceptions;
 /**
  * A runnable representation of a single HTTP request/response procedure.
  * <p>
- * Instantiated by the {@link StreamServer}, executed by the {@link org.teleal.cling.transport.Router}. See the pseudo-code example in the documentation of
- * {@link StreamServer}. An implementation's <code>run()</code> method has to call the {@link #process(org.teleal.cling.model.message.StreamRequestMessage)},
- * {@link #responseSent(org.teleal.cling.model.message.StreamResponseMessage)} and {@link #responseException(Throwable)} methods.
+ * Instantiated by the {@link StreamServer}, executed by the
+ * {@link org.teleal.cling.transport.Router}. See the pseudo-code example in the
+ * documentation of {@link StreamServer}. An implementation's <code>run()</code>
+ * method has to call the
+ * {@link #process(org.teleal.cling.model.message.StreamRequestMessage)},
+ * {@link #responseSent(org.teleal.cling.model.message.StreamResponseMessage)}
+ * and {@link #responseException(Throwable)} methods.
  * </p>
  * <p>
  * An implementation does not have to be thread-safe.
@@ -56,22 +60,27 @@ public abstract class UpnpStream implements Runnable {
 	}
 
 	/**
-	 * Selects a UPnP protocol, runs it within the calling thread, returns the response.
+	 * Selects a UPnP protocol, runs it within the calling thread, returns the
+	 * response.
 	 * <p>
-	 * This method will return <code>null</code> if the UPnP protocol returned <code>null</code>. The HTTP response in this case is always
-	 * <em>404 NOT FOUND</em>. Any other (HTTP) error condition will be encapsulated in the returned response message and has to be passed to the HTTP client as
-	 * it is.
+	 * This method will return <code>null</code> if the UPnP protocol returned
+	 * <code>null</code>. The HTTP response in this case is always
+	 * <em>404 NOT FOUND</em>. Any other (HTTP) error condition will be
+	 * encapsulated in the returned response message and has to be passed to the
+	 * HTTP client as it is.
 	 * </p>
 	 * 
 	 * @param requestMsg
 	 *            The TCP (HTTP) stream request message.
-	 * @return The TCP (HTTP) stream response message, or <code>null</code> if a 404 should be send to the client.
+	 * @return The TCP (HTTP) stream response message, or <code>null</code> if a
+	 *         404 should be send to the client.
 	 */
 	public StreamResponseMessage process(StreamRequestMessage requestMsg) {
 		log.fine("Processing stream request message: " + requestMsg);
 
 		try {
-			// Try to get a protocol implementation that matches the request message
+			// Try to get a protocol implementation that matches the request
+			// message
 			syncProtocol = getProtocolFactory().createReceivingSync(requestMsg);
 		} catch (ProtocolCreationException ex) {
 			log.warning("Processing stream request failed - " + Exceptions.unwrap(ex).toString());
@@ -86,7 +95,8 @@ public abstract class UpnpStream implements Runnable {
 		StreamResponseMessage responseMsg = syncProtocol.getOutputMessage();
 
 		if (responseMsg == null) {
-			// That's ok, the caller is supposed to handle this properly (e.g. convert it to HTTP 404)
+			// That's ok, the caller is supposed to handle this properly (e.g.
+			// convert it to HTTP 404)
 			log.finer("Protocol did not return any response message");
 			return null;
 		}
@@ -95,7 +105,8 @@ public abstract class UpnpStream implements Runnable {
 	}
 
 	/**
-	 * Must be called by a subclass after the response has been successfully sent to the client.
+	 * Must be called by a subclass after the response has been successfully
+	 * sent to the client.
 	 * 
 	 * @param responseMessage
 	 *            The response message successfully sent to the client.
@@ -106,7 +117,8 @@ public abstract class UpnpStream implements Runnable {
 	}
 
 	/**
-	 * Must be called by a subclass if the response was not delivered to the client.
+	 * Must be called by a subclass if the response was not delivered to the
+	 * client.
 	 * 
 	 * @param t
 	 *            The reason why the response wasn't delivered.
