@@ -14,6 +14,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -22,6 +23,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -56,6 +58,7 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 		m_listView.setTextFilterEnabled(true);
 		m_listView.setAdapter(m_adapter);
 		m_listView.setOnItemClickListener(itemClickListener);
+		m_listView.setOnItemLongClickListener(itemLongClickListener);
 
 		m_traceID = new ArrayList<String>();
 		m_traceID.add("-1");
@@ -134,6 +137,28 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 			}
 		}
 	};
+
+	private OnItemLongClickListener itemLongClickListener = new OnItemLongClickListener() {
+
+		@Override
+		public boolean onItemLongClick(AdapterView<?> adapter, View view, int position, long arg3) {
+			downloadItem(m_adapter.getItem(position));
+			return true;
+		}
+	};
+
+	private void downloadItem(final DIDLObject item) {
+		if (item instanceof Item) {
+			new AlertDialog.Builder(LibraryActivity.this).setTitle("Download content")
+					.setMessage("Do you want to download this content?").setPositiveButton("Yes", new OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							MainActivity.UPNP_PROCESSOR.getDownloadProcessor().startDownload(item);
+						}
+					}).setNegativeButton("No", null).create().show();
+		}
+	}
 
 	private void browse(String id) {
 		m_filterText.setText("");
@@ -231,7 +256,8 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 			m_traceID.remove(m_traceID.size() - 1);
 			m_traceID.remove(m_traceID.size() - 1);
 		} else {
-			Toast.makeText(LibraryActivity.this, "You are in the root of this MediaServer. Press Back again to chose other MediaServer", Toast.LENGTH_SHORT)
+			Toast.makeText(LibraryActivity.this,
+					"You are in the root of this MediaServer. Press Back again to chose other MediaServer", Toast.LENGTH_SHORT)
 					.show();
 			finish();
 		}
