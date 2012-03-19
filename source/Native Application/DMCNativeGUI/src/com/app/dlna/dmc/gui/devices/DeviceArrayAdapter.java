@@ -83,7 +83,8 @@ public class DeviceArrayAdapter extends ArrayAdapter<Device> {
 									final RemoteDevice remoteDevice = (RemoteDevice) device;
 
 									String urlString = remoteDevice.getIdentity().getDescriptorURL().getProtocol() + "://"
-											+ remoteDevice.getIdentity().getDescriptorURL().getAuthority() + icons[0].getUri().toString();
+											+ remoteDevice.getIdentity().getDescriptorURL().getAuthority()
+											+ icons[0].getUri().toString();
 									URL url = new URL(urlString);
 									final Bitmap icon = BitmapFactory.decodeStream(url.openConnection().getInputStream());
 									m_cacheDMSIcon.put(udn, icon);

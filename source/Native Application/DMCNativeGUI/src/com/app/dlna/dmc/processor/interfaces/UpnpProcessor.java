@@ -39,6 +39,8 @@ public interface UpnpProcessor {
 
 	DMRProcessor getDMRProcessor();
 
+	DownloadProcessor getDownloadProcessor();
+
 	public interface UpnpProcessorListener {
 
 		@SuppressWarnings("rawtypes")
@@ -60,4 +62,5 @@ public interface UpnpProcessor {
 		void onRouterDisabledEvent();
 
 	}
+
 }

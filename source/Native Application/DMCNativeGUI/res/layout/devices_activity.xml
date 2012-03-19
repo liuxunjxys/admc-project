@@ -32,9 +32,9 @@
         android:id="@+id/ll_dms"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_above="@id/navigateBar"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_below="@id/navigateBar"
         android:orientation="vertical" >
 
         <TextView
@@ -56,6 +56,7 @@
         android:id="@+id/ll_dmr"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_above="@id/navigateBar"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:orientation="vertical"

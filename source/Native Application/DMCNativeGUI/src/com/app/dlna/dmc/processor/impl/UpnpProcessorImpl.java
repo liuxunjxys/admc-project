@@ -26,6 +26,7 @@ import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerActivity;
 import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerTabActivity;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor;
+import com.app.dlna.dmc.processor.interfaces.DownloadProcessor;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.interfaces.UpnpProcessor;
 import com.app.dlna.dmc.processor.upnp.CoreUpnpService;
@@ -43,16 +44,20 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener, CoreU
 
 	private List<UpnpProcessorListener> m_listeners;
 
+	private DownloadProcessor m_downloadProcessor;
+
 	public UpnpProcessorImpl(UpnpListenerActivity activity) {
 		m_activity = activity;
 		m_listeners = new ArrayList<UpnpProcessorListener>();
 		m_listeners.add(activity);
+		m_downloadProcessor = new DownloadProcessorImpl(activity);
 	}
 
 	public UpnpProcessorImpl(UpnpListenerTabActivity activity) {
 		m_activity = activity;
 		m_listeners = new ArrayList<UpnpProcessorListener>();
 		m_listeners.add(activity);
+		m_downloadProcessor = new DownloadProcessorImpl(activity);
 	}
 
 	public void bindUpnpService() {
@@ -322,6 +327,11 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener, CoreU
 	@Override
 	public void onRouterEnabled() {
 		fireOnRouterEnabledEvent();
+	}
+
+	@Override
+	public DownloadProcessor getDownloadProcessor() {
+		return m_downloadProcessor;
 	}
 
 }
