@@ -17,8 +17,6 @@ import org.teleal.cling.model.types.UnsignedIntegerFourBytes;
 import org.teleal.cling.support.contentdirectory.DIDLParser;
 import org.teleal.cling.support.model.DIDLContent;
 import org.teleal.cling.support.model.DIDLObject;
-import org.teleal.cling.support.model.container.Container;
-import org.teleal.cling.support.model.item.Item;
 
 import android.util.Log;
 
@@ -44,7 +42,6 @@ public class DMSProcessorImpl implements DMSProcessor {
 	public void browse(String objectID) {
 		result = new HashMap<String, List<? extends DIDLObject>>();
 		Service cds = m_server.findService(new ServiceType("schemas-upnp-org", "ContentDirectory"));
-
 		if (cds != null) {
 			Action action = cds.getAction("Browse");
 			ActionInvocation actionInvocation = new ActionInvocation(action);
@@ -58,24 +55,12 @@ public class DMSProcessorImpl implements DMSProcessor {
 
 				@Override
 				public void success(ActionInvocation invocation) {
-					Log.e(TAG, invocation.getOutput("Result").toString());
-
 					try {
 						DIDLParser parser = new DIDLParser();
 						DIDLContent content = parser.parse(invocation.getOutput("Result").toString());
-						for (Container container : content.getContainers()) {
-							Log.e(TAG, "Container = " + container.getTitle());
-						}
 						result.put("Containers", content.getContainers());
-
-						for (Item item : content.getItems()) {
-							Log.e(TAG, "Item = " + item.getTitle());
-						}
-
 						result.put("Items", content.getItems());
-
 						fireOnBrowseCompleteEvent();
-
 					} catch (Exception e) {
 						Log.e(TAG, e.getMessage());
 						m_listeners.remove("Error: " + e.getMessage());
@@ -87,9 +72,7 @@ public class DMSProcessorImpl implements DMSProcessor {
 					Log.e(TAG, defaultMsg);
 					fireOnBrowseFailEvent(defaultMsg);
 				}
-
 			};
-
 			m_controlPoint.execute(actionCallback);
 		}
 	}

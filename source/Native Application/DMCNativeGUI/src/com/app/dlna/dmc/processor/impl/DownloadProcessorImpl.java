@@ -1,6 +1,8 @@
 package com.app.dlna.dmc.processor.impl;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.teleal.cling.support.model.DIDLObject;
 
@@ -15,16 +17,27 @@ public class DownloadProcessorImpl implements DownloadProcessor {
 
 	private Activity m_activity;
 	private File m_sdRoot;
+	private List<DownloadThread> m_listDownloads;
+
+	// private NotificationManager m_notificationManager;
 
 	public DownloadProcessorImpl(Activity activity) {
 		m_activity = activity;
 		// TODO: must change app_name here
 		m_sdRoot = new File("/mnt/sdcard/DMCProject");
 		m_sdRoot.mkdir();
+		m_listDownloads = new ArrayList<DownloadThread>();
+		// m_notificationManager = (NotificationManager)
+		// activity.getSystemService(Context.NOTIFICATION_SERVICE);
 	}
 
 	@Override
 	public int startDownload(DIDLObject item) {
+		int size;
+		synchronized (m_listDownloads) {
+			size = m_listDownloads.size();
+		}
+
 		DownloadThread downloadThread = new DownloadThread(item, m_sdRoot, new DownloadListener() {
 
 			@Override
@@ -51,9 +64,11 @@ public class DownloadProcessorImpl implements DownloadProcessor {
 					}
 				});
 			}
-		});
-
-		downloadThread.startDownload();
+		}, size + 1, m_activity);
+		synchronized (m_listDownloads) {
+			m_listDownloads.add(downloadThread);
+			downloadThread.startDownload();
+		}
 		return 0;
 	}
 
@@ -64,7 +79,12 @@ public class DownloadProcessorImpl implements DownloadProcessor {
 
 	@Override
 	public void stopAllDownloads() {
-
+		synchronized (m_listDownloads) {
+			for (DownloadThread downloadThread : m_listDownloads) {
+				if (downloadThread != null && !downloadThread.isInterrupted())
+					downloadThread.stopDownload();
+			}
+		}
 	}
 
 }

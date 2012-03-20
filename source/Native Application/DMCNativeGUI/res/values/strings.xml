@@ -35,5 +35,7 @@
     <string name="dmr_list">DMR List</string>
     <string name="select_all">Select All</string>
     <string name="enter_keyword_here">Enter keyword here</string>
+    <string name="cancel">Cancel</string>
+    <string name="contentName">Content name</string>
 
 </resources>
