@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plugins>
+	<plugin name="App" value="com.phonegap.App" />
+	<plugin name="Device" value="com.phonegap.Device" />
+	<plugin name="DevicesPlugin" value="com.app.dlna.dmc.gui.plugin.devices.DevicesPlugin"></plugin>
+</plugins>

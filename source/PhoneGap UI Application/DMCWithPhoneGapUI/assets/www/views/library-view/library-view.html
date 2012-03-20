@@ -1,0 +1,138 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+ 
+	<title>Youtube view</title> 
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.css" />
+	<script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.js"></script>
+	<script src="../../iscroll.js"></script>
+	<link rel="stylesheet" href="library-view.css"/>
+	
+	<script type="text/javascript">
+		var myScroll;
+		
+		$(document).ready(function() {
+			setTimeout(function() {
+				myScroll = new iScroll('wrapper', { hScroll: false, vScrollbar: false });
+			}, 200);
+			console.log("set scroll for libs view");
+		});
+	</script>
+
+</head> 
+<body> 
+
+<div id="page_youtube" data-role="page" data-theme="a">
+	<div id="div_header" data-role="header">
+		<div data-role="navbar" data-iconpos="top" data-id="main_navbar">
+			<ul>
+				<li><a href="../devices-view/devices-view.html" 
+					
+					data-icon="search"
+					data-transition="fade">Devices</a></li>
+				<li><a href="#" 
+					class="ui-btn-active ui-state-persist"
+					data-icon="search">Library</a></li>
+					
+				<li><a href="../youtube-view/youtube-view.html"
+					
+					data-icon="search"
+					data-transition="fade"
+					data-prefetch>Youtube</a></li>
+					
+				<li><a href="../playlists-view/playlists-view.html" 
+					data-icon="search"
+					data-transition="fade">Playlists</a></li>
+			</ul>
+		</div>
+	</div>
+	
+	<div id="libs_div_page_content" data-role="content">
+		<div id="div_toolbar" data-theme="e">
+			<img alt="Back Button" src="../../img/btn_back.png" style="height: 48px; width: 48px;">
+			<input type="text" data-theme="d" placeholder="Search text..." style="position: absolute; top: 3px; left: 50px; width: 79%;">
+		</div>
+		
+		<div id="wrapper">
+			<ul data-role="listview">
+				<li>
+					<a href="#" style="padding-top: 0px; padding-bottom: 0px;">
+						<img src="../../img/folder_icon.png" 
+							style="width: 48px; height: 48px; padding-left: 10px;" />
+						<h3>First</h3>
+						<p>details</p>
+					</a>
+					
+				</li>	
+				
+				<li>
+					<a href="#" style="padding-top: 0px; padding-bottom: 0px;">
+						<img src="../../img/folder_icon.png" 
+							style="width: 48px; height: 48px; padding-left: 10px;" />
+						<h3>Folder 1</h3>
+						<p>details</p>
+					</a>
+				</li>
+				
+				<li>
+					<a href="#" style="padding-top: 0px; padding-bottom: 0px;">
+						<img src="../../img/folder_icon.png" 
+							style="width: 48px; height: 48px; padding-left: 10px;" />
+						<h3>Folder 1</h3>
+						<p>details</p>
+					</a>
+				</li>
+				
+				<li>
+					<a href="#" style="padding-top: 0px; padding-bottom: 0px;">
+						<img src="../../img/folder_icon.png" 
+							style="width: 48px; height: 48px; padding-left: 10px;" />
+						<h3>Folder 1</h3>
+						<p>details</p>
+					</a>
+				</li>
+				
+				<li>
+					<a href="#" style="padding-top: 0px; padding-bottom: 0px;">
+						<img src="../../img/folder_icon.png" 
+							style="width: 48px; height: 48px; padding-left: 10px;" />
+						<h3>Folder 1</h3>
+						<p>details</p>
+					</a>
+				</li>
+				
+				<li>
+					<a href="#" style="padding-top: 0px; padding-bottom: 0px;">
+						<img src="../../img/folder_icon.png" 
+							style="width: 48px; height: 48px; padding-left: 10px;" />
+						<h3>Folder 1</h3>
+						<p>details</p>
+					</a>
+				</li>
+				
+				<li>
+					<a href="#" style="padding-top: 0px; padding-bottom: 0px;">
+						<img src="../../img/folder_icon.png" 
+							style="width: 48px; height: 48px; padding-left: 10px;" />
+						<h3>Last</h3>
+						<p>details</p>
+					</a>
+				</li>
+			</ul>
+		</div>
+		
+		<script type="text/javascript">
+			var myScroll;
+			setTimeout(function() {
+				myScroll = new iScroll('wrapper', { hScroll: false, vScrollbar: false });
+			}, 200);
+			console.log("load libs page complete!");
+		</script>
+	</div>
+</div>
+</body>
+</html>
