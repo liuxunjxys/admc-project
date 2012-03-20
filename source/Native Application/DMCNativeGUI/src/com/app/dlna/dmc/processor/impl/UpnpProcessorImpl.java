@@ -97,6 +97,9 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener, CoreU
 					ex.printStackTrace();
 				}
 			}
+			if (m_downloadProcessor != null) {
+				m_downloadProcessor.stopAllDownloads();
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

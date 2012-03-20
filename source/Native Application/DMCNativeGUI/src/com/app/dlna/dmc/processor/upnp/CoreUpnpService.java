@@ -104,9 +104,6 @@ public class CoreUpnpService extends Service {
 							if (m_upnpProcessor != null) {
 								m_upnpProcessor.onNetworkChanged(ni);
 							}
-							// HTTPServerData.HOST =
-							// ni.getInetAddresses().nextElement().getHostAddress();
-							// Log.i(TAG, "HTTP host = " + HTTPServerData.HOST);
 						}
 
 						@Override
