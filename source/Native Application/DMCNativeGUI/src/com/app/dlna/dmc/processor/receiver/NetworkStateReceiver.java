@@ -1,6 +1,11 @@
 package com.app.dlna.dmc.processor.receiver;
 
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
 
 import org.teleal.cling.android.AndroidNetworkAddressFactory;
 import org.teleal.cling.transport.SwitchableRouter;
@@ -68,7 +73,22 @@ public class NetworkStateReceiver extends BroadcastReceiver {
 				m_routerStateListener.onNetworkChanged(ni);
 			}
 			m_interfaceCache = ni;
-			HTTPServerData.HOST = ni.getInetAddresses().nextElement().getHostAddress();
+
+			List<InetAddress> inets = Collections.list(ni.getInetAddresses());
+			for (InetAddress inet : inets) {
+				if (inet instanceof Inet4Address) {
+					HTTPServerData.HOST = inet.getHostAddress();
+					break;
+				}
+			}
+			// while (ni.getInetAddresses().hasMoreElements()) {
+			// InetAddress inet = ni.getInetAddresses().nextElement();
+			// Log.i(TAG, inet.toString());
+			// if (inet instanceof Inet4Address) {
+			// HTTPServerData.HOST = inet.getHostAddress();
+			// break;
+			// }
+			// }
 			Log.i(TAG, "HOST = " + HTTPServerData.HOST);
 			m_disableWifiPending = false;
 		}

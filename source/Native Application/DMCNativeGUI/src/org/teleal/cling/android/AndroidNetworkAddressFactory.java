@@ -37,12 +37,16 @@ import org.teleal.cling.transport.spi.NetworkAddressFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
+import android.util.Log;
 
 /**
- * Implementation appropriate for Android environment, avoids unavailable methods.
+ * Implementation appropriate for Android environment, avoids unavailable
+ * methods.
  * <p>
- * Detects only (one) WiFi network interface on an Android device and its addresses, ignores all other interfaces. Requires the Android <code>WifiManager</code>
- * to ensure that the discovered interface is really the WiFi interface.
+ * Detects only (one) WiFi network interface on an Android device and its
+ * addresses, ignores all other interfaces. Requires the Android
+ * <code>WifiManager</code> to ensure that the discovered interface is really
+ * the WiFi interface.
  * </p>
  * 
  * @author Christian Bauer
@@ -51,7 +55,9 @@ public class AndroidNetworkAddressFactory implements NetworkAddressFactory {
 
 	final private static Logger log = Logger.getLogger(NetworkAddressFactory.class.getName());
 
-	//private static final String TAG = "AndroidNetworkAddressFactory";
+	private static final String TAG = AndroidNetworkAddressFactory.class.getName();
+
+	// private static final String TAG = "AndroidNetworkAddressFactory";
 
 	protected NetworkInterface wifiInterface;
 	protected List<InetAddress> bindAddresses = new ArrayList<InetAddress>();
@@ -59,7 +65,8 @@ public class AndroidNetworkAddressFactory implements NetworkAddressFactory {
 	/**
 	 * Defaults to an ephemeral port.
 	 */
-	public AndroidNetworkAddressFactory(WifiManager wifiManager, ConnectivityManager connectivityManager) throws InitializationException {
+	public AndroidNetworkAddressFactory(WifiManager wifiManager, ConnectivityManager connectivityManager)
+			throws InitializationException {
 		wifiInterface = getWifiNetworkInterface(wifiManager, connectivityManager);
 		if (wifiInterface == null)
 			throw new InitializationException("Could not discover WiFi network interface");
@@ -132,21 +139,25 @@ public class AndroidNetworkAddressFactory implements NetworkAddressFactory {
 	}
 
 	public InetAddress getBroadcastAddress(InetAddress inetAddress) {
-		return null; // TODO: No low-level network interface methods available on Android API
+		return null; // TODO: No low-level network interface methods available
+						// on Android API
 	}
 
 	public InetAddress getLocalAddress(NetworkInterface networkInterface, boolean isIPv6, InetAddress remoteAddress) {
-		// TODO: This is totally random because we can't access low level InterfaceAddress on Android!
+		// TODO: This is totally random because we can't access low level
+		// InterfaceAddress on Android!
 		for (InetAddress localAddress : getInetAddresses(networkInterface)) {
 			if (isIPv6 && localAddress instanceof Inet6Address)
 				return localAddress;
 			if (!isIPv6 && localAddress instanceof Inet4Address)
 				return localAddress;
 		}
-		throw new IllegalStateException("Can't find any IPv4 or IPv6 address on interface: " + networkInterface.getDisplayName());
+		throw new IllegalStateException("Can't find any IPv4 or IPv6 address on interface: "
+				+ networkInterface.getDisplayName());
 	}
 
-	// Code from: http://www.gubatron.com/blog/2010/09/19/android-programming-how-to-obtain-the-wifis-corresponding-networkinterface/
+	// Code from:
+	// http://www.gubatron.com/blog/2010/09/19/android-programming-how-to-obtain-the-wifis-corresponding-networkinterface/
 
 	public static NetworkInterface getWifiNetworkInterface(WifiManager manager, ConnectivityManager connectivityManager) {
 		if (ModelUtil.ANDROID_EMULATOR) {
@@ -172,7 +183,8 @@ public class AndroidNetworkAddressFactory implements NetworkAddressFactory {
 		return null;
 	}
 
-	public static NetworkInterface getRealWifiNetworkInterface(WifiManager manager, ConnectivityManager connectivityManager) {
+	public static NetworkInterface getRealWifiNetworkInterface(WifiManager manager,
+			ConnectivityManager connectivityManager) {
 		// TODO: change here
 		// Enumeration<NetworkInterface> interfaces = null;
 		// NetworkInterface iface = null;
@@ -184,12 +196,17 @@ public class AndroidNetworkAddressFactory implements NetworkAddressFactory {
 		// return null;
 		// }
 		//
-		// // We'll use the WiFiManager's ConnectionInfo IP address and compare it with
-		// // the ips of the enumerated NetworkInterfaces to find the WiFi NetworkInterface.
+		// // We'll use the WiFiManager's ConnectionInfo IP address and compare
+		// it with
+		// // the ips of the enumerated NetworkInterfaces to find the WiFi
+		// NetworkInterface.
 		//
-		// // Wifi manager gets a ConnectionInfo object that has the ipAdress as an int
-		// // It's endianness could be different as the one on java.net.InetAddress
-		// // maybe this varies from device to device, the android API has no documentation on this method.
+		// // Wifi manager gets a ConnectionInfo object that has the ipAdress as
+		// an int
+		// // It's endianness could be different as the one on
+		// java.net.InetAddress
+		// // maybe this varies from device to device, the android API has no
+		// documentation on this method.
 		// int wifiIP = manager.getConnectionInfo().getIpAddress();
 		//
 		// // so I keep the same IP number with the reverse endianness
@@ -199,7 +216,8 @@ public class AndroidNetworkAddressFactory implements NetworkAddressFactory {
 		// iface = interfaces.nextElement();
 		// try {
 		// if (iface != null) {
-		// Log.e(TAG, "Network interface: name = " + iface.getName() + "; isLoopBack = " + String.valueOf(iface.isLoopback()));
+		// Log.e(TAG, "Network interface: name = " + iface.getName() +
+		// "; isLoopBack = " + String.valueOf(iface.isLoopback()));
 		// }
 		// } catch (Exception ex) {
 		//
@@ -221,7 +239,8 @@ public class AndroidNetworkAddressFactory implements NetworkAddressFactory {
 		// } else if (wifiIP == 0) {
 		// try {
 		// if (!iface.isLoopback()) {
-		// HTTPServerData.HOST = iface.getInetAddresses().nextElement().getHostAddress();
+		// HTTPServerData.HOST =
+		// iface.getInetAddresses().nextElement().getHostAddress();
 		// Log.e(TAG, "Host address = " + HTTPServerData.HOST);
 		// }
 		// } catch (SocketException e) {
@@ -266,8 +285,10 @@ public class AndroidNetworkAddressFactory implements NetworkAddressFactory {
 				if (networkInfo == null) {
 					// case 4: only hot-spot mode
 					return iface;
-				} else if (networkInfo.getType() == ConnectivityManager.TYPE_MOBILE || networkInfo.getType() == ConnectivityManager.TYPE_MOBILE_DUN
-						|| networkInfo.getType() == ConnectivityManager.TYPE_MOBILE_HIPRI || networkInfo.getType() == ConnectivityManager.TYPE_MOBILE_MMS
+				} else if (networkInfo.getType() == ConnectivityManager.TYPE_MOBILE
+						|| networkInfo.getType() == ConnectivityManager.TYPE_MOBILE_DUN
+						|| networkInfo.getType() == ConnectivityManager.TYPE_MOBILE_HIPRI
+						|| networkInfo.getType() == ConnectivityManager.TYPE_MOBILE_MMS
 						|| networkInfo.getType() == ConnectivityManager.TYPE_MOBILE_SUPL) {
 					// case 6: only mobile network
 					return null;
@@ -277,10 +298,11 @@ public class AndroidNetworkAddressFactory implements NetworkAddressFactory {
 				}
 			}
 		}
-
-		if (interfaces.size() == 3) {
+		NetworkInterface ret = null;
+		if (interfaces.size() >= 3) {
 			// case 5: hot-spot + mobile network
 			for (NetworkInterface iface : interfaces) {
+				Log.i(TAG, iface.toString());
 				try {
 					if (iface.isLoopback()) {
 						continue;
@@ -289,12 +311,13 @@ public class AndroidNetworkAddressFactory implements NetworkAddressFactory {
 				}
 				List<InterfaceAddress> interfaceAddresses = iface.getInterfaceAddresses();
 				for (InterfaceAddress interfaceAddress : interfaceAddresses) {
-					if (interfaceAddress.getBroadcast() != null)
-						return iface;
+					if (interfaceAddress.getBroadcast() != null) {
+						ret = iface;
+					}
 				}
 			}
 		}
-		return null;
+		return ret;
 	}
 
 	static int byteArrayToInt(byte[] arr, int offset) {
