@@ -5,6 +5,8 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -69,36 +71,39 @@ public class DownloadThread extends Thread {
 		super.run();
 
 		Log.i(TAG, "Download item " + m_item.getTitle());
-		DataOutputStream dos = null;
-		DataInputStream dis = null;
+		OutputStream os = null;
+		InputStream is = null;
 		HttpURLConnection connection = null;
 		try {
+			Log.i(TAG, "Download URL = " + m_item.getResources().get(0).getValue());
 			URL u = new URL(m_item.getResources().get(0).getValue());
-			connection = (HttpURLConnection) u.openConnection();
-			connection.setRequestMethod("GET");
-			connection.setDoOutput(true);
-			connection.connect();
-			String contentType = "";
+
+			// connection = (HttpURLConnection) u.openConnection();
+			// connection.setRequestMethod("GET");
+			// connection.setDoOutput(true);
+			// connection.connect();
+			// String contentType = "";
 			String filename = m_item.getTitle();
-			Log.i(TAG, "Content type = " + (contentType = connection.getContentType()));
-			if (contentType != null) {
-				if (contentType.equals("audio/mpeg")) {
-					filename += ".mp3";
-				}
-			}
+			// Log.i(TAG, "Content type = " + (contentType =
+			// connection.getContentType()));
+			// if (contentType != null) {
+			// if (contentType.equals("audio/mpeg")) {
+			// filename += ".mp3";
+			// }
+			// }
 			File newFile = new File(m_parent, filename);
-			dos = new DataOutputStream(new FileOutputStream(newFile));
-			dis = new DataInputStream(connection.getInputStream());
+			os = new FileOutputStream(newFile);
+			is = u.openStream();
 			byte[] buffer = new byte[204800];
 			int read = 0;
 			long size = 0;
 			long second = System.currentTimeMillis();
 			long maxsize = m_item.getResources().get(0).getSize();
 			Log.d(TAG, "second = " + second);
-			while ((read = dis.read(buffer)) > 0 && m_isRunning) {
+			while ((read = is.read(buffer)) > 0 && m_isRunning) {
 				size += read;
-				dos.write(buffer, 0, read);
-				dos.flush();
+				os.write(buffer, 0, read);
+				os.flush();
 				long newSecond = System.currentTimeMillis();
 				Log.d(TAG, "new second = " + second);
 				if (Math.abs(newSecond - second) > 1000) {
@@ -119,15 +124,15 @@ public class DownloadThread extends Thread {
 			if (m_listener != null)
 				m_listener.onDownloadFail(this, ex);
 		} finally {
-			if (dos != null)
+			if (os != null)
 				try {
-					dos.close();
+					os.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-			if (dis != null)
+			if (is != null)
 				try {
-					dis.close();
+					is.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
