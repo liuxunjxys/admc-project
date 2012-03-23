@@ -1,0 +1,74 @@
+#div_app_page{
+	padding: 0px;
+	margin: 0px;
+	position: relative;
+	left: 0px;
+	top: 0px;
+	height: 100%;
+	width: 100%;
+}
+
+#div_all_content{
+	padding: 0px;
+	margin: 0px;
+	position: relative;
+	left: 0px;
+	top: 0px;
+	height: 100%;
+	width: 100%;
+}
+
+#div_header{
+	position: relative;
+	padding: 0px;
+	margin: 0px;
+	height: 12%;
+}
+
+.div_navbar{
+	padding: 0px;
+	margin: 0px;
+	position: relative;
+	height: 100%;
+}
+
+.div_navbar ul{
+	padding: 0px;
+	margin: 0px;
+	position: relative;
+	height: 100%;
+}
+
+.div_navbar ul li{
+	padding: 0px;
+	margin: 0px;
+	position: relative;
+	height: 100%;
+}
+
+.div_navbar ul li a{
+	padding: 0px;
+	position: relative;
+	height: 100%;
+}
+
+.div_navbar ul a img{
+	padding: 0px;
+	height: 28px;
+	width: 28px;
+}
+
+#div_content{
+	position: relative;
+	height: 88%;
+	background-color: blue;
+}
+
+.div_subcontent{
+	position: relative;
+	left: 0px;
+	height:100%;
+	background-color: red;
+	display: none;
+}
+
