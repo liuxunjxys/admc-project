@@ -1,0 +1,35 @@
+#div_libs_toolbar
+{
+	position: relative;
+	height: 10%;
+	width: 100%;
+	padding: 0px;
+	margin: 0px;
+}
+
+#div_libs_toolbar img{
+	height: 100%;
+	width: height;
+	float: left;
+}
+
+#div_libs_toolbar input{
+	
+	position: relative;
+	margin: 5px;
+	margin-bottom: 0px;
+	padding: 0px;
+	height: 30%; /*temp, config later*/
+	width: 100px; /*temp, config later*/
+	float: left;
+}
+
+.div_library_list 
+{
+	clear: both;
+	position: relative;
+	height: 90%;
+	margin: 0px;
+	padding: 0px;
+}
+

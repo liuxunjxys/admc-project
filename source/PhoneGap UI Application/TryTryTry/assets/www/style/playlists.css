@@ -1,0 +1,75 @@
+
+/*---------------------1---------------------*/
+#div_play_toolbar
+{
+	height: 10%;
+	width: 100%;
+	padding: 0px;
+	margin: 0px;
+	position: relative;
+	background-color: blue;
+}
+
+#div_play_toolbar input{
+	position: absolute;
+	width: 95%;
+	height: 20%; /*temp, config later*/
+	margin: 5px;
+	margin-bottom: 0px;
+	padding: 0px;
+}
+
+/*---------------------2---------------------*/
+.div_play_media_list
+{
+	position: relative;
+	height: 45%;
+	margin: 0px;
+	padding: 0px;
+	clear: both;
+	background-color: green;
+}
+
+/*---------------------3---------------------*/
+#div_play_media_controller
+{
+	position: relative;
+	height: 38%;
+	background-color: gray;
+}
+
+#div_play_media_controller div#div_field_info{
+	position: relative;
+	height: 13%;
+	background-color: red;
+}
+
+#div_play_media_controller div#div_field_controlbar{
+	position: relative;
+	height: 40%;
+	background-color: yellow;
+}
+
+#div_play_media_controller div#div_field_controlbar div{
+	padding: 0px;
+	margin: 0px;
+}
+
+#div_play_media_controller div#div_field_durationAndVol{
+	position: relative;
+	height: 20%;
+	background-color: gray;
+}
+
+#div_play_media_controller div#div_field_seekbar{
+	position: relative;
+	height: 27%;
+	background-color: orange;
+}
+
+/*---------------------4---------------------*/
+#div_play_dmr_info{
+	position: relative;
+	height: 7%;
+	background-color: green;
+}

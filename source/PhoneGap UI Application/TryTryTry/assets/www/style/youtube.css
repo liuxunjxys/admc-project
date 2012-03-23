@@ -1,0 +1,39 @@
+
+#div_you_toolbar
+{
+	height: 10%;
+	width: 100%;
+	padding: 0px;
+	margin: 0px;
+	position: relative;
+	background-color: blue;
+}
+
+#div_you_toolbar input{
+	position: relative;
+	margin: 5px;
+	margin-bottom: 0px;
+	padding: 0px;
+	height: 30%; /*temp, config later*/
+	width: 100px; /*temp, config later*/
+	float: left;
+}
+
+#div_you_toolbar img{
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	height: 100%;
+	width: height;
+	float: left;
+}
+
+.div_youtube_list
+{
+	clear: both;
+	position: relative;
+	height: 90%;
+	margin: 0px;
+	padding: 0px;
+	background-color: green;
+}
