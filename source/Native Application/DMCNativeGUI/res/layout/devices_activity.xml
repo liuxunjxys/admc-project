@@ -4,6 +4,21 @@
     android:layout_height="match_parent"
     android:orientation="horizontal" >
 
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewPager"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" >
+
+        <android.support.v4.view.PagerTitleStrip
+            android:id="@+id/viewPagerStrip"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:background="#fff"
+            android:textColor="#33f" />
+    </android.support.v4.view.ViewPager>
+
+    <!--
     <LinearLayout
         android:id="@+id/navigateBar"
         android:layout_width="fill_parent"
@@ -26,8 +41,11 @@
             android:layout_weight="0.5"
             android:onClick="onDMRButtonClick"
             android:text="@string/dmr_list" />
-    </LinearLayout>
+    </LinearLayout>
+    -->
 
+
+    <!--
     <LinearLayout
         android:id="@+id/ll_dms"
         android:layout_width="fill_parent"
@@ -50,8 +68,11 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content" >
         </ListView>
-    </LinearLayout>
+    </LinearLayout>
+    -->
 
+
+    <!--
     <LinearLayout
         android:id="@+id/ll_dmr"
         android:layout_width="fill_parent"
@@ -75,6 +96,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content" >
         </ListView>
-    </LinearLayout>
+    </LinearLayout>
+    -->
 
 </RelativeLayout>
