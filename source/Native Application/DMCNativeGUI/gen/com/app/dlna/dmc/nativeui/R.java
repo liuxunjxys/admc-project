@@ -53,9 +53,9 @@ public final class R {
     public static final class id {
         public static final int checked=0x7f06000b;
         public static final int contentName=0x7f06000e;
-        public static final int deviceAddress=0x7f060002;
+        public static final int deviceAddress=0x7f060003;
         public static final int deviceIcon=0x7f060000;
-        public static final int deviceName=0x7f060001;
+        public static final int deviceName=0x7f060002;
         public static final int dmrList=0x7f060008;
         public static final int dmsList=0x7f060006;
         public static final int downloadProgress=0x7f06000d;
@@ -88,7 +88,7 @@ public final class R {
         public static final int rl_seekbar=0x7f06001d;
         public static final int search_box=0x7f060011;
         public static final int selectAll=0x7f060014;
-        public static final int selected=0x7f060003;
+        public static final int selected=0x7f060001;
         public static final int sound=0x7f060020;
         public static final int stop=0x7f06001b;
         public static final int submit=0x7f060028;

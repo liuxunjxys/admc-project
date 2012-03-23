@@ -4,13 +4,10 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 
 import org.teleal.cling.android.AndroidNetworkAddressFactory;
 import org.teleal.cling.transport.SwitchableRouter;
-
-import com.app.dlna.dmc.processor.http.HTTPServerData;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -18,6 +15,8 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.util.Log;
+
+import com.app.dlna.dmc.processor.http.HTTPServerData;
 
 public class NetworkStateReceiver extends BroadcastReceiver {
 	private static final String TAG = NetworkStateReceiver.class.getSimpleName();
