@@ -5,8 +5,12 @@ import org.teleal.cling.model.meta.LocalDevice;
 import org.teleal.cling.model.types.UDN;
 
 import android.os.Bundle;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
@@ -26,8 +30,9 @@ public class DevicesActivity extends UpnpListenerActivity {
 	private ListView m_dmsList;
 	private DeviceArrayAdapter m_dmrAdapter;
 	private DeviceArrayAdapter m_dmsAdapter;
-	private LinearLayout m_ll_dms;
-	private LinearLayout m_ll_dmr;
+	private ViewPager m_pager;
+	private View m_dms_page;
+	private View m_dmr_page;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -35,20 +40,74 @@ public class DevicesActivity extends UpnpListenerActivity {
 		Log.i(TAG, "Devices onCreate");
 		setContentView(R.layout.devices_activity);
 
-		m_dmrList = (ListView) findViewById(R.id.dmrList);
-		m_dmsList = (ListView) findViewById(R.id.dmsList);
-
-		m_dmrAdapter = new DeviceArrayAdapter(DevicesActivity.this, 0);
+		m_dms_page = getLayoutInflater().inflate(R.layout.dms_page, null);
+		m_dmsList = (ListView) m_dms_page.findViewById(R.id.dmsList);
 		m_dmsAdapter = new DeviceArrayAdapter(DevicesActivity.this, 0);
-
-		m_dmrList.setOnItemClickListener(onDMRClick);
 		m_dmsList.setOnItemClickListener(onDMSClick);
-
-		m_dmrList.setAdapter(m_dmrAdapter);
 		m_dmsList.setAdapter(m_dmsAdapter);
 
-		m_ll_dms = (LinearLayout) findViewById(R.id.ll_dms);
-		m_ll_dmr = (LinearLayout) findViewById(R.id.ll_dmr);
+		m_dmr_page = getLayoutInflater().inflate(R.layout.dmr_page, null);
+		m_dmrList = (ListView) m_dmr_page.findViewById(R.id.dmrList);
+		m_dmrAdapter = new DeviceArrayAdapter(DevicesActivity.this, 0);
+		m_dmrList.setOnItemClickListener(onDMRClick);
+		m_dmrList.setAdapter(m_dmrAdapter);
+
+		m_pager = (ViewPager) findViewById(R.id.viewPager);
+
+		m_pager.setOnPageChangeListener(new OnPageChangeListener() {
+
+			@Override
+			public void onPageSelected(int position) {
+			}
+
+			@Override
+			public void onPageScrolled(int arg0, float arg1, int arg2) {
+
+			}
+
+			@Override
+			public void onPageScrollStateChanged(int arg0) {
+
+			}
+		});
+		PagerAdapter adapter = new PagerAdapter() {
+			@Override
+			public void destroyItem(ViewGroup container, int position, Object view) {
+				((ViewPager) container).removeView((View) view);
+			}
+
+			@Override
+			public Object instantiateItem(ViewGroup container, int position) {
+				if (position == 0) {
+
+					((ViewPager) container).addView(m_dms_page);
+					return m_dms_page;
+				} else if (position == 1) {
+
+					((ViewPager) container).addView(m_dmr_page);
+					return m_dmr_page;
+				} else {
+					return null;
+				}
+
+			}
+
+			@Override
+			public boolean isViewFromObject(View view, Object key) {
+				return view == key;
+			}
+
+			@Override
+			public CharSequence getPageTitle(int position) {
+				return new String[] { "Media Server", "Media Renderer" }[position];
+			}
+
+			@Override
+			public int getCount() {
+				return 2;
+			}
+		};
+		m_pager.setAdapter(adapter);
 
 		// restoreState();
 
@@ -138,7 +197,8 @@ public class DevicesActivity extends UpnpListenerActivity {
 		synchronized (m_dmsAdapter) {
 			m_dmsAdapter.clear();
 			if (MainActivity.UPNP_PROCESSOR.getCurrentDMS() != null) {
-				m_dmsAdapter.setCurrentDeviceUDN(MainActivity.UPNP_PROCESSOR.getCurrentDMS().getIdentity().getUdn().getIdentifierString());
+				m_dmsAdapter.setCurrentDeviceUDN(MainActivity.UPNP_PROCESSOR.getCurrentDMS().getIdentity().getUdn()
+						.getIdentifierString());
 			} else {
 				m_dmsAdapter.setCurrentDeviceUDN("");
 			}
@@ -147,7 +207,8 @@ public class DevicesActivity extends UpnpListenerActivity {
 		synchronized (m_dmrAdapter) {
 			m_dmrAdapter.clear();
 			if (MainActivity.UPNP_PROCESSOR.getCurrentDMR() != null) {
-				m_dmrAdapter.setCurrentDeviceUDN(MainActivity.UPNP_PROCESSOR.getCurrentDMR().getIdentity().getUdn().getIdentifierString());
+				m_dmrAdapter.setCurrentDeviceUDN(MainActivity.UPNP_PROCESSOR.getCurrentDMR().getIdentity().getUdn()
+						.getIdentifierString());
 			} else {
 				m_dmrAdapter.setCurrentDeviceUDN("");
 			}
@@ -222,105 +283,106 @@ public class DevicesActivity extends UpnpListenerActivity {
 		});
 	}
 
-	public void onDMSButtonClick(View view) {
-		if (m_ll_dms.getVisibility() == View.VISIBLE)
-			return;
-		AlphaAnimation dmsAnimation = new AlphaAnimation(0f, 1f);
-		dmsAnimation.setDuration(500);
-		dmsAnimation.setAnimationListener(new AnimationListener() {
-
-			@Override
-			public void onAnimationStart(Animation animation) {
-				m_ll_dms.setVisibility(View.VISIBLE);
-			}
-
-			@Override
-			public void onAnimationRepeat(Animation animation) {
-
-			}
-
-			@Override
-			public void onAnimationEnd(Animation animation) {
-				m_ll_dms.setVisibility(View.VISIBLE);
-			}
-		});
-		m_ll_dms.startAnimation(dmsAnimation);
-
-		AlphaAnimation dmrAnimation = new AlphaAnimation(1f, 0f);
-		dmrAnimation.setDuration(500);
-		dmrAnimation.setAnimationListener(new AnimationListener() {
-
-			@Override
-			public void onAnimationStart(Animation animation) {
-				m_ll_dmr.setVisibility(View.VISIBLE);
-			}
-
-			@Override
-			public void onAnimationRepeat(Animation animation) {
-
-			}
-
-			@Override
-			public void onAnimationEnd(Animation animation) {
-				m_ll_dmr.setVisibility(View.GONE);
-			}
-		});
-		m_ll_dmr.startAnimation(dmrAnimation);
-
-	}
-
-	public void onDMRButtonClick(View view) {
-		if (m_ll_dmr.getVisibility() == View.VISIBLE)
-			return;
-		AlphaAnimation dmsAnimation = new AlphaAnimation(1f, 0f);
-		dmsAnimation.setDuration(500);
-		dmsAnimation.setAnimationListener(new AnimationListener() {
-
-			@Override
-			public void onAnimationStart(Animation animation) {
-				m_ll_dms.setVisibility(View.VISIBLE);
-			}
-
-			@Override
-			public void onAnimationRepeat(Animation animation) {
-
-			}
-
-			@Override
-			public void onAnimationEnd(Animation animation) {
-				m_ll_dms.setVisibility(View.GONE);
-			}
-		});
-		m_ll_dms.startAnimation(dmsAnimation);
-
-		AlphaAnimation dmrAnimation = new AlphaAnimation(0f, 1f);
-		dmrAnimation.setDuration(500);
-		dmrAnimation.setAnimationListener(new AnimationListener() {
-
-			@Override
-			public void onAnimationStart(Animation animation) {
-				m_ll_dmr.setVisibility(View.VISIBLE);
-			}
-
-			@Override
-			public void onAnimationRepeat(Animation animation) {
-
-			}
-
-			@Override
-			public void onAnimationEnd(Animation animation) {
-				m_ll_dmr.setVisibility(View.VISIBLE);
-			}
-		});
-		m_ll_dmr.startAnimation(dmrAnimation);
-	}
+	// public void onDMSButtonClick(View view) {
+	// if (m_ll_dms.getVisibility() == View.VISIBLE)
+	// return;
+	// AlphaAnimation dmsAnimation = new AlphaAnimation(0f, 1f);
+	// dmsAnimation.setDuration(500);
+	// dmsAnimation.setAnimationListener(new AnimationListener() {
+	//
+	// @Override
+	// public void onAnimationStart(Animation animation) {
+	// m_ll_dms.setVisibility(View.VISIBLE);
+	// }
+	//
+	// @Override
+	// public void onAnimationRepeat(Animation animation) {
+	//
+	// }
+	//
+	// @Override
+	// public void onAnimationEnd(Animation animation) {
+	// m_ll_dms.setVisibility(View.VISIBLE);
+	// }
+	// });
+	// m_ll_dms.startAnimation(dmsAnimation);
+	//
+	// AlphaAnimation dmrAnimation = new AlphaAnimation(1f, 0f);
+	// dmrAnimation.setDuration(500);
+	// dmrAnimation.setAnimationListener(new AnimationListener() {
+	//
+	// @Override
+	// public void onAnimationStart(Animation animation) {
+	// m_ll_dmr.setVisibility(View.VISIBLE);
+	// }
+	//
+	// @Override
+	// public void onAnimationRepeat(Animation animation) {
+	//
+	// }
+	//
+	// @Override
+	// public void onAnimationEnd(Animation animation) {
+	// m_ll_dmr.setVisibility(View.GONE);
+	// }
+	// });
+	// m_ll_dmr.startAnimation(dmrAnimation);
+	//
+	// }
+	//
+	// public void onDMRButtonClick(View view) {
+	// if (m_ll_dmr.getVisibility() == View.VISIBLE)
+	// return;
+	// AlphaAnimation dmsAnimation = new AlphaAnimation(1f, 0f);
+	// dmsAnimation.setDuration(500);
+	// dmsAnimation.setAnimationListener(new AnimationListener() {
+	//
+	// @Override
+	// public void onAnimationStart(Animation animation) {
+	// m_ll_dms.setVisibility(View.VISIBLE);
+	// }
+	//
+	// @Override
+	// public void onAnimationRepeat(Animation animation) {
+	//
+	// }
+	//
+	// @Override
+	// public void onAnimationEnd(Animation animation) {
+	// m_ll_dms.setVisibility(View.GONE);
+	// }
+	// });
+	// m_ll_dms.startAnimation(dmsAnimation);
+	//
+	// AlphaAnimation dmrAnimation = new AlphaAnimation(0f, 1f);
+	// dmrAnimation.setDuration(500);
+	// dmrAnimation.setAnimationListener(new AnimationListener() {
+	//
+	// @Override
+	// public void onAnimationStart(Animation animation) {
+	// m_ll_dmr.setVisibility(View.VISIBLE);
+	// }
+	//
+	// @Override
+	// public void onAnimationRepeat(Animation animation) {
+	//
+	// }
+	//
+	// @Override
+	// public void onAnimationEnd(Animation animation) {
+	// m_ll_dmr.setVisibility(View.VISIBLE);
+	// }
+	// });
+	// m_ll_dmr.startAnimation(dmrAnimation);
+	// }
 
 	// @SuppressWarnings("rawtypes")
 	// private void saveState() {
 	// ObjectOutputStream outputStream = null;
 	//
 	// try {
-	// outputStream = new ObjectOutputStream(openFileOutput("devices_cache", Context.MODE_PRIVATE));
+	// outputStream = new ObjectOutputStream(openFileOutput("devices_cache",
+	// Context.MODE_PRIVATE));
 	// if (m_dmsAdapter != null) {
 	// synchronized (m_dmsAdapter) {
 	// int dmsCount = m_dmsAdapter.getCount();

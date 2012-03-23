@@ -313,7 +313,6 @@ public class AndroidNetworkAddressFactory implements NetworkAddressFactory {
 						// Open Garden Wifi Tether
 						// Wireless Tether on market
 						return iface;
-
 					}
 				}
 			}
