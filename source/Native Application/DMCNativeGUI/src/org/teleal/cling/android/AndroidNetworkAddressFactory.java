@@ -55,8 +55,6 @@ public class AndroidNetworkAddressFactory implements NetworkAddressFactory {
 
 	final private static Logger log = Logger.getLogger(NetworkAddressFactory.class.getName());
 
-	private static final String TAG = AndroidNetworkAddressFactory.class.getName();
-
 	// private static final String TAG = "AndroidNetworkAddressFactory";
 
 	protected NetworkInterface wifiInterface;
@@ -152,8 +150,7 @@ public class AndroidNetworkAddressFactory implements NetworkAddressFactory {
 			if (!isIPv6 && localAddress instanceof Inet4Address)
 				return localAddress;
 		}
-		throw new IllegalStateException("Can't find any IPv4 or IPv6 address on interface: "
-				+ networkInterface.getDisplayName());
+		throw new IllegalStateException("Can't find any IPv4 or IPv6 address on interface: " + networkInterface.getDisplayName());
 	}
 
 	// Code from:
@@ -183,8 +180,7 @@ public class AndroidNetworkAddressFactory implements NetworkAddressFactory {
 		return null;
 	}
 
-	public static NetworkInterface getRealWifiNetworkInterface(WifiManager manager,
-			ConnectivityManager connectivityManager) {
+	public static NetworkInterface getRealWifiNetworkInterface(WifiManager manager, ConnectivityManager connectivityManager) {
 		// TODO: change here
 		// Enumeration<NetworkInterface> interfaces = null;
 		// NetworkInterface iface = null;
@@ -275,6 +271,7 @@ public class AndroidNetworkAddressFactory implements NetworkAddressFactory {
 		NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 		if (interfaces.size() == 2) {
 			for (NetworkInterface iface : interfaces) {
+				log.info(iface.toString() + " -- " + iface.getName());
 				try {
 					if (iface.isLoopback()) {
 						continue;
@@ -298,11 +295,9 @@ public class AndroidNetworkAddressFactory implements NetworkAddressFactory {
 				}
 			}
 		}
-		NetworkInterface ret = null;
 		if (interfaces.size() >= 3) {
 			// case 5: hot-spot + mobile network
 			for (NetworkInterface iface : interfaces) {
-				Log.i(TAG, iface.toString());
 				try {
 					if (iface.isLoopback()) {
 						continue;
@@ -311,13 +306,19 @@ public class AndroidNetworkAddressFactory implements NetworkAddressFactory {
 				}
 				List<InterfaceAddress> interfaceAddresses = iface.getInterfaceAddresses();
 				for (InterfaceAddress interfaceAddress : interfaceAddresses) {
-					if (interfaceAddress.getBroadcast() != null) {
-						ret = iface;
+					if (interfaceAddress.getBroadcast() != null && interfaceAddress.getNetworkPrefixLength() == 24) {
+						// wifi-hotspot have prefix length = 24
+						// Tested with:
+						// Native Wifi Tether (tethering by function on phone)
+						// Open Garden Wifi Tether
+						// Wireless Tether on market
+						return iface;
+
 					}
 				}
 			}
 		}
-		return ret;
+		return null;
 	}
 
 	static int byteArrayToInt(byte[] arr, int offset) {
