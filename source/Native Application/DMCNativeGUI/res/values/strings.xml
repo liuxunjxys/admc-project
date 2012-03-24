@@ -38,6 +38,6 @@
     <string name="cancel">Cancel</string>
     <string name="contentName">Content name</string>
     <string name="menu_refresh">Refresh</string>
-    <string name="menu_search">Search</string>
+    <string name="menu_settings">Settings</string>
 
 </resources>
