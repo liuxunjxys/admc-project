@@ -48,7 +48,6 @@ import com.app.dlna.dmc.nativeui.R;
 public class ActionBarHelperBase extends ActionBarHelper {
 	private static final String MENU_RES_NAMESPACE = "http://schemas.android.com/apk/res/android";
 	private static final String MENU_ATTR_ID = "id";
-	private static final String MENU_ATTR_SHOW_AS_ACTION = "showAsAction";
 
 	protected Set<Integer> mActionItemIds = new HashSet<Integer>();
 
@@ -241,7 +240,6 @@ public class ActionBarHelperBase extends ActionBarHelper {
 
 				int eventType = parser.getEventType();
 				int itemId;
-				int showAsAction;
 
 				boolean eof = false;
 				while (!eof) {
@@ -256,7 +254,6 @@ public class ActionBarHelperBase extends ActionBarHelper {
 							break;
 						}
 
-						showAsAction = parser.getAttributeIntValue(MENU_RES_NAMESPACE, MENU_ATTR_SHOW_AS_ACTION, -1);
 						mActionItemIds.add(itemId);
 						break;
 

@@ -22,15 +22,23 @@ import org.teleal.cling.support.model.item.MusicTrack;
 import org.teleal.cling.support.model.item.VideoItem;
 import org.teleal.common.util.MimeType;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Environment;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
+import com.app.dlna.dmc.nativeui.R;
 import com.app.dlna.dmc.processor.http.HTTPServerData;
 import com.app.dlna.dmc.utility.Utility;
 
 public class LocalContentDirectoryService extends AbstractContentDirectoryService {
 	private static final String TAG = "LocalContentDirectoryService";
+	private static final int SCANNING_NOTIFICATION = 37000;
+	private static NotificationManager m_notificationManager;
 	private static List<MusicTrack> m_listMusic = null;
 	private static List<VideoItem> m_listVideo = null;
 	private static List<ImageItem> m_listPhoto = null;
@@ -39,7 +47,16 @@ public class LocalContentDirectoryService extends AbstractContentDirectoryServic
 	private static List<String> m_photoMap = null;
 	private static Map<String, String> m_mineMap = null;
 
-	public static void scanMedia() {
+	public static void scanMedia(final Context context) {
+		m_notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+		final Notification notification = new Notification(R.drawable.ic_scanning_sdcard, "Scanning content on sdcard",
+				System.currentTimeMillis());
+
+		PendingIntent contentIntent = PendingIntent.getActivity(context, 0, new Intent(), 0);
+
+		notification.setLatestEventInfo(context, "Scan content on sdcard", "Scanning", contentIntent);
+		notification.flags = Notification.FLAG_NO_CLEAR;
+
 		// TODO: more MIME-Type adding here
 		m_mineMap = new HashMap<String, String>();
 		m_mineMap.put("flv", "video/x-flv");
@@ -83,9 +100,12 @@ public class LocalContentDirectoryService extends AbstractContentDirectoryServic
 					}
 				}
 				try {
+					m_notificationManager.notify(SCANNING_NOTIFICATION, notification);
 					scanFile(Environment.getExternalStorageDirectory().getAbsolutePath());
 				} catch (Exception ex) {
 					ex.printStackTrace();
+				} finally {
+					m_notificationManager.cancel(SCANNING_NOTIFICATION);
 				}
 			}
 		}).start();
@@ -131,27 +151,33 @@ public class LocalContentDirectoryService extends AbstractContentDirectoryServic
 					if (fileExtension != null) {
 						fileExtension = fileExtension.toLowerCase().replace(".", "");
 					}
-					// String mimeType = URLConnection.getFileNameMap().getContentTypeFor("a" + fileExtension);
-					
+					// String mimeType =
+					// URLConnection.getFileNameMap().getContentTypeFor("a" +
+					// fileExtension);
+
 					String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
 					if (mimeType == null) {
 						mimeType = m_mineMap.get(fileExtension);
 					}
 
 					if (mimeType != null) {
-						Res res = new Res(new MimeType(mimeType.split("/")[0], mimeType.split("/")[1]), subFile.length(), Utility.createLink(subFile));
+						Res res = new Res(new MimeType(mimeType.split("/")[0], mimeType.split("/")[1]), subFile.length(),
+								Utility.createLink(subFile));
 						if (fileExtension != null) {
 							if (m_musicMap.contains(fileExtension)) {
-								MusicTrack musicTrack = new MusicTrack("0/1/" + subFile.getName(), "0/1", subFile.getName(), "local dms", "", "", res);
+								MusicTrack musicTrack = new MusicTrack("0/1/" + subFile.getName(), "0/1", subFile.getName(),
+										"local dms", "", "", res);
 								m_listMusic.add(musicTrack);
 							}
 
 							if (m_videoMap.contains(fileExtension)) {
-								VideoItem videoItem = new VideoItem("0/2/" + subFile.getName(), "0/2", subFile.getName(), "local dms", res);
+								VideoItem videoItem = new VideoItem("0/2/" + subFile.getName(), "0/2", subFile.getName(),
+										"local dms", res);
 								m_listVideo.add(new VideoItem(videoItem));
 							}
 							if (m_photoMap.contains(fileExtension)) {
-								ImageItem imageItem = new ImageItem("0/3/" + subFile.getName(), "0/3", subFile.getName(), "local dms", res);
+								ImageItem imageItem = new ImageItem("0/3/" + subFile.getName(), "0/3", subFile.getName(),
+										"local dms", res);
 								m_listPhoto.add(new ImageItem(imageItem));
 							}
 						}
@@ -164,8 +190,8 @@ public class LocalContentDirectoryService extends AbstractContentDirectoryServic
 	}
 
 	@Override
-	public BrowseResult browse(String objectID, BrowseFlag browseFlag, String filter, long firstResult, long maxResults, SortCriterion[] orderby)
-			throws ContentDirectoryException {
+	public BrowseResult browse(String objectID, BrowseFlag browseFlag, String filter, long firstResult, long maxResults,
+			SortCriterion[] orderby) throws ContentDirectoryException {
 		Log.d(TAG, "Browse " + objectID);
 		BrowseResult br = null;
 		int count = 0;

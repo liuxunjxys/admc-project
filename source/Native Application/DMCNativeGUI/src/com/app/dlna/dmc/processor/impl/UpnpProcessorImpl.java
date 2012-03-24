@@ -131,6 +131,10 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener, CoreU
 		}
 	}
 
+	public Registry getRegistry() {
+		return m_upnpService.getRegistry();
+	}
+
 	public ControlPoint getControlPoint() {
 		return m_upnpService != null ? m_upnpService.getControlPoint() : null;
 	}

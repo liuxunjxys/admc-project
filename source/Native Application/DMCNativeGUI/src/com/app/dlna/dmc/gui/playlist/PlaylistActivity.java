@@ -1,5 +1,7 @@
 package com.app.dlna.dmc.gui.playlist;
 
+import java.net.URL;
+
 import org.teleal.cling.model.message.UpnpResponse;
 import org.teleal.cling.model.meta.Action;
 import org.teleal.cling.model.types.UDN;
@@ -24,6 +26,7 @@ import android.widget.Toast;
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerActivity;
 import com.app.dlna.dmc.nativeui.R;
+import com.app.dlna.dmc.processor.http.HTTPServerData;
 import com.app.dlna.dmc.processor.impl.LocalDMRProcessorImpl;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor.DMRProcessorListner;
@@ -89,6 +92,9 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 
 			if (MainActivity.UPNP_PROCESSOR.getDMRProcessor() != null) {
 				m_dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
+				if (m_dmrProcessor == null) {
+					finish();
+				}
 				if (m_dmrProcessor instanceof LocalDMRProcessorImpl) {
 					m_rl_dmrController.setVisibility(View.GONE);
 				} else {
@@ -140,7 +146,8 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 
 		@Override
 		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-			m_tv_progressTime.setText(getTimeString(m_sb_playingProgress.getProgress()) + " / " + getTimeString(m_sb_playingProgress.getMax()));
+			m_tv_progressTime.setText(getTimeString(m_sb_playingProgress.getProgress()) + " / "
+					+ getTimeString(m_sb_playingProgress.getMax()));
 		}
 	};
 
@@ -233,7 +240,8 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 				if (!m_isFailed) {
 					m_isFailed = true;
 					try {
-						new AlertDialog.Builder(PlaylistActivity.this).setTitle("Error").setMessage("Remote Device Error: " + cause)
+						new AlertDialog.Builder(PlaylistActivity.this).setTitle("Error")
+								.setMessage("Remote Device Error: " + cause)
 								.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 
 									@Override
@@ -262,7 +270,8 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 				if (!m_isFailed) {
 					m_isFailed = true;
 					try {
-						new AlertDialog.Builder(PlaylistActivity.this).setTitle("Error").setMessage("Remote Device Error: " + error)
+						new AlertDialog.Builder(PlaylistActivity.this).setTitle("Error")
+								.setMessage("Remote Device Error: " + error)
 								.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 
 									@Override
@@ -404,28 +413,51 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 
 		@Override
 		public boolean onItemLongClick(AdapterView<?> adapter, View view, final int position, long arg3) {
-			final String actionList[] = new String[2];
-			actionList[0] = "Play";
-			actionList[1] = "Remove";
-			new AlertDialog.Builder(PlaylistActivity.this).setTitle("Select action").setCancelable(false).setItems(actionList, new OnClickListener() {
-
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					switch (which) {
-					case 0:
-						playItem(position);
-						break;
-					case 1:
-						PlaylistItem item = m_adapter.getItem(position);
-						m_playlistProcessor.removeItem(item);
-						m_adapter.remove(item);
-						m_adapter.notifyDataSetChanged();
-						break;
-					default:
-						break;
-					}
+			String actionList[] = null;
+			final PlaylistItem playlistItem = m_adapter.getItem(position);
+			try {
+				URL url = new URL(playlistItem.getUri());
+				if (url.getHost().equals(HTTPServerData.HOST)) {
+					actionList = new String[2];
+					actionList[0] = "Play";
+					actionList[1] = "Remove";
+				} else {
+					actionList = new String[3];
+					actionList[0] = "Play";
+					actionList[1] = "Remove";
+					actionList[2] = "Download";
 				}
-			}).setNegativeButton("Cancel", null).create().show();
+
+			} catch (Exception ex) {
+				Toast.makeText(PlaylistActivity.this, ex.getMessage(), Toast.LENGTH_SHORT).show();
+			}
+
+			new AlertDialog.Builder(PlaylistActivity.this).setTitle("Select action").setCancelable(false)
+					.setItems(actionList, new OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							switch (which) {
+							case 0:
+								playItem(position);
+								break;
+							case 1:
+								PlaylistItem item = m_adapter.getItem(position);
+								m_playlistProcessor.removeItem(item);
+								m_adapter.remove(item);
+								m_adapter.notifyDataSetChanged();
+								break;
+							case 2:
+								if (MainActivity.UPNP_PROCESSOR != null) {
+									MainActivity.UPNP_PROCESSOR.getDownloadProcessor().startDownload(playlistItem.getTitle(),
+											playlistItem.getUri());
+								}
+								break;
+							default:
+								break;
+							}
+						}
+					}).setNegativeButton("Cancel", null).create().show();
 
 			return true;
 

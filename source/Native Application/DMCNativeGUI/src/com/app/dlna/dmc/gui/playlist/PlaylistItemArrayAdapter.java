@@ -53,12 +53,19 @@ public class PlaylistItemArrayAdapter extends ArrayAdapter<PlaylistItem> {
 		default:
 			break;
 		}
+
+		// if (m_currentItem != null && m_currentItem.equals(object)) {
+		// convertView.setBackgroundColor(Color.rgb(242, 189, 15));
+		// holder.name.setTextColor(Color.BLACK);
+		// } else {
+		// convertView.setBackgroundColor(Color.BLACK);
+		// holder.name.setTextColor(Color.WHITE);
+		// }
+
 		if (m_currentItem != null && m_currentItem.equals(object)) {
 			convertView.setBackgroundColor(Color.rgb(242, 189, 15));
-			holder.name.setTextColor(Color.BLACK);
 		} else {
-			convertView.setBackgroundColor(Color.BLACK);
-			holder.name.setTextColor(Color.WHITE);
+			convertView.setBackgroundDrawable(null);
 		}
 
 		return convertView;

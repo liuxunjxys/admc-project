@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:background="@android:color/background_light"
+        android:background="#ddd"
         android:orientation="horizontal" >
 
         <Button
@@ -28,33 +28,34 @@
             android:maxLines="1" />
     </LinearLayout>
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/rl_controlBar"
         android:layout_width="fill_parent"
         android:layout_height="48dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:background="@android:color/background_light"
-        android:orientation="horizontal" >
-
-        <Button
-            android:id="@+id/refresh"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:onClick="onRefreshButtonClick"
-            android:text="@string/refresh" />
+        android:background="#ddd"
+        android:orientation="horizontal"
+        android:weightSum="1" >
 
         <Button
             android:id="@+id/selectAll"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="fill_parent"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
+            android:layout_weight="0.5"
+            android:drawableLeft="@drawable/ic_item_selected"
             android:onClick="onSelectAllButtonClick"
             android:text="@string/select_all" />
-    </RelativeLayout>
+
+        <Button
+            android:id="@+id/deselectAll"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="0.5"
+            android:drawableLeft="@drawable/ic_item_deselected"
+            android:onClick="onDeselectAllButtonClick"
+            android:text="@string/deselect_all" />
+    </LinearLayout>
 
     <ListView
         android:id="@+id/lv_ServerContent"

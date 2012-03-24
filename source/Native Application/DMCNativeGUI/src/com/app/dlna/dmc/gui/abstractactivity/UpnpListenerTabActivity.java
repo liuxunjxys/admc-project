@@ -2,8 +2,6 @@ package com.app.dlna.dmc.gui.abstractactivity;
 
 import org.teleal.cling.model.meta.Device;
 
-import android.app.TabActivity;
-
 import com.app.dlna.dmc.gui.actionbar.ActionBarActivity;
 import com.app.dlna.dmc.processor.interfaces.UpnpProcessor.UpnpProcessorListener;
 

@@ -6,7 +6,7 @@
     </style>
 
     <style name="MediaControlButton" parent="android:Widget.Button">
-        <item name="android:layout_margin">5dp</item>
+        <item name="android:layout_margin">0dp</item>
         <item name="android:layout_width">32dp</item>
         <item name="android:layout_height">32dp</item>
     </style>
@@ -61,17 +61,5 @@
     <style name="ActionBarCompatItem" parent="style/ActionBarCompatItemBase"></style>
 
     <style name="ActionBarCompatHomeItem" parent="style/ActionBarCompatItemBase"></style>
-
-    <style name="StockDetailHeader" parent="@android:style/TextAppearance.Medium">
-        <item name="android:textColor">@color/highlight</item>
-    </style>
-
-    <style name="StockDetailValues" parent="@android:style/TextAppearance.Small">
-        <item name="android:textColor">@android:color/darker_gray</item>
-    </style>
-
-    <style name="StockDetail" parent="@android:style/TextAppearance.Small">
-        <item name="android:textColor">@android:color/black</item>
-    </style>
 
 </resources>
