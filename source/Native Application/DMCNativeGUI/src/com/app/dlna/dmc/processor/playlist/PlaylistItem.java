@@ -5,9 +5,9 @@ public class PlaylistItem {
 		AUDIO, VIDEO, IMAGE
 	};
 
-	protected String m_url;
-	protected String m_title;
-	protected Type m_type;
+	private String m_url;
+	private String m_title;
+	private Type m_type;
 
 	public String getUri() {
 		return m_url;

@@ -5,6 +5,7 @@ import java.util.Collection;
 import org.teleal.cling.controlpoint.ControlPoint;
 import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.model.types.UDN;
+import org.teleal.cling.registry.Registry;
 
 public interface UpnpProcessor {
 	void addListener(UpnpProcessorListener listener);
@@ -18,6 +19,8 @@ public interface UpnpProcessor {
 	void setCurrentDMS(UDN uDN);
 
 	void setCurrentDMR(UDN uDN);
+	
+	Registry getRegistry();
 
 	@SuppressWarnings("rawtypes")
 	Device getCurrentDMS();

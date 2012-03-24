@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.teleal.cling.model.meta.RemoteDevice;
 import org.teleal.cling.support.model.DIDLObject;
 import org.teleal.cling.support.model.container.Container;
 import org.teleal.cling.support.model.item.AudioItem;
@@ -142,7 +143,9 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 
 		@Override
 		public boolean onItemLongClick(AdapterView<?> adapter, View view, int position, long arg3) {
-			downloadItem(m_adapter.getItem(position));
+			if (MainActivity.UPNP_PROCESSOR.getCurrentDMS() != null
+					&& MainActivity.UPNP_PROCESSOR.getCurrentDMS() instanceof RemoteDevice)
+				downloadItem(m_adapter.getItem(position));
 			return true;
 		}
 	};
@@ -294,6 +297,31 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 					item.setType(Type.IMAGE);
 				}
 				m_playlistProcessor.addItem(item);
+				m_adapter.notifyDataSetChanged();
+			}
+		}
+	}
+
+	public void onDeselectAllButtonClick(View view) {
+		if (m_playlistProcessor == null) {
+			Toast.makeText(LibraryActivity.this, "Cannot get playlist processor", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		int count = m_adapter.getCount();
+		for (int i = 0; i < count; ++i) {
+			DIDLObject object = m_adapter.getItem(i);
+			if (object instanceof Item) {
+				PlaylistItem item = new PlaylistItem();
+				item.setTitle(object.getTitle());
+				item.setUrl(object.getResources().get(0).getValue());
+				if (object instanceof AudioItem) {
+					item.setType(Type.AUDIO);
+				} else if (object instanceof VideoItem) {
+					item.setType(Type.VIDEO);
+				} else {
+					item.setType(Type.IMAGE);
+				}
+				m_playlistProcessor.removeItem(item);
 				m_adapter.notifyDataSetChanged();
 			}
 		}

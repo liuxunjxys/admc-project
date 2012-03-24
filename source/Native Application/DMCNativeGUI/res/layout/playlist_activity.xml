@@ -2,22 +2,14 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:weightSum="1" >
 
     <RelativeLayout
         android:id="@+id/rl_dmrController"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true" >
-
-        <SeekBar
-            android:id="@+id/volumeControl"
-            android:layout_width="200dp"
-            android:layout_height="30dp"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:visibility="gone" />
+        android:layout_alignParentBottom="true"
+        android:background="#555" >
 
         <LinearLayout
             android:id="@+id/ll_control_button"
@@ -73,6 +65,14 @@
                 android:textSize="12sp" />
 
             <SeekBar
+                android:id="@+id/volumeControl"
+                android:layout_width="200dp"
+                android:layout_height="20dp"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:visibility="gone" />
+
+            <SeekBar
                 android:id="@+id/playingProgress"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="fill_parent"
@@ -96,7 +96,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/rl_seekbar"
-            android:background="@android:color/white"
             android:gravity="center"
             android:maxLines="1"
             android:textColor="@android:color/black"

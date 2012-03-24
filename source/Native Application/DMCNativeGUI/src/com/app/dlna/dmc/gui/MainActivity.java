@@ -71,7 +71,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 				m_tabHost.setCurrentTab(DEFAULT_TAB_INDEX);
 				return;
 			}
-			if (tabId.equals("NowPlaying") && UPNP_PROCESSOR.getCurrentDMR() == null) {
+			if (tabId.equals("Playlist") && UPNP_PROCESSOR.getCurrentDMR() == null) {
 				Toast.makeText(MainActivity.this, "Please select a MediaRenderer to control", Toast.LENGTH_SHORT).show();
 				m_tabHost.setCurrentTab(DEFAULT_TAB_INDEX);
 				return;
@@ -171,8 +171,16 @@ public class MainActivity extends UpnpListenerTabActivity {
 
 			@Override
 			public void run() {
-				Toast.makeText(getApplicationContext(), "Network interface changed", Toast.LENGTH_SHORT).show();
-				restartActivity();
+				new AlertDialog.Builder(MainActivity.this).setTitle("Network changed")
+						.setMessage("Network interface changed. Application must restart.").setCancelable(false)
+						.setPositiveButton("OK", new OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								restartActivity();
+							}
+						}).create().show();
+
 			}
 		});
 	}
@@ -257,7 +265,15 @@ public class MainActivity extends UpnpListenerTabActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_refresh:
-			Toast.makeText(this, "Tapped refresh", Toast.LENGTH_SHORT).show();
+			if (UPNP_PROCESSOR != null) {
+				if (m_tabHost.getCurrentTab() == 0) {
+					UPNP_PROCESSOR.getRegistry().removeAllRemoteDevices();
+					UPNP_PROCESSOR.getControlPoint().search();
+				} else if (m_tabHost.getCurrentTab() == 1) {
+					((LibraryActivity) getLocalActivityManager().getActivity(m_tabHost.getCurrentTabTag()))
+							.onRefreshButtonClick(null);
+				}
+			}
 			break;
 		case R.id.menu_settings:
 			Toast.makeText(this, "Tapped setting", Toast.LENGTH_SHORT).show();

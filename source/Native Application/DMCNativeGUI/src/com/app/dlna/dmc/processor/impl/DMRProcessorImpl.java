@@ -56,6 +56,7 @@ public class DMRProcessorImpl implements DMRProcessor {
 	private boolean m_checkGetPositionInfo = false;
 	private boolean m_checkGetTransportInfo = false;
 	private boolean m_checkGetVolumeInfo = false;
+	private boolean m_user_stop = false;
 
 	private Thread m_updateThread = new Thread(new Runnable() {
 
@@ -81,8 +82,7 @@ public class DMRProcessorImpl implements DMRProcessor {
 						public void received(ActionInvocation invocation, PositionInfo positionInfo) {
 							Log.v(TAG, positionInfo.toString());
 							Log.v(TAG, "Track uri = " + positionInfo.getTrackURI());
-							fireUpdatePositionEvent(positionInfo.getTrackElapsedSeconds(),
-									positionInfo.getTrackDurationSeconds());
+							fireUpdatePositionEvent(positionInfo.getTrackElapsedSeconds(), positionInfo.getTrackDurationSeconds());
 
 							// if ((positionInfo.getTrack().getValue() == 0 ||
 							// positionInfo.getElapsedPercent() == 100)
@@ -114,7 +114,7 @@ public class DMRProcessorImpl implements DMRProcessor {
 									public void run() {
 										try {
 											Thread.sleep(2000);
-											if (m_state == STOP) {
+											if (m_state == STOP && m_user_stop == false) {
 												fireOnEndTrackEvent();
 											}
 										} catch (InterruptedException e) {
@@ -319,8 +319,7 @@ public class DMRProcessorImpl implements DMRProcessor {
 							m_controlPoint.execute(new Play(m_avtransportService) {
 
 								@Override
-								public void failure(ActionInvocation invocation, UpnpResponse operation,
-										String defaultMsg) {
+								public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
 									Log.e(TAG, "Call fail");
 									fireOnFailEvent(invocation.getAction(), operation, defaultMsg);
 									m_isBusy = false;
@@ -357,6 +356,7 @@ public class DMRProcessorImpl implements DMRProcessor {
 				super.success(invocation);
 				m_isBusy = false;
 				m_state = PLAYING;
+				m_user_stop = false;
 			}
 
 			@Override
@@ -401,6 +401,7 @@ public class DMRProcessorImpl implements DMRProcessor {
 		if (m_controlPoint == null || m_avtransportService == null)
 			return;
 		m_isBusy = true;
+
 		Stop stop = new Stop(m_avtransportService) {
 			@Override
 			public void success(ActionInvocation invocation) {
@@ -408,12 +409,14 @@ public class DMRProcessorImpl implements DMRProcessor {
 				fireUpdatePositionEvent(0, 0);
 				m_isBusy = false;
 				m_state = STOP;
+				m_user_stop = true;
 			}
 
 			@Override
 			public void failure(ActionInvocation invocation, UpnpResponse response, String defaultMsg) {
 				fireOnFailEvent(invocation.getAction(), response, defaultMsg);
 				m_isBusy = false;
+				m_user_stop = false;
 			}
 		};
 
