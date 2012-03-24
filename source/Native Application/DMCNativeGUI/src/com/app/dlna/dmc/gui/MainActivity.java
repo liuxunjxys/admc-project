@@ -259,8 +259,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 		case R.id.menu_refresh:
 			Toast.makeText(this, "Tapped refresh", Toast.LENGTH_SHORT).show();
 			break;
-		case R.id.menu_search:
-			Toast.makeText(this, "Tapped search", Toast.LENGTH_SHORT).show();
+		case R.id.menu_settings:
+			Toast.makeText(this, "Tapped setting", Toast.LENGTH_SHORT).show();
 			break;
 		}
 		return super.onOptionsItemSelected(item);

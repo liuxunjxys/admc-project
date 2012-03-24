@@ -22,7 +22,8 @@
             android:icon="@drawable/ic_launcher"
             android:label="@string/app_name"
             android:launchMode="singleInstance"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait" 
+            android:windowSoftInputMode="adjustPan" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -30,24 +31,24 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.app.dlna.dmc.gui.nowplaying.NowPlayingActivity"
-            android:label="@string/app_name" >
-        </activity>
-        <activity
             android:name="com.app.dlna.dmc.gui.playlist.PlaylistActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:windowSoftInputMode="stateAlwaysHidden" >
         </activity>
         <activity
             android:name="com.app.dlna.dmc.gui.library.LibraryActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:windowSoftInputMode="adjustPan" >
         </activity>
         <activity
             android:name="com.app.dlna.dmc.gui.devices.DevicesActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:windowSoftInputMode="stateAlwaysHidden" >
         </activity>
         <activity
             android:name="com.app.dlna.dmc.gui.youtube.YoutubeActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:windowSoftInputMode="adjustPan" >
         </activity>
 
         <service
