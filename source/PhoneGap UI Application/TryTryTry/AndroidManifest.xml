@@ -38,7 +38,8 @@
     <application android:debuggable="true" android:icon="@drawable/ic_launcher"
         android:label="@string/app_name" >
         <activity android:configChanges="orientation|keyboardHidden" android:label="@string/app_name"
-            android:name=".TryTryTryActivity" >
+            android:name=".TryTryTryActivity"
+            android:windowSoftInputMode="adjustPan" >
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
 
