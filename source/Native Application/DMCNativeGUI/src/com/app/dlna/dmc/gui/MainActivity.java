@@ -10,6 +10,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabSpec;
@@ -46,7 +49,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 
 		UPNP_PROCESSOR = new UpnpProcessorImpl(MainActivity.this);
 		UPNP_PROCESSOR.bindUpnpService();
-		// m_progressDialog = ProgressDialog.show(MainActivity.this, "Starting Service", "");
+		// m_progressDialog = ProgressDialog.show(MainActivity.this,
+		// "Starting Service", "");
 		// m_progressDialog.setCancelable(true);
 
 		IntentFilter filter = new IntentFilter();
@@ -139,7 +143,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 	@Override
 	public void onStartFailed() {
 		super.onStartFailed();
-		new AlertDialog.Builder(MainActivity.this).setTitle("Start Fail").setMessage("Cannot found a connection for UpnpService. Start service fail")
+		new AlertDialog.Builder(MainActivity.this).setTitle("Start Fail")
+				.setMessage("Cannot found a connection for UpnpService. Start service fail")
 				.setPositiveButton("OK", new OnClickListener() {
 
 					@Override
@@ -203,7 +208,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 			public void run() {
 				if (m_routerProgressDialog != null)
 					m_routerProgressDialog.dismiss();
-				m_routerProgressDialog = ProgressDialog.show(MainActivity.this, "Router disabled", "Router disabled, try to enabled router");
+				m_routerProgressDialog = ProgressDialog.show(MainActivity.this, "Router disabled",
+						"Router disabled, try to enabled router");
 			}
 		});
 
@@ -223,7 +229,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 	}
 
 	private void restartActivity() {
-		new AlertDialog.Builder(this).setTitle("Restart Required").setMessage("Network interface changed. Application must restart.")
+		new AlertDialog.Builder(this).setTitle("Restart Required")
+				.setMessage("Network interface changed. Application must restart.")
 				.setPositiveButton("OK", new OnClickListener() {
 
 					@Override
@@ -233,5 +240,29 @@ public class MainActivity extends UpnpListenerTabActivity {
 					}
 				}).setCancelable(false).create().show();
 
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater menuInflater = getMenuInflater();
+		menuInflater.inflate(R.menu.main, menu);
+
+		// Calling super after populating the menu is necessary here to ensure
+		// that the
+		// action bar helpers have a chance to handle this event.
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.menu_refresh:
+			Toast.makeText(this, "Tapped refresh", Toast.LENGTH_SHORT).show();
+			break;
+		case R.id.menu_search:
+			Toast.makeText(this, "Tapped search", Toast.LENGTH_SHORT).show();
+			break;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 }
