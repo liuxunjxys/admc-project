@@ -26,6 +26,7 @@ import com.app.dlna.dmc.gui.youtube.YoutubeActivity;
 import com.app.dlna.dmc.nativeui.R;
 import com.app.dlna.dmc.processor.impl.UpnpProcessorImpl;
 import com.app.dlna.dmc.processor.interfaces.UpnpProcessor;
+import com.app.dlna.dmc.processor.localdevice.service.LocalContentDirectoryService;
 import com.app.dlna.dmc.processor.receiver.SDCardReceiver;
 import com.app.dlna.dmc.processor.systemservice.RestartService;
 
@@ -272,10 +273,6 @@ public class MainActivity extends UpnpListenerTabActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater menuInflater = getMenuInflater();
 		menuInflater.inflate(R.menu.main, menu);
-
-		// Calling super after populating the menu is necessary here to ensure
-		// that the
-		// action bar helpers have a chance to handle this event.
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -294,7 +291,22 @@ public class MainActivity extends UpnpListenerTabActivity {
 			}
 			break;
 		case R.id.menu_settings:
-			Toast.makeText(this, "Tapped setting", Toast.LENGTH_SHORT).show();
+			String[] items = new String[1];
+			items[0] = "Rescan external storage";
+			new AlertDialog.Builder(MainActivity.this).setTitle("Settings").setItems(items, new OnClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					switch (which) {
+					case 0:
+						if (!LocalContentDirectoryService.isScanning())
+							LocalContentDirectoryService.scanMedia(MainActivity.this);
+						break;
+					default:
+						break;
+					}
+				}
+			}).create().show();
 			break;
 		}
 		return super.onOptionsItemSelected(item);
