@@ -46,8 +46,10 @@ public class LocalContentDirectoryService extends AbstractContentDirectoryServic
 	private static List<String> m_videoMap = null;
 	private static List<String> m_photoMap = null;
 	private static Map<String, String> m_mineMap = null;
+	private static boolean IS_SCANNING;
 
 	public static void scanMedia(final Context context) {
+		IS_SCANNING = true;
 		m_notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		final Notification notification = new Notification(R.drawable.ic_scanning_sdcard, "Scanning content on sdcard",
 				System.currentTimeMillis());
@@ -64,6 +66,7 @@ public class LocalContentDirectoryService extends AbstractContentDirectoryServic
 		m_listMusic = new ArrayList<MusicTrack>();
 		m_listVideo = new ArrayList<VideoItem>();
 		m_listPhoto = new ArrayList<ImageItem>();
+
 		m_musicMap = new ArrayList<String>();
 		m_videoMap = new ArrayList<String>();
 		m_photoMap = new ArrayList<String>();
@@ -106,9 +109,14 @@ public class LocalContentDirectoryService extends AbstractContentDirectoryServic
 					ex.printStackTrace();
 				} finally {
 					m_notificationManager.cancel(SCANNING_NOTIFICATION);
+					IS_SCANNING = false;
 				}
 			}
 		}).start();
+	}
+
+	public static boolean isScanning() {
+		return IS_SCANNING;
 	}
 
 	public static void removeAllContent() {
