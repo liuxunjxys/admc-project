@@ -66,6 +66,24 @@ public class MainActivity extends UpnpListenerTabActivity {
 		@Override
 		public void onTabChanged(String tabId) {
 			Log.d(TAG, "Select tab = " + tabId);
+			// int tabIndex = -1;
+			// if (tabId.equals("Devices")) {
+			// tabIndex = 0;
+			// } else if (tabId.equals("Library")) {
+			// tabIndex = 1;
+			// } else if (tabId.equals("Youtube")) {
+			// tabIndex = 2;
+			// } else if (tabId.equals("Playlist")) {
+			// tabIndex = 3;
+			// }
+			// for (int i = 0; i < m_tabHost.getTabWidget().getChildCount();
+			// i++) {
+			// if (i == tabIndex) {
+			// m_tabHost.getTabWidget().getChildAt(i).setBackgroundColor(Color.parseColor("#ddddff"));
+			// } else {
+			// m_tabHost.getTabWidget().getChildAt(i).setBackgroundColor(Color.parseColor("#aaaaff"));
+			// }
+			// }
 			if (tabId.equals("Library") && UPNP_PROCESSOR.getCurrentDMS() == null) {
 				Toast.makeText(MainActivity.this, "Please select a MediaServer to browse", Toast.LENGTH_SHORT).show();
 				m_tabHost.setCurrentTab(DEFAULT_TAB_INDEX);
@@ -108,22 +126,22 @@ public class MainActivity extends UpnpListenerTabActivity {
 		TabSpec devicesTabSpec = m_tabHost.newTabSpec("Devices");
 
 		Intent intent = null;
-		devicesTabSpec.setIndicator("Devices", getResources().getDrawable(R.drawable.ic_tab_devices));
+		devicesTabSpec.setIndicator("", getResources().getDrawable(R.drawable.ic_tab_devices));
 		intent = new Intent(this, DevicesActivity.class);
 		devicesTabSpec.setContent(intent);
 
 		TabSpec libraryTabSpec = m_tabHost.newTabSpec("Library");
-		libraryTabSpec.setIndicator("Library", getResources().getDrawable(R.drawable.ic_tab_browse));
+		libraryTabSpec.setIndicator("", getResources().getDrawable(R.drawable.ic_tab_browse));
 		intent = new Intent(this, LibraryActivity.class);
 		libraryTabSpec.setContent(intent);
 
 		TabSpec youtubeTabSpec = m_tabHost.newTabSpec("Youtube");
-		youtubeTabSpec.setIndicator("Youtube", getResources().getDrawable(R.drawable.ic_tab_youtube));
+		youtubeTabSpec.setIndicator("", getResources().getDrawable(R.drawable.ic_tab_youtube));
 		intent = new Intent(this, YoutubeActivity.class);
 		youtubeTabSpec.setContent(intent);
 
 		TabSpec playlistTabSpec = m_tabHost.newTabSpec("Playlist");
-		playlistTabSpec.setIndicator("Playlist", getResources().getDrawable(R.drawable.ic_tab_play_list));
+		playlistTabSpec.setIndicator("", getResources().getDrawable(R.drawable.ic_tab_play_list));
 		intent = new Intent(this, PlaylistActivity.class);
 		playlistTabSpec.setContent(intent);
 

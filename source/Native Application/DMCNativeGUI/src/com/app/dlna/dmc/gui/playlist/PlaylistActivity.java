@@ -92,11 +92,9 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 
 			if (MainActivity.UPNP_PROCESSOR.getDMRProcessor() != null) {
 				m_dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
-				if (m_dmrProcessor == null) {
-					finish();
-				}
 				if (m_dmrProcessor instanceof LocalDMRProcessorImpl) {
 					m_rl_dmrController.setVisibility(View.GONE);
+					m_dmrProcessor.removeListener(PlaylistActivity.this);
 				} else {
 					m_rl_dmrController.setVisibility(View.VISIBLE);
 					m_dmrProcessor.setPlaylistProcessor(m_playlistProcessor);
@@ -322,7 +320,7 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 
 			@Override
 			public void run() {
-				m_btn_PlayPause.setBackgroundResource(R.drawable.play);
+				m_btn_PlayPause.setBackgroundResource(R.drawable.ic_media_play);
 				m_btn_Stop.setEnabled(true);
 				m_currentState = STATE_PAUSE;
 			}
@@ -338,7 +336,7 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 			public void run() {
 				m_btn_Stop.setEnabled(false);
 				m_currentState = STATE_STOP;
-				m_btn_PlayPause.setBackgroundResource(R.drawable.play);
+				m_btn_PlayPause.setBackgroundResource(R.drawable.ic_media_play);
 			}
 		});
 
@@ -350,7 +348,7 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 
 			@Override
 			public void run() {
-				m_btn_PlayPause.setBackgroundResource(R.drawable.pause);
+				m_btn_PlayPause.setBackgroundResource(R.drawable.ic_media_pause);
 				m_btn_Stop.setEnabled(true);
 				m_currentState = STATE_PLAYING;
 			}
@@ -400,7 +398,16 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 		PlaylistItem item = m_adapter.getItem(position);
 		String url = item.getUri();
 		if (m_dmrProcessor == null) {
-			Toast.makeText(PlaylistActivity.this, "Cannot get DMRProcessor", Toast.LENGTH_SHORT).show();
+			// Toast.makeText(PlaylistActivity.this, "Cannot get DMRProcessor",
+			// Toast.LENGTH_SHORT).show();
+			new AlertDialog.Builder(PlaylistActivity.this).setTitle("Error")
+					.setMessage("Cannot get DMRProcessor. Please select another one")
+					.setPositiveButton("Ok", new OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							PlaylistActivity.this.finish();
+						}
+					}).create().show();
 		} else {
 			m_dmrProcessor.setURIandPlay(url);
 			m_playlistProcessor.setCurrentItem(item);
