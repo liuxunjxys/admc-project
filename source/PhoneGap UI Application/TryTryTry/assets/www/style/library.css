@@ -1,34 +1,54 @@
 #div_libs_toolbar
 {
 	position: relative;
-	height: 10%;
+	height: 15%;
 	width: 100%;
 	padding: 0px;
 	margin: 0px;
 }
 
-#div_libs_toolbar img{
+#div_libs_toolbar div#div_libs_toolbar_left{
+	position: absolute;
+	padding: 0px;
+	margin: 0px;
+	left: 0px;
 	height: 100%;
-	width: height;
-	float: left;
+	width: 18%;
 }
 
-#div_libs_toolbar input{
-	
-	position: relative;
-	margin: 5px;
-	margin-bottom: 0px;
+#div_libs_toolbar div#div_libs_toolbar_right{
+	position: absolute;
 	padding: 0px;
-	height: 30%; /*temp, config later*/
-	width: 100px; /*temp, config later*/
-	float: left;
+	margin: 0px;
+	left: 18%;
+	height: 100%;
+	width: 82%;
+}
+
+#div_libs_toolbar div#div_libs_toolbar_left img{
+	padding-left: 5%;
+	padding-top: 5px;
+	height: 90%;
+	width: height;
+}
+
+#div_libs_toolbar div#div_libs_toolbar_right input{
+	position: absolute;
+	margin-left: 0px;
+	margin-right: 0px;
+	padding-left: 0px;
+	padding-right: 0px;
+	left: 0px;
+	top: 10px;
+	bottom: 5px;
+	width: 96%;
 }
 
 .div_library_list 
 {
 	clear: both;
 	position: relative;
-	height: 90%;
+	height: 85%;
 	margin: 0px;
 	padding: 0px;
 }
