@@ -1,19 +1,35 @@
+var myScroll_devi_dmS;
+var myScroll_devi_dmR;
 var myScroll_libs;
 var myScroll_you;
 var myScroll_playlists;
 
+
 $(document).ready(function(){
-	
-	$('div.div_subcontent').show();
-	cssConfig(); // must show before..
+	iScrollConfig();
+	myInitPage();
+	myInitDevicesSide();
+});
+
+
+function iScrollConfig (){
+	setTimeout(function() {
+		myScroll_devi_dmS = new iScroll('div_wrraper_devi_dmS', { hScroll: false, vScrollbar: false });
+		myScroll_devi_dmR = new iScroll('div_wrraper_devi_dmR', { hScroll: false, vScrollbar: false });
+		myScroll_libs = new iScroll('div_wrapper_libs', { hScroll: false, vScrollbar: false });
+		myScroll_you = new iScroll('div_wrapper_you', { hScroll: false, vScrollbar: false });
+		myScroll_playlists = new iScroll('div_wrapper_play', { hScroll: false, vScrollbar: false });
+	}, 200);
+}
+
+/*Index side*/
+function myInitPage (){
 	$('div.div_subcontent').hide(); // all hide
-	
 	$('div#content_devices').show(); //first tab appear
-	
+	$('div#div_navbar_1 a').addClass('ui-btn-active');
 	$('div[data-role="navbar"] a').live('click', function(){
 		$(this).addClass('ui-btn-active');
 		$('div.div_subcontent').hide();
-		
 		var datahref_info = $(this).attr('data-href');
 		$('div#' + datahref_info).fadeIn('slow');
 		
@@ -41,61 +57,43 @@ $(document).ready(function(){
 			break;
 		}
 	});
-});
-
-
-function cssConfig (){
-	cssConfig_Libs();
-	cssConfig_You();
-	cssConfig_Playlists ();
-	
-	iScroolConfig();
 }
 
-/*LIB CONFIG*/
-function cssConfig_Libs(){
-	var height_of_toolbar = $('#div_libs_toolbar').height();
-	var width_of_toolbar = $('#div_libs_toolbar').width();
-	
-	var height_of_input = height_of_toolbar - 10; //subtract margin value
-	var width_of_input = width_of_toolbar - 15 - height_of_toolbar; //subtrac margin and default boder of input
-	
-	$('div#div_libs_toolbar input').css('height', height_of_input + 'px');
-	$('div#div_libs_toolbar input').css('width', width_of_input + 'px');
-}
+/*Devices side*/
+function myInitDevicesSide(){
+	$('div#content_devices div.div_devi_subcontent').hide();
+	$('div#div_devi_dmS').show();
+	setTimeout(function () {
+		myScroll_devi_dmS.refresh();
+	}, 0);
 
-/*YOU CONFIG*/
-function cssConfig_You (){
-	var height_of_toolbar = $('#div_you_toolbar').height();
-	var width_of_toolbar = $('#div_you_toolbar').width();
-	
-	var height_of_input = height_of_toolbar - 10; //subtract margin value
-	var width_of_input = width_of_toolbar - 15 - height_of_toolbar; //subtrac margin and default boder of input
+	$('div.div_devi_subcontent div img.img_devi_navigate').live('click', function(){
+		var id = $(this).attr('id');
+		switch (id) {
+		case "img_devi_goNext":
+			$('div#div_devi_dmS').hide();
+			$('div#div_devi_dmR').fadeIn('slow');
+			setTimeout(function () {
+				myScroll_devi_dmR.refresh();
+			}, 0);
+			break;
+			
+		case "img_devi_goPrevious":
+			$('div#div_devi_dmR').hide();
+			$('div#div_devi_dmS').fadeIn('slow');
+			setTimeout(function () {
+				myScroll_devi_dmS.refresh();
+			}, 0);
 
-	$('div#div_you_toolbar input').css('height', height_of_input + 'px');
-	$('div#div_you_toolbar input').css('width', width_of_input + 'px');
+			break;
+		}
+	});
 }
+/*Library side*/
 
-/*PLAYLISTS CONFIG*/
-function cssConfig_Playlists (){
-	var height_of_toolbar = $('#div_play_toolbar').height();
-	var width_of_toolbar = $('#div_play_toolbar').width();
-	
-	var height_of_input = height_of_toolbar - 10; //subtract margin value
-	var left_of_input_ = width_of_toolbar * 2.5 / 100 - 5; // width = 95% -> left = 2.5 % and then subtract 5px margin left
-	
-	$('div#div_play_toolbar input').css('height', height_of_input + 'px');
-	$('div#div_play_toolbar input').css('left', left_of_input_ + 'px');
-}
+/*Youtube side*/
 
-/*IScrool config*/
-function iScroolConfig (){
-	setTimeout(function() {
-		myScroll_libs = new iScroll('div_wrapper_libs', { hScroll: false, vScrollbar: false });
-		myScroll_you = new iScroll('div_wrapper_you', { hScroll: false, vScrollbar: false });
-		myScroll_playlists = new iScroll('div_wrapper_play', { hScroll: false, vScrollbar: false });
-	}, 200);
-}
+/*Playlist side*/
 
 
 

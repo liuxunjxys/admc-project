@@ -7,13 +7,12 @@
 	padding: 0px;
 	margin: 0px;
 	position: relative;
-	background-color: blue;
 }
 
 #div_play_toolbar input{
 	position: absolute;
 	width: 95%;
-	height: 20%; /*temp, config later*/
+	height: 20%;
 	margin: 5px;
 	margin-bottom: 0px;
 	padding: 0px;
