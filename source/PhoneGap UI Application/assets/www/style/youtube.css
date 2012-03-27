@@ -1,0 +1,83 @@
+
+#div_you_toolbar
+{
+	height: 15%;
+	width: 100%;
+	padding: 0px;
+	margin: 0px;
+	position: relative;
+}
+
+#div_you_toolbar div#div_you_toolbar_left{
+	position: absolute;
+	padding: 0px;
+	margin: 0px;
+	left: 0px;
+	height: 100%;
+	width: 82%;
+}
+
+#div_you_toolbar div#div_you_toolbar_right{
+	position: absolute;
+	padding: 0px;
+	margin: 0px;
+	left: 82%;
+	height: 100%;
+	width: 18%;
+}
+
+#div_you_toolbar div#div_you_toolbar_left input{
+	position: absolute;
+	margin-left: 0px;
+	margin-right: 0px;
+	padding-left: 0px;
+	padding-right: 0px;
+	left: 5px;
+	top: 10px;
+	bottom: 5px;
+	width: 98%;
+}
+
+#div_you_toolbar div#div_you_toolbar_right img{
+	position: absolute;
+	right: 5%;
+	padding-top: 5px;
+	height: 90%;
+	width: height;
+}
+
+.div_youtube_list
+{
+	clear: both;
+	position: relative;
+	height: 78%;
+	margin: 0px;
+	padding: 0px;
+}
+
+#div_you_proxy{
+	position: relative;
+	height: 7%;
+	width: 100%;
+	margin: 0px;
+	padding: 0px;
+	border-top: 1px solid #CCC;
+	/*background-color:   #F8F8F8;*/
+}
+
+#div_you_proxy a{
+	position: relative;
+	text-align: center;
+	padding: 0px;
+	margin: 0px;
+	height: 100%;
+	width: 100%;
+}
+
+#div_you_proxy a img{
+	padding: 0px;
+	margin: 0px;
+	height: 100%;
+	width: height;
+	float: right;
+}
