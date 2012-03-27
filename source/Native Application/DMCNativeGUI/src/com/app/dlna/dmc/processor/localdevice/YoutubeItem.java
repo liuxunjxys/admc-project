@@ -1,4 +1,4 @@
-package com.app.dlna.dmc.gui.youtube;
+package com.app.dlna.dmc.processor.localdevice;
 
 public class YoutubeItem {
 	private String title;

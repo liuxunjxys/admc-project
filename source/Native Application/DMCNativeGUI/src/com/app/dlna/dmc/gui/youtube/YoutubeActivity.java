@@ -23,6 +23,7 @@ import com.app.dlna.dmc.processor.impl.YoutubeProcessorImpl;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.interfaces.YoutubeProcessor;
 import com.app.dlna.dmc.processor.interfaces.YoutubeProcessor.IYoutubeProcessorListener;
+import com.app.dlna.dmc.processor.localdevice.YoutubeItem;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem.Type;
 
