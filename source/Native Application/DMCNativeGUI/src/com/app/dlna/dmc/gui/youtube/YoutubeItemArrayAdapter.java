@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.app.dlna.dmc.nativeui.R;
+import com.app.dlna.dmc.processor.localdevice.YoutubeItem;
 
 public class YoutubeItemArrayAdapter extends ArrayAdapter<YoutubeItem> {
 

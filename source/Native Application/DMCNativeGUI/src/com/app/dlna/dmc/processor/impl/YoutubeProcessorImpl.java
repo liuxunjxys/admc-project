@@ -16,9 +16,9 @@ import org.json.JSONObject;
 
 import android.util.Log;
 
-import com.app.dlna.dmc.gui.youtube.YoutubeItem;
 import com.app.dlna.dmc.processor.http.HTTPLinkManager;
 import com.app.dlna.dmc.processor.interfaces.YoutubeProcessor;
+import com.app.dlna.dmc.processor.localdevice.YoutubeItem;
 import com.app.dlna.dmc.utility.Utility;
 
 public class YoutubeProcessorImpl implements YoutubeProcessor {

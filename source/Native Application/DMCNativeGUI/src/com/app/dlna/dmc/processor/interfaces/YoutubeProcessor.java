@@ -2,7 +2,7 @@ package com.app.dlna.dmc.processor.interfaces;
 
 import java.util.List;
 
-import com.app.dlna.dmc.gui.youtube.YoutubeItem;
+import com.app.dlna.dmc.processor.localdevice.YoutubeItem;
 
 public interface YoutubeProcessor {
 
