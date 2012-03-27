@@ -29,7 +29,10 @@
         <activity
             android:name="com.app.dlna.dmc.phonegapui.MainActivity"
             android:configChanges="orientation|keyboardHidden"
+            android:icon="@drawable/ic_launcher"
             android:label="@string/app_name"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -44,6 +47,15 @@
             <intent-filter>
             </intent-filter>
         </activity>
+
+        <service
+            android:name="com.app.dlna.dmc.processor.upnp.CoreUpnpService"
+            android:description="@string/upnp_service" >
+        </service>
+        <service
+            android:name="com.app.dlna.dmc.processor.systemservice.RestartService"
+            android:description="@string/upnp_service" >
+        </service>
     </application>
 
 </manifest>

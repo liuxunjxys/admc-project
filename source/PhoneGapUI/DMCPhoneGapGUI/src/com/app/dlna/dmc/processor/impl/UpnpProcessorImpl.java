@@ -22,8 +22,7 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerActivity;
-import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerTabActivity;
+import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerDroidGapActivity;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor;
 import com.app.dlna.dmc.processor.interfaces.DownloadProcessor;
@@ -46,14 +45,7 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener, CoreU
 
 	private DownloadProcessor m_downloadProcessor;
 
-	public UpnpProcessorImpl(UpnpListenerActivity activity) {
-		m_activity = activity;
-		m_listeners = new ArrayList<UpnpProcessorListener>();
-		m_listeners.add(activity);
-		m_downloadProcessor = new DownloadProcessorImpl(activity);
-	}
-
-	public UpnpProcessorImpl(UpnpListenerTabActivity activity) {
+	public UpnpProcessorImpl(UpnpListenerDroidGapActivity activity) {
 		m_activity = activity;
 		m_listeners = new ArrayList<UpnpProcessorListener>();
 		m_listeners.add(activity);

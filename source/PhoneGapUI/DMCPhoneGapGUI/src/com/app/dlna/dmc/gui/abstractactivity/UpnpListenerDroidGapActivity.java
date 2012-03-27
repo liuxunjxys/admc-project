@@ -2,11 +2,10 @@ package com.app.dlna.dmc.gui.abstractactivity;
 
 import org.teleal.cling.model.meta.Device;
 
-import android.app.TabActivity;
-
 import com.app.dlna.dmc.processor.interfaces.UpnpProcessor.UpnpProcessorListener;
+import com.phonegap.DroidGap;
 
-public class UpnpListenerTabActivity extends TabActivity implements UpnpProcessorListener {
+public class UpnpListenerDroidGapActivity extends DroidGap implements UpnpProcessorListener {
 
 	@Override
 	public void onStartComplete() {
