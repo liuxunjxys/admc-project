@@ -10,7 +10,6 @@ import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.model.meta.Icon;
 import org.teleal.cling.model.meta.RemoteDevice;
 import org.teleal.cling.model.types.UDN;
-import org.teleal.common.util.Base64Coder;
 
 import android.util.Log;
 
@@ -32,10 +31,22 @@ public class DevicesPlugin extends Plugin implements UpnpProcessorListener {
 	@SuppressWarnings("rawtypes")
 	private List<Device> m_dmr_list = new ArrayList<Device>();
 
-	public DevicesPlugin(PhonegapActivity context) {
-		setContext(context);
+	public DevicesPlugin() {
 	}
 
+	@SuppressWarnings("rawtypes")
+	public DevicesPlugin(PhonegapActivity ctx) {
+		super.setContext(ctx);
+		Log.e(TAG, "Set context");
+		for (Device device : MainActivity.UPNP_PROCESSOR.getDMSList()) {
+			addDMS(device);
+		}
+		for (Device device : MainActivity.UPNP_PROCESSOR.getDMRList()) {
+			addDMR(device);
+		}
+	}
+
+	@SuppressWarnings("rawtypes")
 	@Override
 	public PluginResult execute(String action, JSONArray data, String callID) {
 
@@ -69,12 +80,27 @@ public class DevicesPlugin extends Plugin implements UpnpProcessorListener {
 		return result;
 	}
 
+	@SuppressWarnings("rawtypes")
 	private void setDMR(String udn) {
 		MainActivity.UPNP_PROCESSOR.setCurrentDMR(new UDN(udn));
+		Device device = MainActivity.UPNP_PROCESSOR.getCurrentDMR();
+		if (device != null) {
+			sendJavascript("setCurrentDMR('" + device.getIdentity().getUdn().getIdentifierString() + "');");
+		} else {
+			Log.i(TAG, "Selected device is null");
+		}
+
 	}
 
+	@SuppressWarnings("rawtypes")
 	private void setDMS(String udn) {
 		MainActivity.UPNP_PROCESSOR.setCurrentDMS(new UDN(udn));
+		Device device = MainActivity.UPNP_PROCESSOR.getCurrentDMS();
+		if (device != null) {
+			sendJavascript("setCurrentDMS('" + device.getIdentity().getUdn().getIdentifierString() + "');");
+		} else {
+			Log.i(TAG, "Selected device is null");
+		}
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -137,12 +163,10 @@ public class DevicesPlugin extends Plugin implements UpnpProcessorListener {
 			}
 		} else {
 			deviceAddress = "Local Device";
-			// byte[] bytes = device.getIcons()[0].getData();
-			// if (bytes.length != 0) {
-			// String base64String = new String(Base64Coder.encode(bytes));
-			// Log.e(TAG, base64String);
-			// deviceImage = "data:image/png;base64," + base64String;
-			// }
+			if (type.equals("dms"))
+				deviceImage = "img/icon_dms.png";
+			else
+				deviceImage = "img/icon_dmr.png";
 		}
 		try {
 			jsonDevice.put("name", deviceName);
