@@ -14,70 +14,31 @@ PhoneGap.addConstructor(function() {
 	PhoneGap.addPlugin("DevicesPlugin", new DevicesPlugin());
 });
 
-var dms_listview;
-var dmr_listview;
-
 var add_device = function(element, type) {
-	console.log("Element= " + element);
-	// var device_item = document.createElement('li');
-	// device_item.className = "li_device_item";
-	// device_item.innerHTML = element;
-	// if (type == 'dms')
-	// dms_listview.appendChild(device_item);
-	// else
-	// dmr_listview.appendChild(device_item);
-
-	// StringBuilder result = new StringBuilder();
-	// result.append("\"");
-	// result.append("<div class='device_list_item' type='" + type + "' udn='" +
-	// udn + "' onclick='onDeviceClick(this);'>");
-	// result.append("<div align='center' class='device_icon'>");
-	// result.append("<img class='img_device_icon' src='" + deviceImage +
-	// "'/>");
-	// result.append("</div>");
-	// result.append("<div class='device_info'>");
-	// result.append("<div class='div_device_name'>" + deviceName + "</div>");
-	// result.append("<div class='div_device_address'>" + deviceAddress +
-	// "</div>");
-	// result.append("</div>");
-	// result.append("</div>\"");
-	// var device = eval(element);
-	// var html = "<div class='device_list_item' type='" + device.type + "'
-	// udn='"
-	// + device.udn + "' onclick='onDeviceClick(this);'>";
-	// html += "<div align='center' class='device_icon'>";
-	// html += "<img class='img_device_icon' src='" + device.icon + "'/></div>";
-	// html += "<div class='device_info'><div class='div_device_name'>";
-	// html += device.name + "</div>";
-	// html += "<div class='div_device_address'>" + device.address
-	// + "</div></div></div>";
-	// var device_item = document.createElement('li');
-	// device_item.className = "li_device_item";
-	// device_item.innerHTML = html;
-	// if (type == 'dms')
-	// dms_listview.append(device_item);
-	// else
-	// dmr_listview.append(device_item);
-	
-
-	// <li><a href="#"
-	// style="padding-top: 0px; padding-bottom: 0px;"> <img
-	// src="img/icon_dms.png"
-	// style="height: 100%; width: height; padding-left: 2%; float: left;" />
-	// <h3>First</h3>
-	// <p>details</p>
-	// </a></li>
+	var device = eval(element);
+	var html = "<li data-icon='false' type='" + device.type + "' udn='" + device.udn
+			+ "'  onclick='onDeviceClick(this);'><a href='#' style='padding-top: 0px;padding-bottom: 0px' data-icon='delete'><img src='"
+			+ device.icon + "' style='height: 100%; width: height; padding-left: 4%; float: left;'/><h3>" + device.name + "</h3><p>"
+			+ device.address + "</p></a></li>";
+	if (type == 'dms') {
+		dms_listview.append(html);
+		dms_listview.listview('refresh');
+		myScroll_devi_dmS.refresh();
+	} else {
+		dmr_listview.append(html);
+		dmr_listview.listview('refresh');
+		myScroll_devi_dmR.refresh();
+	}
 };
 
 var remove_device = function(udn) {
-	$("div[udn='" + udn + "']").remove();
+	$("li[udn='" + udn + "']").remove();
 };
 
 var onDeviceClick = function(e) {
 	var type = e.getAttribute('type');
 	var udn = e.getAttribute('udn');
-	console.log('deviceType = ' + type.toString() + '; UDN = '
-			+ type.toString());
+	console.log('deviceType = ' + type.toString() + '; UDN = ' + udn.toString());
 
 	if (type == 'dms') {
 		choseDMS(udn);
@@ -92,4 +53,17 @@ function choseDMS(udn) {
 
 function choseDMR(udn) {
 	window.plugins.DevicesPlugin.setDMR(udn);
+}
+
+function setCurrentDMS(udn) {
+	console.log('Set current dms ' + udn.toString());
+	$("li[udn='" + udn + "']").attr('data-icon', 'check');
+	dms_listview.listview('refresh');
+	console.log($("li[udn='" + udn + "']").html());
+}
+
+function setCurrentDMR(udn) {
+	console.log('Set current dmr ' + udn.toString());
+	$("li[udn='" + udn + "']").attr('data-icon', 'check');
+	dmr_listview.listview('refresh');
 }
