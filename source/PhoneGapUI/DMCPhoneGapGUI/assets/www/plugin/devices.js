@@ -1,6 +1,3 @@
-var DevicesPlugin = function() {
-};
-
 DevicesPlugin.prototype.setDMS = function(udn) {
 	PhoneGap.exec(null, null, 'DevicesPlugin', 'setDMS', [ udn ]);
 };
@@ -9,17 +6,19 @@ DevicesPlugin.prototype.setDMR = function(udn) {
 	PhoneGap.exec(null, null, 'DevicesPlugin', 'setDMR', [ udn ]);
 };
 
-PhoneGap.addConstructor(function() {
-	console.log("Phonegap add constructor");
-	PhoneGap.addPlugin("DevicesPlugin", new DevicesPlugin());
-});
+var currentDMS_udn = "";
+var currentDMR_udn = "";
 
 var add_device = function(element, type) {
 	var device = eval(element);
-	var html = "<li data-icon='false' type='" + device.type + "' udn='" + device.udn
+	var html = "<li data-icon='false' type='"
+			+ device.type
+			+ "' udn='"
+			+ device.udn
 			+ "'  onclick='onDeviceClick(this);'><a href='#' style='padding-top: 0px;padding-bottom: 0px' data-icon='delete'><img src='"
-			+ device.icon + "' style='height: 100%; width: height; padding-left: 4%; float: left;'/><h3>" + device.name + "</h3><p>"
-			+ device.address + "</p></a></li>";
+			+ device.icon
+			+ "' style='height: 100%; width: height; padding-left: 4%; float: left;'/><h3>"
+			+ device.name + "</h3><p>" + device.address + "</p></a></li>";
 	if (type == 'dms') {
 		dms_listview.append(html);
 		dms_listview.listview('refresh');
@@ -38,7 +37,9 @@ var remove_device = function(udn) {
 var onDeviceClick = function(e) {
 	var type = e.getAttribute('type');
 	var udn = e.getAttribute('udn');
-	console.log('deviceType = ' + type.toString() + '; UDN = ' + udn.toString());
+	console
+			.log('deviceType = ' + type.toString() + '; UDN = '
+					+ udn.toString());
 
 	if (type == 'dms') {
 		choseDMS(udn);
@@ -57,13 +58,36 @@ function choseDMR(udn) {
 
 function setCurrentDMS(udn) {
 	console.log('Set current dms ' + udn.toString());
-	$("li[udn='" + udn + "']").attr('data-icon', 'check');
-	dms_listview.listview('refresh');
-	console.log($("li[udn='" + udn + "']").html());
+	if (currentDMS_udn != udn) {
+		currentDMS_udn = udn;
+		setSelectedDevice();
+		rescanDMS();
+	}
+}
+
+function rescanDMS() {
+	window.plugins.LibraryPlugin.browse("0");
 }
 
 function setCurrentDMR(udn) {
 	console.log('Set current dmr ' + udn.toString());
-	$("li[udn='" + udn + "']").attr('data-icon', 'check');
+	currentDMR_udn = udn;
+	setSelectedDevice();
+}
+
+function setSelectedDevice() {
+	$('li')
+			.each(
+					function(index) {
+						if ((currentDMS_udn != null && $(this).attr('udn')
+								.toString() == currentDMS_udn.toString())
+								|| (currentDMR_udn != null && $(this).attr(
+										'udn').toString() == currentDMR_udn
+										.toString())) {
+							$(this).addClass("ui-btn-active");
+						} else {
+							$(this).removeClass("ui-btn-active");
+						}
+					});
 	dmr_listview.listview('refresh');
 }

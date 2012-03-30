@@ -1,8 +1,8 @@
-var LibraryPlugin = function() {
+LibraryPlugin.prototype.browse = function(objectID) {
+	PhoneGap.exec(null, null, 'LibraryPlugin', 'browse', [ objectID ]);
 };
 
-PhoneGap.addConstructor(function() {
 
-	PhoneGap.addPlugin("LibraryPlugin", new LibraryPlugin());
-
-});
+LibraryPlugin.prototype.back = function(objectID) {
+	PhoneGap.exec(null, null, 'LibraryPlugin', 'back', [ objectID ]);
+};

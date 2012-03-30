@@ -30,12 +30,15 @@ public class DMSProcessorImpl implements DMSProcessor {
 	private ControlPoint m_controlPoint;
 	private Map<String, List<? extends DIDLObject>> result;
 	private List<DMSProcessorListner> m_listeners;
+	private List<String> m_traceID;
 
 	@SuppressWarnings("rawtypes")
 	public DMSProcessorImpl(Device device, ControlPoint controlPoint) {
 		m_server = device;
 		m_controlPoint = controlPoint;
 		m_listeners = new ArrayList<DMSProcessor.DMSProcessorListner>();
+		m_traceID = new ArrayList<String>();
+		m_traceID.add("-1");
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -110,6 +113,62 @@ public class DMSProcessorImpl implements DMSProcessor {
 			for (DMSProcessorListner listener : m_listeners) {
 				listener.onBrowseFail(message);
 			}
+		}
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	public void browse(String objectID, final DMSProcessorListner listener) {
+		m_traceID.add(objectID);
+		result = new HashMap<String, List<? extends DIDLObject>>();
+		Service cds = m_server.findService(new ServiceType("schemas-upnp-org", "ContentDirectory"));
+		if (cds != null) {
+			Action action = cds.getAction("Browse");
+			ActionInvocation actionInvocation = new ActionInvocation(action);
+			actionInvocation.setInput("ObjectID", objectID);
+			actionInvocation.setInput("BrowseFlag", "BrowseDirectChildren");
+			actionInvocation.setInput("Filter", "*");
+			actionInvocation.setInput("StartingIndex", new UnsignedIntegerFourBytes(0));
+			actionInvocation.setInput("RequestedCount", new UnsignedIntegerFourBytes(999));
+			actionInvocation.setInput("SortCriteria", null);
+			ActionCallback actionCallback = new ActionCallback(actionInvocation) {
+
+				@Override
+				public void success(ActionInvocation invocation) {
+					try {
+						DIDLParser parser = new DIDLParser();
+						DIDLContent content = parser.parse(invocation.getOutput("Result").toString());
+						result.put("Containers", content.getContainers());
+						result.put("Items", content.getItems());
+						listener.onBrowseComplete(result);
+					} catch (Exception e) {
+						Log.e(TAG, e.getMessage());
+						listener.onBrowseFail(e.getMessage());
+					}
+				}
+
+				@Override
+				public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
+					Log.e(TAG, defaultMsg);
+					listener.onBrowseFail(defaultMsg);
+				}
+			};
+			m_controlPoint.execute(actionCallback);
+		}
+		for (String _id : m_traceID) {
+			Log.e(TAG, _id);
+		}
+	}
+
+	@Override
+	public void back(String objectID, DMSProcessorListner listener) {
+		int traceSize = m_traceID.size();
+		if (traceSize > 2) {
+			String parentID = m_traceID.get(traceSize - 2);
+			browse(parentID, listener);
+			m_traceID.remove(m_traceID.size() - 1);
+			m_traceID.remove(m_traceID.size() - 1);
+		} else {
 		}
 	}
 }
