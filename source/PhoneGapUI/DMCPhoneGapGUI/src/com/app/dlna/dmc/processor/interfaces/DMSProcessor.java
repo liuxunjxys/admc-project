@@ -8,6 +8,10 @@ import org.teleal.cling.support.model.DIDLObject;
 public interface DMSProcessor {
 	void browse(String objectID);
 
+	void browse(String objectID, DMSProcessorListner listener);
+
+	void back(String objectID, DMSProcessorListner listener);
+
 	void dispose();
 
 	void addListener(DMSProcessorListner listener);
