@@ -6,6 +6,7 @@ var myScroll_playlists;
 
 var dms_listview; // list dms
 var dmr_listview; // list dmr
+var library_listview;
 
 $(document).ready(function() {
 	iScrollConfig();
@@ -76,8 +77,8 @@ function myInitPage() {
 	// init variable
 	// view devices:
 	dms_listview = $('#div_wrraper_devi_dmS ul:first');
-	console.log(dms_listview.html());
 	dmr_listview = $('#div_wrraper_devi_dmR ul:first');
+	library_listview = $('#div_wrapper_libs ul:first');
 }
 
 /* Devices side */

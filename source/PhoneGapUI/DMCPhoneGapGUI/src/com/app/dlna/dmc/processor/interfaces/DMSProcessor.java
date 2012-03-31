@@ -10,7 +10,7 @@ public interface DMSProcessor {
 
 	void browse(String objectID, DMSProcessorListner listener);
 
-	void back(String objectID, DMSProcessorListner listener);
+	void back(DMSProcessorListner listener);
 
 	void dispose();
 
