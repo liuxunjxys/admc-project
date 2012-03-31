@@ -161,7 +161,7 @@ public class DMSProcessorImpl implements DMSProcessor {
 	}
 
 	@Override
-	public void back(String objectID, DMSProcessorListner listener) {
+	public void back(DMSProcessorListner listener) {
 		int traceSize = m_traceID.size();
 		if (traceSize > 2) {
 			String parentID = m_traceID.get(traceSize - 2);
