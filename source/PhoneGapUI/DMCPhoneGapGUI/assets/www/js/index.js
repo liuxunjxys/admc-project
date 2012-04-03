@@ -3,6 +3,7 @@ var myScroll_devi_dmR;
 var myScroll_libs;
 var myScroll_you;
 var myScroll_playlists;
+var icon_loading;
 
 var dms_listview; // list dms
 var dmr_listview; // list dmr
@@ -81,6 +82,18 @@ function myInitPage() {
 	dms_listview = $('#div_wrraper_devi_dmS ul:first');
 	dmr_listview = $('#div_wrraper_devi_dmR ul:first');
 	library_listview = $('#div_wrapper_libs ul:first');
+
+	icon_loading = $('#icon_loading');
+	icon_loading.hide();
+}
+
+/* User interface */
+function showLoadingIcon() {
+	icon_loading.show();
+}
+
+function hideLoadingIcon() {
+	icon_loading.hide();
 }
 
 /* Devices side */
@@ -91,38 +104,75 @@ function myInitDevicesSide() {
 		myScroll_devi_dmS.refresh();
 	}, 0);
 
-	$('div.div_devi_subcontent div img.img_devi_navigate').live('click',
-			function() {
-				var id = $(this).attr('id');
-				switch (id) {
-				case "img_devi_goNext":
-					$('div#div_devi_dmS').hide();
-					$('div#div_devi_dmR').fadeIn('slow');
-					setTimeout(function() {
-						myScroll_devi_dmR.refresh();
-					}, 0);
-					break;
+	$('div.div_devi_subcontent div img.img_devi_navigate').live('click', function() {
+		var id = $(this).attr('id');
+		switch (id) {
+		case "img_devi_goNext":
+			$('div#div_devi_dmS').hide();
+			$('div#div_devi_dmR').fadeIn('slow');
+			setTimeout(function() {
+				myScroll_devi_dmR.refresh();
+			}, 0);
+			break;
 
-				case "img_devi_goPrevious":
-					$('div#div_devi_dmR').hide();
-					$('div#div_devi_dmS').fadeIn('slow');
-					setTimeout(function() {
-						myScroll_devi_dmS.refresh();
-					}, 0);
-					break;
-				}
-			});
+		case "img_devi_goPrevious":
+			$('div#div_devi_dmR').hide();
+			$('div#div_devi_dmS').fadeIn('slow');
+			setTimeout(function() {
+				myScroll_devi_dmS.refresh();
+			}, 0);
+			break;
+		}
+	});
 }
 /* Library side */
 function onClick_previousResult() {
 	console.log('view previous result');
-	window.plugins.LibraryPlugin.previousPage();
+	var btn_prev = $('#btn_prevPage');
+	if (btn_prev.attr("enable") == "true") {
+		console.log('previous page');
+		window.plugins.LibraryPlugin.previousPage();
+	}
 
 }
 
 function onClick_nextResult() {
 	console.log('view next result');
-	window.plugins.LibraryPlugin.nextPage();
+	var btn_next = $('#btn_nextPage');
+	if (btn_next.attr("enable") == "true") {
+		console.log('next page');
+		window.plugins.LibraryPlugin.nextPage();
+	}
+}
+
+function enableBackButton() {
+	console.log('enable back button');
+	$('#btn_back').attr("enable", "true");
+}
+
+function disableBackButton() {
+	console.log('disable back button');
+	$('#btn_back').attr("enable", "false");
+}
+
+function enableNextPageButton() {
+	console.log('enable next page button');
+	$('#btn_nextPage').attr("enable", "true");
+}
+
+function disableNextPageButton() {
+	console.log('disable next page button');
+	$('#btn_nextPage').attr("enable", "false");
+}
+
+function enablePrevPageButton() {
+	console.log('enable prev page button');
+	$('#btn_prevPage').attr("enable", "true");
+}
+
+function disablePrevPageButton() {
+	console.log('disable prev page button');
+	$('#btn_prevPage').attr("enable", "false");
 }
 
 /* Youtube side */

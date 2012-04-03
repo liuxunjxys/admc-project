@@ -17,6 +17,8 @@ import org.teleal.cling.model.types.UnsignedIntegerFourBytes;
 import org.teleal.cling.support.contentdirectory.DIDLParser;
 import org.teleal.cling.support.model.DIDLContent;
 import org.teleal.cling.support.model.DIDLObject;
+import org.teleal.cling.support.model.container.Container;
+import org.teleal.cling.support.model.item.Item;
 
 import android.util.Log;
 
@@ -28,10 +30,9 @@ public class DMSProcessorImpl implements DMSProcessor {
 	@SuppressWarnings("rawtypes")
 	private Device m_server;
 	private ControlPoint m_controlPoint;
-	private Map<String, List<? extends DIDLObject>> result;
 	private List<String> m_traceID;
 	private int m_currentPageIndex;
-	public static int ITEM_PER_PAGE = 10;
+	public static int ITEM_PER_PAGE = 25;
 
 	@SuppressWarnings("rawtypes")
 	public DMSProcessorImpl(Device device, ControlPoint controlPoint) {
@@ -107,7 +108,7 @@ public class DMSProcessorImpl implements DMSProcessor {
 	@Override
 	public void browse(String objectID, int pageIndex, final DMSProcessorListner listener) {
 		m_traceID.add(objectID);
-		result = new HashMap<String, List<? extends DIDLObject>>();
+		m_currentPageIndex = 0;
 		executeBrowse(objectID, pageIndex, listener);
 		for (String _id : m_traceID) {
 			Log.e(TAG, _id);
@@ -115,7 +116,7 @@ public class DMSProcessorImpl implements DMSProcessor {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void executeBrowse(String objectID, int pageIndex, final DMSProcessorListner listener) {
+	private void executeBrowse(final String objectID, final int pageIndex, final DMSProcessorListner listener) {
 		Service cds = m_server.findService(new ServiceType("schemas-upnp-org", "ContentDirectory"));
 		if (cds != null) {
 			m_currentPageIndex = pageIndex;
@@ -126,7 +127,7 @@ public class DMSProcessorImpl implements DMSProcessor {
 			actionInvocation.setInput("BrowseFlag", "BrowseDirectChildren");
 			actionInvocation.setInput("Filter", "*");
 			actionInvocation.setInput("StartingIndex", new UnsignedIntegerFourBytes(startIndex));
-			actionInvocation.setInput("RequestedCount", new UnsignedIntegerFourBytes(ITEM_PER_PAGE));
+			actionInvocation.setInput("RequestedCount", new UnsignedIntegerFourBytes(ITEM_PER_PAGE + 1));
 			actionInvocation.setInput("SortCriteria", null);
 			ActionCallback actionCallback = new ActionCallback(actionInvocation) {
 
@@ -135,11 +136,23 @@ public class DMSProcessorImpl implements DMSProcessor {
 					try {
 						DIDLParser parser = new DIDLParser();
 						DIDLContent content = parser.parse(invocation.getOutput("Result").toString());
-						Log.i(TAG, "Container = " + content.getContainers().size() + " Item = "
-								+ content.getItems().size());
-						result.put("Containers", content.getContainers());
-						result.put("Items", content.getItems());
-						listener.onBrowseComplete(result);
+						Log.i(TAG, "Container = " + content.getContainers().size() + " Item = " + content.getItems().size());
+						Map<String, List<? extends DIDLObject>> result = new HashMap<String, List<? extends DIDLObject>>();
+						List<Container> containers = content.getContainers();
+						List<Item> items = content.getItems();
+						boolean haveNext = false;
+						if (containers.size() > ITEM_PER_PAGE) {
+							haveNext = true;
+							containers.remove(containers.size() - 1);
+						}
+						if (items.size() > ITEM_PER_PAGE) {
+							haveNext = true;
+							items.remove(items.size() - 1);
+						}
+						boolean havePrev = m_currentPageIndex > 0;
+						result.put("Containers", containers);
+						result.put("Items", items);
+						listener.onBrowseComplete(objectID, haveNext, havePrev, result);
 					} catch (Exception e) {
 						Log.e(TAG, e.getMessage());
 						listener.onBrowseFail(e.getMessage());
@@ -175,6 +188,7 @@ public class DMSProcessorImpl implements DMSProcessor {
 
 	@Override
 	public void previousPage(DMSProcessorListner listener) {
-		executeBrowse(m_traceID.get(m_traceID.size() - 1), m_currentPageIndex - 1, listener);
+		if (m_currentPageIndex > 0)
+			executeBrowse(m_traceID.get(m_traceID.size() - 1), m_currentPageIndex - 1, listener);
 	}
 }
