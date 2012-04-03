@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.teleal.cling.support.model.DIDLObject;
+import org.teleal.cling.support.model.container.Container;
 import org.teleal.cling.support.model.item.ImageItem;
 import org.teleal.cling.support.model.item.MusicTrack;
 import org.teleal.cling.support.model.item.VideoItem;
@@ -74,6 +75,9 @@ public class LibraryPlugin extends Plugin {
 			result.put("name", object.getTitle().trim().replace("\"", "\\\"").replace("'", " "));
 			result.put("id", object.getId());
 			result.put("state", "false");
+			if (object instanceof Container) {
+				result.put("childCount", String.valueOf(((Container) object).getChildCount()));
+			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -139,7 +143,8 @@ public class LibraryPlugin extends Plugin {
 		// sendJavascript("notifyBrowseComplete();");
 		// };
 
-		public void onBrowseComplete(Map<String, List<? extends DIDLObject>> result) {
+		public void onBrowseComplete(String objectID, boolean haveNext, boolean havePrev,
+				Map<String, List<? extends DIDLObject>> result) {
 			sendJavascript("clearLibraryList();");
 			JSONArray response = new JSONArray();
 			for (DIDLObject container : result.get("Containers")) {
@@ -168,9 +173,25 @@ public class LibraryPlugin extends Plugin {
 				}
 				response.put(object);
 			}
-			Log.i(TAG, "Browse result = " + response.toString());
 			if (response.length() != 0)
 				sendJavascript("loadBrowseResult('" + response.toString() + "');");
+			if (objectID.equals("0")) {
+				sendJavascript("disableBackButton();");
+			} else {
+				sendJavascript("enableBackButton();");
+			}
+
+			if (haveNext) {
+				sendJavascript("enableNextPageButton();");
+			} else {
+				sendJavascript("disableNextPageButton();");
+			}
+
+			if (havePrev) {
+				sendJavascript("enablePrevPageButton();");
+			} else {
+				sendJavascript("disablePrevPageButton();");
+			}
 		}
 	};
 }
