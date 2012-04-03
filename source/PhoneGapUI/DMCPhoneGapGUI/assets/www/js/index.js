@@ -91,40 +91,43 @@ function myInitDevicesSide() {
 		myScroll_devi_dmS.refresh();
 	}, 0);
 
-	$('div.div_devi_subcontent div img.img_devi_navigate').live('click', function() {
-		var id = $(this).attr('id');
-		switch (id) {
-		case "img_devi_goNext":
-			$('div#div_devi_dmS').hide();
-			$('div#div_devi_dmR').fadeIn('slow');
-			setTimeout(function() {
-				myScroll_devi_dmR.refresh();
-			}, 0);
-			break;
+	$('div.div_devi_subcontent div img.img_devi_navigate').live('click',
+			function() {
+				var id = $(this).attr('id');
+				switch (id) {
+				case "img_devi_goNext":
+					$('div#div_devi_dmS').hide();
+					$('div#div_devi_dmR').fadeIn('slow');
+					setTimeout(function() {
+						myScroll_devi_dmR.refresh();
+					}, 0);
+					break;
 
-		case "img_devi_goPrevious":
-			$('div#div_devi_dmR').hide();
-			$('div#div_devi_dmS').fadeIn('slow');
-			setTimeout(function() {
-				myScroll_devi_dmS.refresh();
-			}, 0);
-			break;
-		}
-	});
+				case "img_devi_goPrevious":
+					$('div#div_devi_dmR').hide();
+					$('div#div_devi_dmS').fadeIn('slow');
+					setTimeout(function() {
+						myScroll_devi_dmS.refresh();
+					}, 0);
+					break;
+				}
+			});
 }
 /* Library side */
-function onClick_previousResult(){
+function onClick_previousResult() {
 	console.log('view previous result');
+	window.plugins.LibraryPlugin.previousPage();
+
 }
 
-function onClick_nextResult(){
+function onClick_nextResult() {
 	console.log('view next result');
+	window.plugins.LibraryPlugin.nextPage();
 }
 
 /* Youtube side */
 
-/*Playlists side*/
+/* Playlists side */
 
 /* Playlist side */
-
 

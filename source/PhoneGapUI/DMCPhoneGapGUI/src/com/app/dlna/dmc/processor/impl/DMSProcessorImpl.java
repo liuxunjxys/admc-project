@@ -29,107 +29,104 @@ public class DMSProcessorImpl implements DMSProcessor {
 	private Device m_server;
 	private ControlPoint m_controlPoint;
 	private Map<String, List<? extends DIDLObject>> result;
-	private List<DMSProcessorListner> m_listeners;
 	private List<String> m_traceID;
+	private int m_currentPageIndex;
+	public static int ITEM_PER_PAGE = 10;
 
 	@SuppressWarnings("rawtypes")
 	public DMSProcessorImpl(Device device, ControlPoint controlPoint) {
 		m_server = device;
 		m_controlPoint = controlPoint;
-		m_listeners = new ArrayList<DMSProcessor.DMSProcessorListner>();
 		m_traceID = new ArrayList<String>();
 		m_traceID.add("-1");
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void browse(String objectID) {
-		result = new HashMap<String, List<? extends DIDLObject>>();
-		Service cds = m_server.findService(new ServiceType("schemas-upnp-org", "ContentDirectory"));
-		if (cds != null) {
-			Action action = cds.getAction("Browse");
-			ActionInvocation actionInvocation = new ActionInvocation(action);
-			actionInvocation.setInput("ObjectID", objectID);
-			actionInvocation.setInput("BrowseFlag", "BrowseDirectChildren");
-			actionInvocation.setInput("Filter", "*");
-			actionInvocation.setInput("StartingIndex", new UnsignedIntegerFourBytes(0));
-			actionInvocation.setInput("RequestedCount", new UnsignedIntegerFourBytes(999));
-			actionInvocation.setInput("SortCriteria", null);
-			ActionCallback actionCallback = new ActionCallback(actionInvocation) {
-
-				@Override
-				public void success(ActionInvocation invocation) {
-					try {
-						DIDLParser parser = new DIDLParser();
-						DIDLContent content = parser.parse(invocation.getOutput("Result").toString());
-						result.put("Containers", content.getContainers());
-						result.put("Items", content.getItems());
-						fireOnBrowseCompleteEvent();
-					} catch (Exception e) {
-						Log.e(TAG, e.getMessage());
-						m_listeners.remove("Error: " + e.getMessage());
-					}
-				}
-
-				@Override
-				public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
-					Log.e(TAG, defaultMsg);
-					fireOnBrowseFailEvent(defaultMsg);
-				}
-			};
-			m_controlPoint.execute(actionCallback);
-		}
-	}
+	// @SuppressWarnings({ "rawtypes", "unchecked" })
+	// public void browse(String objectID) {
+	// result = new HashMap<String, List<? extends DIDLObject>>();
+	// Service cds = m_server.findService(new ServiceType("schemas-upnp-org",
+	// "ContentDirectory"));
+	// if (cds != null) {
+	// Action action = cds.getAction("Browse");
+	// ActionInvocation actionInvocation = new ActionInvocation(action);
+	// actionInvocation.setInput("ObjectID", objectID);
+	// actionInvocation.setInput("BrowseFlag", "BrowseDirectChildren");
+	// actionInvocation.setInput("Filter", "*");
+	// actionInvocation.setInput("StartingIndex", new
+	// UnsignedIntegerFourBytes(0));
+	// actionInvocation.setInput("RequestedCount", new
+	// UnsignedIntegerFourBytes(999));
+	// actionInvocation.setInput("SortCriteria", null);
+	// ActionCallback actionCallback = new ActionCallback(actionInvocation) {
+	//
+	// @Override
+	// public void success(ActionInvocation invocation) {
+	// try {
+	// DIDLParser parser = new DIDLParser();
+	// DIDLContent content =
+	// parser.parse(invocation.getOutput("Result").toString());
+	// result.put("Containers", content.getContainers());
+	// result.put("Items", content.getItems());
+	// fireOnBrowseCompleteEvent();
+	// } catch (Exception e) {
+	// Log.e(TAG, e.getMessage());
+	// }
+	// }
+	//
+	// @Override
+	// public void failure(ActionInvocation invocation, UpnpResponse operation,
+	// String defaultMsg) {
+	// Log.e(TAG, defaultMsg);
+	// fireOnBrowseFailEvent(defaultMsg);
+	// }
+	// };
+	// m_controlPoint.execute(actionCallback);
+	// }
+	// }
 
 	public void dispose() {
 
 	}
 
+	// private void fireOnBrowseCompleteEvent() {
+	// synchronized (m_listeners) {
+	// for (DMSProcessorListner listener : m_listeners) {
+	// listener.onBrowseComplete(result);
+	// }
+	// }
+	// }
+	//
+	// private void fireOnBrowseFailEvent(String message) {
+	// synchronized (m_listeners) {
+	// for (DMSProcessorListner listener : m_listeners) {
+	// listener.onBrowseFail(message);
+	// }
+	// }
+	// }
+
 	@Override
-	public void addListener(DMSProcessorListner listener) {
-		synchronized (m_listeners) {
-			if (!m_listeners.contains(listener))
-				m_listeners.add(listener);
-		}
-
-	}
-
-	@Override
-	public void removeListener(DMSProcessorListner listener) {
-		synchronized (m_listeners) {
-			m_listeners.remove(listener);
-		}
-	}
-
-	private void fireOnBrowseCompleteEvent() {
-		synchronized (m_listeners) {
-			for (DMSProcessorListner listener : m_listeners) {
-				listener.onBrowseComplete(result);
-			}
-		}
-	}
-
-	private void fireOnBrowseFailEvent(String message) {
-		synchronized (m_listeners) {
-			for (DMSProcessorListner listener : m_listeners) {
-				listener.onBrowseFail(message);
-			}
+	public void browse(String objectID, int pageIndex, final DMSProcessorListner listener) {
+		m_traceID.add(objectID);
+		result = new HashMap<String, List<? extends DIDLObject>>();
+		executeBrowse(objectID, pageIndex, listener);
+		for (String _id : m_traceID) {
+			Log.e(TAG, _id);
 		}
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@Override
-	public void browse(String objectID, final DMSProcessorListner listener) {
-		m_traceID.add(objectID);
-		result = new HashMap<String, List<? extends DIDLObject>>();
+	private void executeBrowse(String objectID, int pageIndex, final DMSProcessorListner listener) {
 		Service cds = m_server.findService(new ServiceType("schemas-upnp-org", "ContentDirectory"));
 		if (cds != null) {
+			m_currentPageIndex = pageIndex;
+			int startIndex = pageIndex * ITEM_PER_PAGE;
 			Action action = cds.getAction("Browse");
 			ActionInvocation actionInvocation = new ActionInvocation(action);
 			actionInvocation.setInput("ObjectID", objectID);
 			actionInvocation.setInput("BrowseFlag", "BrowseDirectChildren");
 			actionInvocation.setInput("Filter", "*");
-			actionInvocation.setInput("StartingIndex", new UnsignedIntegerFourBytes(0));
-			actionInvocation.setInput("RequestedCount", new UnsignedIntegerFourBytes(999));
+			actionInvocation.setInput("StartingIndex", new UnsignedIntegerFourBytes(startIndex));
+			actionInvocation.setInput("RequestedCount", new UnsignedIntegerFourBytes(ITEM_PER_PAGE));
 			actionInvocation.setInput("SortCriteria", null);
 			ActionCallback actionCallback = new ActionCallback(actionInvocation) {
 
@@ -138,6 +135,8 @@ public class DMSProcessorImpl implements DMSProcessor {
 					try {
 						DIDLParser parser = new DIDLParser();
 						DIDLContent content = parser.parse(invocation.getOutput("Result").toString());
+						Log.i(TAG, "Container = " + content.getContainers().size() + " Item = "
+								+ content.getItems().size());
 						result.put("Containers", content.getContainers());
 						result.put("Items", content.getItems());
 						listener.onBrowseComplete(result);
@@ -155,9 +154,6 @@ public class DMSProcessorImpl implements DMSProcessor {
 			};
 			m_controlPoint.execute(actionCallback);
 		}
-		for (String _id : m_traceID) {
-			Log.e(TAG, _id);
-		}
 	}
 
 	@Override
@@ -165,10 +161,20 @@ public class DMSProcessorImpl implements DMSProcessor {
 		int traceSize = m_traceID.size();
 		if (traceSize > 2) {
 			String parentID = m_traceID.get(traceSize - 2);
-			browse(parentID, listener);
+			browse(parentID, 0, listener);
 			m_traceID.remove(m_traceID.size() - 1);
 			m_traceID.remove(m_traceID.size() - 1);
 		} else {
 		}
+	}
+
+	@Override
+	public void nextPage(DMSProcessorListner listener) {
+		executeBrowse(m_traceID.get(m_traceID.size() - 1), m_currentPageIndex + 1, listener);
+	}
+
+	@Override
+	public void previousPage(DMSProcessorListner listener) {
+		executeBrowse(m_traceID.get(m_traceID.size() - 1), m_currentPageIndex - 1, listener);
 	}
 }
