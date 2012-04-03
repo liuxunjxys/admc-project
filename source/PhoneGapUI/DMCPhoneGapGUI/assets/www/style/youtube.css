@@ -53,8 +53,8 @@
 	height: 78%;
 	margin: 0px;
 	padding: 0px;
+	
 }
-
 #div_you_proxy{
 	position: relative;
 	height: 7%;
@@ -64,6 +64,7 @@
 	border-top: 1px solid #CCC;
 	/*background-color:   #F8F8F8;*/
 }
+
 
 #div_you_proxy a{
 	position: relative;

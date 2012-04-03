@@ -12,6 +12,7 @@ $(document).ready(function() {
 	iScrollConfig();
 	myInitPage();
 	myInitDevicesSide();
+	myInitPlaylistsSide();
 });
 
 function iScrollConfig() {
@@ -44,7 +45,6 @@ function myInitPage() {
 	$('div.div_subcontent').hide(); // all hide
 	$('div#content_devices').show(); // first tab appear
 	$('div[data-role="navbar"] a').live('click', function() {
-		$(this).addClass('ui-btn-active');
 		$('div.div_subcontent').hide();
 		var datahref_info = $(this).attr('data-href');
 		$('div#' + datahref_info).fadeIn('slow');
@@ -63,6 +63,7 @@ function myInitPage() {
 		case "content_youtube":
 			setTimeout(function() {
 				myScroll_you.refresh();
+				console.log('refresh done!');
 			}, 0);
 			break;
 
@@ -72,6 +73,7 @@ function myInitPage() {
 			}, 0);
 			break;
 		}
+		$(this).addClass('ui-btn-active');
 	});
 	$('div#div_navbar_1 a').addClass('ui-btn-active');
 	// init variable
@@ -106,14 +108,23 @@ function myInitDevicesSide() {
 			setTimeout(function() {
 				myScroll_devi_dmS.refresh();
 			}, 0);
-
 			break;
 		}
 	});
 }
 /* Library side */
+function onClick_previousResult(){
+	console.log('view previous result');
+}
+
+function onClick_nextResult(){
+	console.log('view next result');
+}
 
 /* Youtube side */
 
+/*Playlists side*/
+
 /* Playlist side */
+
 

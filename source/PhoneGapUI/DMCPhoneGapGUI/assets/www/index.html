@@ -15,30 +15,29 @@
 <link rel="stylesheet" href="style/playlists.css" />
 <script type="text/javascript" src="phonegap-1.4.1.js"></script>
 <script type="text/javascript" src="js/index.js"></script>
+ 
 <script type="text/javascript" src="plugin/application.js"></script>
 <script type="text/javascript" src="plugin/devices.js"></script>
 <script type="text/javascript" src="plugin/library.js"></script>
 <script type="text/javascript" src="plugin/youtube.js"></script>
 <script type="text/javascript" src="plugin/playlist.js"></script>
+
 </head>
 <body>
 
 	<div id="div_app_page" data-role="page" data-theme="c">
-
 		<div id="di_main_tool_bar">
 			<img src="img/setting_icon.png"> <img
 				src="img/refresh_icon.png">
 		</div>
 
 		<div id="div_header" data-theme="a">
-
 			<div class="div_navbar" data-role="navbar">
 				<div id="div_navbar_1" align="center">
 					<a href="#" data-href="content_devices"> <img
 						src="img/ic_tab_devices_img.png">
 					</a>
 				</div>
-
 				<div id="div_navbar_2" align="center">
 					<a href="#" data-href="content_library"> <img
 						src="img/ic_tab_library.png">
@@ -101,9 +100,24 @@
 					<ul data-role="listview" data-theme="d">
 					</ul>
 				</div>
+				
+				<div id="div_lib_selection_bar">
+					<div align="center">
+						<img src="img/previous_icon.png" 
+							style="float: left; padding-left: 5px;"
+							onclick="onClick_previousResult()">
+						<img src="img/selected_icon.png">
+					</div>
+					<div align="center">
+						<img src="img/remove_icon.png">
+						<img src="img/next_icon.png" 
+							style="float: right; padding-right: 5px;"
+							onclick="onClick_nextResult()">
+					</div>
+				</div>
 			</div>
 
-			<div id="content_youtube" class="div_subcontent">
+		<div id="content_youtube" class="div_subcontent">
 				<div id="div_you_toolbar">
 					<div id="div_you_toolbar_left">
 						<input type="text" data-theme="d" placeholder="Search text...">
@@ -180,6 +194,7 @@
 								<p>Link details</p>
 						</a></li>
 					</ul>
+					
 				</div>
 
 				<div id="div_you_proxy">
@@ -188,95 +203,82 @@
 				</div>
 			</div>
 
-			<div id="content_playlists" class="div_subcontent">
-				<div id="div_play_toolbar">
-					<input type="text" placeholder="Search text.." data-theme="d">
-				</div>
-
-				<div id="div_wrapper_play" class="div_play_media_list">
-					<ul data-role="listview">
-						<li><a href="#"
-							style="padding-top: 0px; padding-bottom: 0px;"> <img
-								src="img/youtube_icon.png"
-								style="height: 100%; width: height; padding-left: 2%; float: left;" />
-								<h3>First - Youtube video name</h3>
-								<p>Link details</p>
-						</a></li>
-
-						<li><a href="#"
-							style="padding-top: 0px; padding-bottom: 0px;"> <img
-								src="img/youtube_icon.png"
-								style="height: 100%; width: height; padding-left: 2%; float: left;" />
-								<h3>First - Youtube video name</h3>
-								<p>Link details</p>
-						</a></li>
-
-						<li><a href="#"
-							style="padding-top: 0px; padding-bottom: 0px;"> <img
-								src="img/youtube_icon.png"
-								style="height: 100%; width: height; padding-left: 2%; float: left;" />
-								<h3>LAST</h3>
-								<p>Link details</p>
-						</a></li>
-					</ul>
-				</div>
-
-				<div id="div_play_media_controller">
-					<!-- 
-				<div class="ui-grid-c" style="padding-top: 10px; vertical-align: middle;">
-					<div class="ui-block-a" align="right" style=" padding-top: 10px;">
-						<img src="img/previous_icon.png" 
-								style="width: 28px; height: 28px;" />
-					</div>
-					<div class="ui-block-b" align="right">
-						<img src="img/play_icon.png" 
-								style="width: 48px; height: 48px;" />
-					</div>
-					<div class="ui-block-c" align="left" style=" padding-top: 8px;">
-						<img src="img/stop_icon.png" 
-								style="width: 32px; height: 32px; padding-left: 8px;" />
-					</div>
-					<div class="ui-block-d" align="left" style=" padding-top: 10px;">
-						<img src="img/next_icon.png" 
-								style="width: 28px; height: 28px;" />
-					</div>
-				</div>
+		<div id="content_playlists" class="div_subcontent">  
+			<div id="div_play_toolbar">
 				
-				<div data-role="fieldcontain">
-					<input class="ui-hidden-accessible" 
-					type="range" value="25" min="0" max="100" step="1"
-					style="width: 300px; height: 5px;"/>
-				</div>
-				-->
-					<div id="div_field_info"></div>
+			</div>
+			
+			<div id="div_wrapper_play" class="div_play_media_list">  
+				<ul data-role="listview">
+					<li>
+						<a href="#" style="padding-top: 0px; padding-bottom: 0px;">
+							<img src="img/youtube_icon.png" 
+								style="height: 100%; width: height; padding-left: 2%; float: left;" />
+								<h3>First - Youtube video name</h3>
+								<p>Link details</p>
+						</a></li>
 
-					<div id="div_field_controlbar">
-						<div class="ui-grid-c">
-							<div class="ui-block-a" align="right">
-								<img src="img/previous_icon.png"
-									style="height: 50%; width: height; padding-top: 25%;" />
-							</div>
-							<div class="ui-block-b" align="right">
-								<img src="img/play_icon.png"
-									style="height: 90%; width: height; padding-top: 5%;" />
-							</div>
-							<div class="ui-block-c" align="left">
-								<img src="img/stop_icon.png"
-									style="height: 64%; width: height; padding-top: 18%;" />
-							</div>
-							<div class="ui-block-d" align="left">
-								<img src="img/next_icon.png"
-									style="height: 50%; width: height; padding-top: 25%;" />
+						<li><a href="#"
+							style="padding-top: 0px; padding-bottom: 0px;"> <img
+								src="img/youtube_icon.png"
+								style="height: 100%; width: height; padding-left: 2%; float: left;" />
+								<h3>First - Youtube video name</h3>
+								<p>Link details</p>
+						</a></li>
+
+						<li><a href="#"
+							style="padding-top: 0px; padding-bottom: 0px;"> <img
+								src="img/youtube_icon.png"
+								style="height: 100%; width: height; padding-left: 2%; float: left;" />
+							<h3>First - Youtube video name</h3>
+							<p>Link details</p>
+						</a>
+					</li>
+					
+					<li>
+						<a href="#" style="padding-top: 0px; padding-bottom: 0px;">
+							<img src="img/youtube_icon.png" 
+								style="height: 100%; width: height; padding-left: 2%; float: left;" />
+							<h3>LAST</h3>
+							<p>Link details</p>
+						</a>
+					</li>
+				</ul>
+			</div>
+		
+			<div id="div_play_media_controller">				
+				<div id="div_field_controlbar">
+					<div class="ui-grid-c">
+						<div class="ui-block-a" align="right" >
+							<img src="img/media_previous_icon.png"
+									style="height: 60%; width: height; padding-top: 18%;" />
+						</div>
+						<div class="ui-block-b" align="right">
+							<img src="img/media_play_icon.png" 
+									style="height: 90%; width: height; padding-top: 3%;" />
+
+						</div>
+						<div class="ui-block-c" align="left">
+							<img src="img/media_stop_icon.png" 
+									style="height: 75%; width: height; padding-top: 13%; padding-left: 20%;" />
+						</div>
+						<div class="ui-block-d" align="left">
+							<img src="img/media_next_icon.png" 
+									style="height: 60%; width: height; padding-top: 18%;" />
 							</div>
 						</div>
-					</div>
-
-					<div id="div_field_durationAndVol"></div>
-
-					<div id="div_field_seekbar"></div>
+				</div>
+				
+				<div id="div_field_durationAndVol">
+					
+				</div>
+				
+				<div id="div_field_seekbar">
+					<input type="range"  id="slider_seek_bar" value="0" min="0" max="300" />
 				</div>
 
-				<div id="div_play_dmr_info"></div>
+				<div id="div_play_dmr_info">
+				</div>
 			</div>
 		</div>
 	</div>
