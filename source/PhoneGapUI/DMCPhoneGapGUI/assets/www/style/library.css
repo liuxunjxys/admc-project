@@ -48,8 +48,37 @@
 {
 	clear: both;
 	position: relative;
-	height: 85%;
+	height: 78%;
 	margin: 0px;
 	padding: 0px;
 }
 
+
+#div_lib_selection_bar{
+	position: relative;
+	height: 7%;
+	width: 100%;
+	margin: 0px;
+	padding: 0px;
+	border-top: 1px solid #CCC;
+}
+
+#div_lib_selection_bar div{
+	position: relative;
+	float: left;
+	width: 50%;
+	height: 100%;
+	padding: 0px;
+	margin: 0px;
+	-webkit-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius  : 8px;
+    -moz-border-radius  : 8px;  
+}
+
+#div_lib_selection_bar div img {
+	padding: 0px;
+	margin: 0px;
+	height: 90%;
+	width: auto;
+}
