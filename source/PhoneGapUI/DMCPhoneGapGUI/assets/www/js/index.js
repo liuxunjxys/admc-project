@@ -9,7 +9,7 @@ var dms_listview; // list dms
 var dmr_listview; // list dmr
 var library_listview;
 
-var time_to_swap_image = 200;
+var time_to_swap_image = 300;
 
 $(document).ready(function() {
 	iScrollConfig();
@@ -47,6 +47,11 @@ function changeImagePath (sender, imgPath){
 	$(sender).attr('src', imgPath);
 }
 
+function changeImagePath (sender, imgPath, timeOut){
+	setTimeout(function() {
+		$(sender).attr('src', imgPath);
+	}, timeOut);
+}
 /* Index side */
 function myInitPage() {
 	$('div.div_subcontent').hide(); // all hide
@@ -187,15 +192,11 @@ function disablePrevPageButton() {
 function onClick_play_play (sender){
 	var state = $(sender).attr('data-my-state');
 	if (state == "play"){
-		setTimeout(function() {
-			$(sender).attr('src', 'img/media_pause_icon.png');
-		}, time_to_swap_image);
+		changeImagePath(sender, 'img/media_pause_icon.png', time_to_swap_image);
 		$(sender).attr('data-my-state', 'pause');
 		
 	}else{
-		setTimeout(function() {
-			$(sender).attr('src', 'img/media_play_icon.png');
-		}, time_to_swap_image);
+		changeImagePath(sender, 'img/media_play_icon.png', time_to_swap_image);
 		$(sender).attr('data-my-state', 'play');
 		
 	}
@@ -211,20 +212,14 @@ function onMouseDown_play_play (sender){
 }
 
 function onClick_next_play (sender){
-	setTimeout(function() {
-		$(sender).attr('src', 'img/media_next_icon.png');
-	}, time_to_swap_image);
+	changeImagePath(sender, 'img/media_next_icon.png', time_to_swap_image);
 }
 
 function onClick_previous_play (sender){
-	setTimeout(function() {
-		$(sender).attr('src', 'img/media_previous_icon.png');
-	}, time_to_swap_image);
+	changeImagePath(sender, 'img/media_previous_icon.png', time_to_swap_image);
 }
 
 function onClick_stop_play (sender){
-	setTimeout(function() {
-		$(sender).attr('src', 'img/media_stop_icon.png');
-	}, time_to_swap_image);
+	changeImagePath(sender, 'img/media_stop_icon.png', time_to_swap_image);
 }
 
