@@ -24,6 +24,7 @@
 	height: 38%;
 }
 
+
 #div_play_media_controller div#div_field_controlbar div{
 	padding: 0px;
 	margin: 0px;
@@ -33,20 +34,22 @@
 #div_play_media_controller div#div_field_controlbar{
 	position: relative;
 	height: 50%;
+	background-color: #C6C6C6;
 }
 
 #div_play_media_controller div#div_field_durationAndVol{
 	position: relative;
 	height: 20%;
-	background-color: red;
+	background-color: #696969;
 }
 
 #div_play_media_controller div#div_field_seekbar{
 	position: relative;
 	height: 30%;
-	background-color: orange;
+	background-color: #696969;
 }
 
+/*Seek bar*/
 #div_field_seekbar input#slider_seek_bar{
 	display: none;
 }
@@ -67,9 +70,86 @@
 	margin-left: -2%;
 }
 
+
+/*duration and volume*/
+#div_play_duration_time{
+	position: relative;
+	margin: 0 auto;
+	width: 50%;
+	height: 100%;
+	float: left;
+	
+}
+
+#div_play_duration_time p{
+	padding: 0px;
+	padding-left: 5px;
+	margin: 0px;
+	position: absolute;
+	top: 20%;
+	height: 100%;
+}
+
+#div_play_volume{
+	
+	position: relative;
+	width: 50%;
+	height: 100%;
+	float: left;
+}
+
+#div_play_volume_left{
+	position: relative;
+	padding: 0px;
+	margin: 0px;
+	height: 100%;
+	width: 80%;
+	float: left;
+}
+
+#slider_volume_bar{
+	display: none;
+}
+
+#div_play_volume_left .ui-slider {
+	width: 96% !important;
+	margin: 0 2% 0 2% !important;
+	padding: 0px !important;
+	bottom: 30% !important;
+	height: 30% !important;
+}
+
+#div_play_volume_left .ui-slider .ui-slider-handle {
+	top: 50%;
+	width: 4%; 
+	height: 180%; 
+	margin-top: -95%; 
+	margin-left: -2%;
+}
+
+#div_play_volume_right{
+	position: relative;
+	padding: 0px;
+	margin: 0px;
+	height: 100%;
+	width: 20%;
+	float: left;
+}
+
+#div_play_volume_right img{
+	padding: 0px;
+	margin: 0px;
+	height: 100%;
+	width: auto;
+	float: left;
+}
+
 /*---------------------4---------------------*/
 #div_play_dmr_info{
 	position: relative;
 	height: 7%;
-	background-color: green;
+	margin: 0px;
+	padding: 0px;
+	text-align: center;
+	border-top: 1px solid #CCC;
 }
