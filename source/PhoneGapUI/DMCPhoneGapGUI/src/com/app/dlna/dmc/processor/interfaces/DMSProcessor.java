@@ -21,4 +21,6 @@ public interface DMSProcessor {
 
 		void onBrowseFail(String message);
 	}
+
+	DIDLObject getDIDLObject(String objectID);
 }

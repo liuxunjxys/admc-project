@@ -33,6 +33,7 @@ public class DMSProcessorImpl implements DMSProcessor {
 	private List<String> m_traceID;
 	private int m_currentPageIndex;
 	public static int ITEM_PER_PAGE = 25;
+	private List<DIDLObject> m_DIDLObjectList;
 
 	@SuppressWarnings("rawtypes")
 	public DMSProcessorImpl(Device device, ControlPoint controlPoint) {
@@ -40,6 +41,7 @@ public class DMSProcessorImpl implements DMSProcessor {
 		m_controlPoint = controlPoint;
 		m_traceID = new ArrayList<String>();
 		m_traceID.add("-1");
+		m_DIDLObjectList = new ArrayList<DIDLObject>();
 	}
 
 	// @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -149,12 +151,15 @@ public class DMSProcessorImpl implements DMSProcessor {
 							haveNext = true;
 							items.remove(items.size() - 1);
 						}
+						m_DIDLObjectList.clear();
+						m_DIDLObjectList.addAll(containers);
+						m_DIDLObjectList.addAll(items);
 						boolean havePrev = m_currentPageIndex > 0;
 						result.put("Containers", containers);
 						result.put("Items", items);
 						listener.onBrowseComplete(objectID, haveNext, havePrev, result);
 					} catch (Exception e) {
-						Log.e(TAG, e.getMessage());
+						e.printStackTrace();
 						listener.onBrowseFail(e.getMessage());
 					}
 				}
@@ -171,6 +176,7 @@ public class DMSProcessorImpl implements DMSProcessor {
 
 	@Override
 	public void back(DMSProcessorListner listener) {
+		m_currentPageIndex = 0;
 		int traceSize = m_traceID.size();
 		if (traceSize > 2) {
 			String parentID = m_traceID.get(traceSize - 2);
@@ -190,5 +196,14 @@ public class DMSProcessorImpl implements DMSProcessor {
 	public void previousPage(DMSProcessorListner listener) {
 		if (m_currentPageIndex > 0)
 			executeBrowse(m_traceID.get(m_traceID.size() - 1), m_currentPageIndex - 1, listener);
+	}
+
+	@Override
+	public DIDLObject getDIDLObject(String objectID) {
+		for (DIDLObject object : m_DIDLObjectList) {
+			if (object.getId().equals(objectID))
+				return object;
+		}
+		return null;
 	}
 }
