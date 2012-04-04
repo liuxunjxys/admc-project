@@ -236,44 +236,65 @@
 							style="padding-top: 0px; padding-bottom: 0px;"> <img
 								src="img/youtube_icon.png"
 								style="height: 100%; width: height; padding-left: 2%; float: left;" />
-								<h3>LAST</h3>
-								<p>Link details</p>
-						</a></li>
-					</ul>
-				</div>
-
-				<div id="div_play_media_controller">
-					<div id="div_field_controlbar">
-						<div class="ui-grid-c">
-							<div class="ui-block-a" align="right">
-								<img src="img/media_previous_icon.png"
-									style="height: 60%; width: height; padding-top: 18%;" />
-							</div>
-							<div class="ui-block-b" align="right">
-								<img src="img/media_play_icon.png"
-									style="height: 90%; width: height; padding-top: 3%;" />
-
+							<h3>LAST</h3>
+							<p>Link details</p>
+						</a>
+					</li>
+				</ul>
+			</div>
+		
+			<div id="div_play_media_controller">	
+			
+				<div id="div_field_seekbar">
+					<input type="range"  id="slider_seek_bar" value="0" min="0" max="300" />
+				</div>	
+						
+				<div id="div_field_controlbar">
+					<div class="ui-grid-c">
+						<div class="ui-block-a" align="right" >
+							<img src="img/media_previous_icon.png"
+									style="height: 60%; width: height; margin-top: 18%;"
+									onmousedown="changeImagePath(this, 'img/media_previous_icon_hl.png')"
+									onclick="onClick_previous_play(this)"/>
+						</div>
+						<div class="ui-block-b" align="right">
+							<img src="img/media_play_icon.png" data-my-state="play"
+									style="height: 90%; width: height; margin-top: 3%;" 
+									onmousedown="onMouseDown_play_play(this)"
+									onclick="onClick_play_play(this)"/>
 							</div>
 							<div class="ui-block-c" align="left">
 								<img src="img/media_stop_icon.png"
-									style="height: 75%; width: height; padding-top: 13%; padding-left: 20%;" />
+									style="height: 75%; width: height; margin-top: 13%; margin-left: 20%;" 
+									onmousedown="changeImagePath(this, 'img/media_stop_icon_hl.png')" 
+									onclick="onClick_stop_play(this)"/>
 							</div>
 							<div class="ui-block-d" align="left">
 								<img src="img/media_next_icon.png"
-									style="height: 60%; width: height; padding-top: 18%;" />
+									style="height: 60%; width: height; margin-top: 18%;" 
+									onmousedown="changeImagePath(this, 'img/media_next_icon_hl.png')" 
+									onclick="onClick_next_play(this)"/>
 							</div>
 						</div>
-					</div>
-
-					<div id="div_field_durationAndVol"></div>
-
-					<div id="div_field_seekbar">
-						<input type="range" id="slider_seek_bar" value="0" min="0"
-							max="300" />
-					</div>
-
-					<div id="div_play_dmr_info"></div>
 				</div>
+				
+				<div id="div_field_durationAndVol">
+					<div id="div_play_duration_time">
+						<p>00:00:00 / 00:00:00</p>
+					</div>
+					<div id="div_play_volume">
+						<div id="div_play_volume_left">
+							<input type="range"  id="slider_volume_bar" value="0" min="0" max="50" />
+						</div>
+						
+						<div id="div_play_volume_right">
+							<img src="img/volume_icon.png">
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="div_play_dmr_info">
+				DMR Name
 			</div>
 		</div>
 	</div>
