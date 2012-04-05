@@ -50,19 +50,19 @@
 {
 	clear: both;
 	position: relative;
-	height: 78%;
+	height: 75%;
 	margin: 0px;
 	padding: 0px;
 	
 }
 #div_you_proxy{
 	position: relative;
-	height: 7%;
+	height: 10%;
 	width: 100%;
 	margin: 0px;
 	padding: 0px;
 	border-top: 1px solid #CCC;
-	/*background-color:   #F8F8F8;*/
+	background-color: #646464;
 }
 
 
@@ -73,6 +73,7 @@
 	margin: 0px;
 	height: 100%;
 	width: 100%;
+	background-color: #646464;
 }
 
 #div_you_proxy a img{

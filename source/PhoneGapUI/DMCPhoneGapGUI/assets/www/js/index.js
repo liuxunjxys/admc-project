@@ -187,8 +187,36 @@ function disablePrevPageButton() {
 }
 
 /* Youtube side */
+//Button search event
+function onClick_search_you (sender){
+	console.log('Search');
+}
+
+//Button use proxy event 
+function onClick_activateProxy_you (sender){
+	var state = $(sender).attr('data-my-state');
+	if (state == "activated"){
+		//Code deactivate here
+		console.log('deactivated process');
+		
+		$(sender).attr('data-my-state', 'deactivated');
+	}else{
+		//Code activate here
+		console.log('activated process');
+		
+		$(sender).attr('data-my-state', 'activated');
+	}
+}
 
 /* Playlists side */
+function myInitPlaylistsSide (){
+	$('#div_field_seekbar input').bind('change', function (event, ui){
+		console.log('onChange');
+		console.log(event);
+		console.log(ui);
+	});
+}
+
 function onClick_play_play (sender){
 	var state = $(sender).attr('data-my-state');
 	if (state == "play"){

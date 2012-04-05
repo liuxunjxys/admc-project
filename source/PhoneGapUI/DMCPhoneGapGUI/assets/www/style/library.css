@@ -46,18 +46,19 @@
 .div_library_list {
 	clear: both;
 	position: relative;
-	height: 78%;
+	height: 75%;
 	margin: 0px;
 	padding: 0px;
 }
 
 #div_lib_selection_bar {
 	position: relative;
-	height: 7%;
+	height: 10%;
 	width: 100%;
 	margin: 0px;
 	padding: 0px;
 	border-top: 1px solid #CCC;
+	background-color: #646464;
 }
 
 #div_lib_selection_bar div {
@@ -67,10 +68,11 @@
 	height: 100%;
 	padding: 0px;
 	margin: 0px;
+	/*
 	-webkit-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 8px;
-	-moz-border-radius: 8px;
+	-moz-border-radius: 8px;*/
 }
 
 #div_lib_selection_bar div img {
@@ -81,6 +83,6 @@
 }
 
 .ui-icon-added-to-playlist {
-	background-image: url(../img/ic_checked.png);
+	background-image: url(../img/selected_icon_smallsize.png);
 	background-repeat: no-repeat;
 }
