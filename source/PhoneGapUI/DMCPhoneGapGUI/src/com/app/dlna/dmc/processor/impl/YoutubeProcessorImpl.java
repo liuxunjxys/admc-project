@@ -127,7 +127,7 @@ public class YoutubeProcessorImpl implements YoutubeProcessor {
 					URLConnection jc = jsonURL.openConnection();
 					InputStream is = jc.getInputStream();
 					String jsonTxt = IOUtils.toString(is);
-
+					Log.i(TAG,"jsonTxt = " + jsonTxt);
 					JSONObject jj = new JSONObject(jsonTxt);
 
 					JSONObject jdata = jj.getJSONObject("data");

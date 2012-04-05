@@ -1,7 +1,7 @@
 var myScroll_devi_dmS;
 var myScroll_devi_dmR;
 var myScroll_libs;
-var myScroll_you;
+var myScroll_youtube;
 var myScroll_playlists;
 var icon_loading;
 
@@ -33,7 +33,7 @@ function iScrollConfig() {
 			hScroll : false,
 			vScrollbar : false
 		});
-		myScroll_you = new iScroll('div_wrapper_you', {
+		myScroll_youtube = new iScroll('div_wrapper_you', {
 			hScroll : false,
 			vScrollbar : false
 		});
@@ -75,7 +75,7 @@ function myInitPage() {
 
 		case "content_youtube":
 			setTimeout(function() {
-				myScroll_you.refresh();
+				myScroll_youtube.refresh();
 				console.log('refresh done!');
 			}, 0);
 			break;
