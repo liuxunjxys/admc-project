@@ -33,6 +33,8 @@ PhoneGap.addConstructor(function() {
 	PhoneGap.addPlugin("LibraryPlugin", new LibraryPlugin());
 });
 
+var active_span = '<span class="ui-icon ui-icon-added-to-playlist ui-icon-shadow"></span>';
+
 function loadBrowseResult(e) {
 	var result = eval(e);
 	for ( var i = 0; i < result.length; i++) {
@@ -48,12 +50,12 @@ function clearLibraryList() {
 }
 
 function addItemToListView(item) {
-	var html = "<li data-icon='false' itemId='" + item.id + "' ";
+	var html = "<li itemId='" + item.id + "'";
 
 	if (item.selected == "true") {
-		html += "class='ui-btn-active' ";
+		html += "data-icon='added-to-playlist' ";
 	} else {
-		html += "class='ui-button' ";
+		html += "data-icon='false' ";
 	}
 	if (item.url != null) {
 		html += "url='" + item.url + "' ";
@@ -62,9 +64,13 @@ function addItemToListView(item) {
 		html += "onclick='onContainerClick(\"" + item.id + "\");'>";
 	} else
 		html += "onclick='onItemClick(\"" + item.id + "\");'>";
-	html += "<a href='#' style='padding-top: 0px;padding-bottom: 0px' data-icon='delete'><img src='" + item.icon
-			+ "' style='height: 100%; width: height; padding-left: 4%; float: left;'/><h3>" + item.name + "</h3><p>"
-			+ (item.childCount != null ? (item.childCount.toString() + " childs") : " ") + "</p></a></li>";
+	html += "<a href='#' style='padding-top: 0px;padding-bottom: 0px' data-icon='delete'><img src='"
+			+ item.icon
+			+ "' style='height: 100%; width: height; padding-left: 4%; float: left;'/><h3>"
+			+ item.name
+			+ "</h3><p>"
+			+ (item.childCount != null ? (item.childCount.toString() + " childs")
+					: " ") + "</p></a></li>";
 	library_listview.append(html);
 	library_listview.listview('refresh');
 	myScroll_libs.refresh();
@@ -94,20 +100,24 @@ function notifyBrowseComplete() {
 
 function addItemToPlaylist(url) {
 	console.log(url);
-	$('li').each(function(index) {
-		if ($(this).attr('url') != null && $(this).attr('url').toString() == url) {
-			$(this).addClass("ui-btn-active");
-		}
-	});
+	$('li').each(
+			function(index) {
+				if ($(this).attr('url') != null
+						&& $(this).attr('url').toString() == url) {
+					$(this).find('div:first').append(active_span);
+				}
+			});
 	dmr_listview.listview('refresh');
 }
 
 function removeItemFromPlaylist(url) {
 	console.log(url);
-	$('li').each(function(index) {
-		if ($(this).attr('url') != null && $(this).attr('url').toString() == url) {
-			$(this).removeClass("ui-btn-active");
-		}
-	});
+	$('li').each(
+			function(index) {
+				if ($(this).attr('url') != null
+						&& $(this).attr('url').toString() == url) {
+					$(this).find('span:first').remove();
+				}
+			});
 	dmr_listview.listview('refresh');
 }
