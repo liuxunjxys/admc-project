@@ -1,5 +1,4 @@
-#div_libs_toolbar
-{
+#div_libs_toolbar {
 	position: relative;
 	height: 15%;
 	width: 100%;
@@ -7,7 +6,7 @@
 	margin: 0px;
 }
 
-#div_libs_toolbar div#div_libs_toolbar_left{
+#div_libs_toolbar div#div_libs_toolbar_left {
 	position: absolute;
 	padding: 0px;
 	margin: 0px;
@@ -16,7 +15,7 @@
 	width: 18%;
 }
 
-#div_libs_toolbar div#div_libs_toolbar_right{
+#div_libs_toolbar div#div_libs_toolbar_right {
 	position: absolute;
 	padding: 0px;
 	margin: 0px;
@@ -25,14 +24,14 @@
 	width: 82%;
 }
 
-#div_libs_toolbar div#div_libs_toolbar_left img{
+#div_libs_toolbar div#div_libs_toolbar_left img {
 	padding-left: 5%;
 	padding-top: 5px;
 	height: 90%;
 	width: height;
 }
 
-#div_libs_toolbar div#div_libs_toolbar_right input{
+#div_libs_toolbar div#div_libs_toolbar_right input {
 	position: absolute;
 	margin-left: 0px;
 	margin-right: 0px;
@@ -44,8 +43,7 @@
 	width: 96%;
 }
 
-.div_library_list 
-{
+.div_library_list {
 	clear: both;
 	position: relative;
 	height: 78%;
@@ -53,8 +51,7 @@
 	padding: 0px;
 }
 
-
-#div_lib_selection_bar{
+#div_lib_selection_bar {
 	position: relative;
 	height: 7%;
 	width: 100%;
@@ -63,7 +60,7 @@
 	border-top: 1px solid #CCC;
 }
 
-#div_lib_selection_bar div{
+#div_lib_selection_bar div {
 	position: relative;
 	float: left;
 	width: 50%;
@@ -71,9 +68,9 @@
 	padding: 0px;
 	margin: 0px;
 	-webkit-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    -moz-border-radius  : 8px;
-    -moz-border-radius  : 8px;  
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 8px;
+	-moz-border-radius: 8px;
 }
 
 #div_lib_selection_bar div img {
@@ -81,4 +78,9 @@
 	margin: 0px;
 	height: 90%;
 	width: auto;
+}
+
+.ui-icon-added-to-playlist {
+	background-image: url(../img/ic_checked.png);
+	background-repeat: no-repeat;
 }
