@@ -105,7 +105,8 @@ public class YoutubePlugin extends Plugin {
 		JSONObject result = new JSONObject();
 		try {
 			result.put("idx", String.valueOf(idx));
-			result.put("title", item.getTitle());
+			result.put("title", item.getTitle().trim().replace("\"", "\\\"").replace("'", " "));
+			Log.i(TAG, "title = " + item.getTitle());
 			result.put("thumb", item.getThumbnail());
 			result.put("duration", item.getDuration());
 		} catch (JSONException e) {
@@ -128,8 +129,7 @@ public class YoutubePlugin extends Plugin {
 				if (playlistProcessor.isFull()) {
 					Toast.makeText(MainActivity.INSTANCE, "Current playlist is full", Toast.LENGTH_SHORT).show();
 				} else {
-					Toast.makeText(MainActivity.INSTANCE, "Item already exits in current Playlist", Toast.LENGTH_SHORT)
-							.show();
+					Toast.makeText(MainActivity.INSTANCE, "Item already exits in current Playlist", Toast.LENGTH_SHORT).show();
 				}
 			}
 		}
@@ -162,8 +162,8 @@ public class YoutubePlugin extends Plugin {
 					dismissProgress();
 					String generatedURL;
 					try {
-						generatedURL = new URI("http", HTTPServerData.HOST + ":" + HTTPServerData.PORT, result, null,
-								null).toString();
+						generatedURL = new URI("http", HTTPServerData.HOST + ":" + HTTPServerData.PORT, result, null, null)
+								.toString();
 						Log.i(TAG, "Generated URL = " + generatedURL);
 						insertPlaylistItem(title, link, generatedURL);
 					} catch (URISyntaxException e) {

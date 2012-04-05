@@ -43,6 +43,8 @@ function loadBrowseResult(e) {
 	}
 	myScroll_libs.scrollTo(0, 0, 0);
 	hideLoadingIcon();
+	library_listview.listview('refresh');
+	myScroll_libs.refresh();
 }
 
 function clearLibraryList() {
@@ -64,17 +66,10 @@ function addItemToListView(item) {
 		html += "onclick='onContainerClick(\"" + item.id + "\");'>";
 	} else
 		html += "onclick='onItemClick(\"" + item.id + "\");'>";
-	html += "<a href='#' style='padding-top: 0px;padding-bottom: 0px' data-icon='delete'><img src='"
-			+ item.icon
-			+ "' style='height: 100%; width: height; padding-left: 4%; float: left;'/><h3>"
-			+ item.name
-			+ "</h3><p>"
-			+ (item.childCount != null ? (item.childCount.toString() + " childs")
-					: " ") + "</p></a></li>";
+	html += "<a href='#' style='padding-top: 0px;padding-bottom: 0px' data-icon='delete'><img src='" + item.icon
+			+ "' style='height: 100%; width: height; padding-left: 4%; float: left;'/><h3>" + item.name + "</h3><p>"
+			+ (item.childCount != null ? (item.childCount.toString() + " childs") : " ") + "</p></a></li>";
 	library_listview.append(html);
-	library_listview.listview('refresh');
-	myScroll_libs.refresh();
-
 }
 
 function onContainerClick(id) {
@@ -100,24 +95,20 @@ function notifyBrowseComplete() {
 
 function addItemToPlaylist(url) {
 	console.log(url);
-	$('li').each(
-			function(index) {
-				if ($(this).attr('url') != null
-						&& $(this).attr('url').toString() == url) {
-					$(this).find('div:first').append(active_span);
-				}
-			});
+	$('li').each(function(index) {
+		if ($(this).attr('url') != null && $(this).attr('url').toString() == url) {
+			$(this).find('div:first').append(active_span);
+		}
+	});
 	dmr_listview.listview('refresh');
 }
 
 function removeItemFromPlaylist(url) {
 	console.log(url);
-	$('li').each(
-			function(index) {
-				if ($(this).attr('url') != null
-						&& $(this).attr('url').toString() == url) {
-					$(this).find('span:first').remove();
-				}
-			});
+	$('li').each(function(index) {
+		if ($(this).attr('url') != null && $(this).attr('url').toString() == url) {
+			$(this).find('span:first').remove();
+		}
+	});
 	dmr_listview.listview('refresh');
 }

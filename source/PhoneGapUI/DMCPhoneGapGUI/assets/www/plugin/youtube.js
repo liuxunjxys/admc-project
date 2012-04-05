@@ -16,8 +16,7 @@ PhoneGap.addConstructor(function() {
 });
 
 function showYoutubeResult(e) {
-	console.log('show result');
-	console.log(e);
+	clearYoutubeList();
 	var result = eval(e);
 	for ( var i = 0; i < result.length; i++) {
 		console.log('add to list');
@@ -26,6 +25,8 @@ function showYoutubeResult(e) {
 	}
 	myScroll_libs.scrollTo(0, 0, 0);
 	hideLoadingIcon();
+	youttube_listview.listview('refresh');
+	myScroll_youtube.refresh();
 }
 
 function yt_addItemToListView(item) {
@@ -37,12 +38,13 @@ function yt_addItemToListView(item) {
 		html += "url='" + item.url + "' ";
 	}
 	html += "onclick='onYoutubeItemClick(\'" + item.idx + "\");'>";
-	html += "<a href='#' style='padding-top: 0px;padding-bottom: 0px' data-icon='delete'><img src='"
-			+ item.thumb
-			+ "' style='height: 100%; width: height; padding-left: 4%; float: left;'/><h3>"
-			+ item.title + "</h3><p>" + item.duration + "</p></a></li>";
+	html += "<a href='#' style='padding-top: 0px;padding-bottom: 0px' data-icon='delete'><img src='" + item.thumb
+			+ "' style='height: 100%; width: height; padding-left: 4%; float: left;'/><h3>" + item.title + "</h3><p>" + item.duration
+			+ "</p></a></li>";
 	youttube_listview.append(html);
-	youttube_listview.listview('refresh');
-	youttube_listview.refresh();
 	console.log(html);
+}
+
+function clearYoutubeList() {
+	youttube_listview.html('');
 }
