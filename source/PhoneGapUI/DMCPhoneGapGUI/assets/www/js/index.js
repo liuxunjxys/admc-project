@@ -8,6 +8,7 @@ var icon_loading;
 var dms_listview; // list dms
 var dmr_listview; // list dmr
 var library_listview;
+var youttube_listview;
 
 var time_to_swap_image = 300;
 
@@ -43,11 +44,11 @@ function iScrollConfig() {
 	}, 200);
 }
 
-function changeImagePath (sender, imgPath){
+function changeImagePath(sender, imgPath) {
 	$(sender).attr('src', imgPath);
 }
 
-function changeImagePath (sender, imgPath, timeOut){
+function changeImagePath(sender, imgPath, timeOut) {
 	setTimeout(function() {
 		$(sender).attr('src', imgPath);
 	}, timeOut);
@@ -93,6 +94,7 @@ function myInitPage() {
 	dms_listview = $('#div_wrraper_devi_dmS ul:first');
 	dmr_listview = $('#div_wrraper_devi_dmR ul:first');
 	library_listview = $('#div_wrapper_libs ul:first');
+	youttube_listview = $('#div_wrapper_you ul:first');
 
 	icon_loading = $('#icon_loading');
 	icon_loading.hide();
@@ -115,26 +117,27 @@ function myInitDevicesSide() {
 		myScroll_devi_dmS.refresh();
 	}, 0);
 
-	$('div.div_devi_subcontent div img.img_devi_navigate').live('click', function() {
-		var id = $(this).attr('id');
-		switch (id) {
-		case "img_devi_goNext":
-			$('div#div_devi_dmS').hide();
-			$('div#div_devi_dmR').fadeIn('slow');
-			setTimeout(function() {
-				myScroll_devi_dmR.refresh();
-			}, 0);
-			break;
+	$('div.div_devi_subcontent div img.img_devi_navigate').live('click',
+			function() {
+				var id = $(this).attr('id');
+				switch (id) {
+				case "img_devi_goNext":
+					$('div#div_devi_dmS').hide();
+					$('div#div_devi_dmR').fadeIn('slow');
+					setTimeout(function() {
+						myScroll_devi_dmR.refresh();
+					}, 0);
+					break;
 
-		case "img_devi_goPrevious":
-			$('div#div_devi_dmR').hide();
-			$('div#div_devi_dmS').fadeIn('slow');
-			setTimeout(function() {
-				myScroll_devi_dmS.refresh();
-			}, 0);
-			break;
-		}
-	});
+				case "img_devi_goPrevious":
+					$('div#div_devi_dmR').hide();
+					$('div#div_devi_dmS').fadeIn('slow');
+					setTimeout(function() {
+						myScroll_devi_dmS.refresh();
+					}, 0);
+					break;
+				}
+			});
 }
 /* Library side */
 function onClick_previousResult() {
@@ -187,67 +190,68 @@ function disablePrevPageButton() {
 }
 
 /* Youtube side */
-//Button search event
-function onClick_search_you (sender){
+// Button search event
+function onClick_search_you(sender) {
 	console.log('Search');
+	window.plugins.YoutubePlugin.query($('#div_you_toolbar_left input').val());
 }
 
-//Button use proxy event 
-function onClick_activateProxy_you (sender){
+// Button use proxy event
+function onClick_activateProxy_you(sender) {
 	var state = $(sender).attr('data-my-state');
-	if (state == "activated"){
-		//Code deactivate here
+	if (state == "activated") {
+		// Code deactivate here
 		console.log('deactivated process');
-		
+
 		$(sender).attr('data-my-state', 'deactivated');
-	}else{
-		//Code activate here
+	} else {
+		// Code activate here
 		console.log('activated process');
-		
+
 		$(sender).attr('data-my-state', 'activated');
 	}
 }
 
 /* Playlists side */
-function myInitPlaylistsSide (){
-	$('#div_field_seekbar input').bind('change', function (event, ui){
+function myInitPlaylistsSide() {
+	$('#div_field_seekbar input').bind('change', function(event, ui) {
 		console.log('onChange');
 		console.log(event);
 		console.log(ui);
 	});
 }
 
-function onClick_play_play (sender){
+/* Playlists side */
+function onClick_play_play(sender) {
 	var state = $(sender).attr('data-my-state');
-	if (state == "play"){
+	if (state == "play") {
 		changeImagePath(sender, 'img/media_pause_icon.png', time_to_swap_image);
 		$(sender).attr('data-my-state', 'pause');
-		
-	}else{
+
+	} else {
 		changeImagePath(sender, 'img/media_play_icon.png', time_to_swap_image);
 		$(sender).attr('data-my-state', 'play');
-		
+
 	}
 }
 
-function onMouseDown_play_play (sender){
+function onMouseDown_play_play(sender) {
 	var state = $(sender).attr('data-my-state');
-	if (state == "play"){
+	if (state == "play") {
 		changeImagePath(sender, 'img/media_play_icon_hl.png');
-	}else{
+	} else {
 		changeImagePath(sender, 'img/media_pause_icon_hl.png');
 	}
 }
 
-function onClick_next_play (sender){
+function onClick_next_play(sender) {
 	changeImagePath(sender, 'img/media_next_icon.png', time_to_swap_image);
 }
 
-function onClick_previous_play (sender){
+function onClick_previous_play(sender) {
 	changeImagePath(sender, 'img/media_previous_icon.png', time_to_swap_image);
 }
 
-function onClick_stop_play (sender){
+function onClick_stop_play(sender) {
 	changeImagePath(sender, 'img/media_stop_icon.png', time_to_swap_image);
 }
-
