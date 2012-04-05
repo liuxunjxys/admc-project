@@ -65,7 +65,8 @@
 				<div id="div_devi_dmS" class="div_devi_subcontent">
 					<div id="div_devi_dmS_toolbar">
 						<img src="img/go_next_icon.png" id="img_devi_goNext"
-							class="img_devi_navigate">
+							class="img_devi_navigate"
+							onmousedown="changeImagePath(this, 'img/go_next_icon_hl.png')">
 					</div>
 					<div id="div_wrraper_devi_dmS">
 						<ul data-role="listview" data-theme="d">
@@ -76,7 +77,8 @@
 				<div id="div_devi_dmR" class="div_devi_subcontent">
 					<div id="div_devi_dmR_toolbar">
 						<img src="img/go_previous_icon.png" id="img_devi_goPrevious"
-							class="img_devi_navigate">
+							class="img_devi_navigate"
+							onmousedown="changeImagePath(this, 'img/go_previous_icon_hl.png')">
 					</div>
 					<div id="div_wrraper_devi_dmR">
 						<ul data-role="listview" data-theme="d">
@@ -124,7 +126,8 @@
 					</div>
 
 					<div id="div_you_toolbar_right">
-						<img src="img/search_icon.png">
+						<img src="img/search_icon.png"
+						onclick="onClick_search_you(this)">
 					</div>
 				</div>
 
@@ -198,7 +201,8 @@
 				</div>
 
 				<div id="div_you_proxy">
-					<a href="#"> <img src="img/proxy_activate.png">
+					<a href="#"> <img src="img/proxy_activate.png" data-my-state="activated"
+						onclick="onClick_activateProxy_you(this)">
 					</a>
 				</div>
 			</div>
