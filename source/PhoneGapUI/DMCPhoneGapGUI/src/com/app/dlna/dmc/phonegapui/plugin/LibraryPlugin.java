@@ -170,8 +170,9 @@ public class LibraryPlugin extends Plugin {
 				}
 				response.put(object);
 			}
-			if (response.length() != 0)
-				sendJavascript("loadBrowseResult('" + response.toString() + "');");
+			
+			sendJavascript("loadBrowseResult('" + response.toString() + "');");
+			
 			if (objectID.equals("0")) {
 				sendJavascript("disableBackButton();");
 			} else {
