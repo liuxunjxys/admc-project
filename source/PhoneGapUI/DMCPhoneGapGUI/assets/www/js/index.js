@@ -1,8 +1,8 @@
-var myScroll_devi_dmS;
-var myScroll_devi_dmR;
-var myScroll_libs;
+var myScroll_devices_dmS;
+var myScroll_devices_dmR;
+var myScroll_library;
 var myScroll_youtube;
-var myScroll_playlists;
+var myScroll_playlist;
 var icon_loading;
 
 var dms_listview; // list dms
@@ -21,18 +21,19 @@ $(document).ready(function() {
 	myInitPlaylistsSide();
 });
 
-//=============================GLOBAL MEDTHODS==========================================
+// =============================GLOBAL
+// MEDTHODS==========================================
 function iScrollConfig() {
 	setTimeout(function() {
-		myScroll_devi_dmS = new iScroll('div_wrraper_devi_dmS', {
+		myScroll_devices_dmS = new iScroll('div_wrraper_devi_dmS', {
 			hScroll : false,
 			vScrollbar : false
 		});
-		myScroll_devi_dmR = new iScroll('div_wrraper_devi_dmR', {
+		myScroll_devices_dmR = new iScroll('div_wrraper_devi_dmR', {
 			hScroll : false,
 			vScrollbar : false
 		});
-		myScroll_libs = new iScroll('div_wrapper_libs', {
+		myScroll_library = new iScroll('div_wrapper_libs', {
 			hScroll : false,
 			vScrollbar : false
 		});
@@ -40,7 +41,7 @@ function iScrollConfig() {
 			hScroll : false,
 			vScrollbar : false
 		});
-		myScroll_playlists = new iScroll('div_wrapper_play', {
+		myScroll_playlist = new iScroll('div_wrapper_play', {
 			hScroll : false,
 			vScrollbar : false
 		});
@@ -51,30 +52,32 @@ function changeImagePath(sender, imgPath) {
 	$(sender).attr('src', imgPath);
 }
 
-function changeImagePathWithTimeOut (sender, imgPath, timeOut){
+function changeImagePathWithTimeOut(sender, imgPath, timeOut) {
 	setTimeout(function() {
 		$(sender).attr('src', imgPath);
 	}, timeOut);
 }
 
-function changeStateImage (sender){
+function changeStateImage(sender) {
 	var currentPath = $(sender).attr('data-current-path');
 	var stateAImgPath = $(sender).attr('data-state-a');
 	var stateBImgPath = $(sender).attr('data-state-b');
-	if (currentPath == stateAImgPath){
+	if (currentPath == stateAImgPath) {
 		$(sender).attr('data-current-path', stateBImgPath);
-	}else{
+	} else {
 		$(sender).attr('data-current-path', stateAImgPath);
 	}
-	changeImagePathWithTimeOut(sender, $(sender).attr('data-current-path'), time_to_swap_image);
+	changeImagePathWithTimeOut(sender, $(sender).attr('data-current-path'),
+			time_to_swap_image);
 	var currentState = $(sender).attr('data-my-state');
-	if (currentState == 'true'){
+	if (currentState == 'true') {
 		currentState = 'false';
-	}else{
+	} else {
 		currentState = 'true';
 	}
 }
-//=========================================PAGE SIDE=================================
+// =========================================PAGE
+// SIDE=================================
 function myInitPage() {
 	$('div.div_subcontent').hide(); // all hide
 	$('div#content_devices').show(); // first tab appear
@@ -91,7 +94,7 @@ function myInitPage() {
 
 		case "content_library":
 			setTimeout(function() {
-				myScroll_libs.refresh();
+				myScroll_library.refresh();
 			}, 0);
 			break;
 
@@ -104,7 +107,7 @@ function myInitPage() {
 
 		case "content_playlists":
 			setTimeout(function() {
-				myScroll_playlists.refresh();
+				myScroll_playlist.refresh();
 			}, 0);
 			break;
 		}
@@ -119,31 +122,37 @@ function myInitPage() {
 
 	icon_loading = $('#icon_loading');
 	icon_loading.hide();
-	
-	//Mapping process for all image on page
+
+	// Mapping process for all image on page
 	$('.img_normal').live('vmousedown', function() {
 		changeImagePath($(this), $(this).attr('data-highlight-image'));
 	});
-	
-	$('.img_normal').live('vmouseup', function() {
-		changeImagePathWithTimeOut($(this), $(this).attr('data-normal-image'), time_to_swap_image);
-	});
-	
-	$('.img_double_state').live('vmousedown', function(){
+
+	$('.img_normal').live(
+			'vmouseup',
+			function() {
+				changeImagePathWithTimeOut($(this), $(this).attr(
+						'data-normal-image'), time_to_swap_image);
+			});
+
+	$('.img_double_state').live('vmousedown', function() {
 		var currentPath = $(this).attr('data-current-path');
 		var stateAImgPath = $(this).attr('data-state-a');
 		var highlightImagePath = "";
-		if (currentPath == stateAImgPath){
+		if (currentPath == stateAImgPath) {
 			highlightImagePath = $(this).attr('data-highlight-a');
-		}else{
+		} else {
 			highlightImagePath = $(this).attr('data-highlight-b');
 		}
 		changeImagePath($(this), highlightImagePath);
 	});
-	
-	$('.img_double_state').live('vmouseup', function() {
-		changeImagePathWithTimeOut($(this), $(this).attr('data-current-path'), time_to_swap_image);
-	});
+
+	$('.img_double_state').live(
+			'vmouseup',
+			function() {
+				changeImagePathWithTimeOut($(this), $(this).attr(
+						'data-current-path'), time_to_swap_image);
+			});
 }
 
 /* User interface */
@@ -155,48 +164,59 @@ function hideLoadingIcon() {
 	icon_loading.hide();
 }
 
-//================================================DEVICES SIDE===========================
+// ================================================DEVICES
+// SIDE===========================
 function myInitDevicesSide() {
 	$('div#content_devices div.div_devi_subcontent').hide();
 	$('div#div_devi_dmS').show();
 	setTimeout(function() {
-		myScroll_devi_dmS.refresh();
+		myScroll_devices_dmS.refresh();
 	}, 0);
 
-	$('div.div_devi_subcontent div img.img_normal').live('tap',
-			function() {
-				var id = $(this).attr('id');
-				switch (id) {
-				case "img_devi_goNext":
-					setTimeout(function(){
-						$('div#div_devi_dmS').hide();
-						$('div#div_devi_dmR').fadeIn('slow');
-						setTimeout(function() {
-							myScroll_devi_dmR.refresh();
-						}, 0);
-					}, time_to_swap_image);
-					break;
+	$('div.div_devi_subcontent div img.img_normal').live('tap', function() {
+		var id = $(this).attr('id');
+		switch (id) {
+		case "img_devi_goNext":
+			setTimeout(function() {
+				$('div#div_devi_dmS').hide();
+				$('div#div_devi_dmR').fadeIn('slow');
+				setTimeout(function() {
+					myScroll_devices_dmR.refresh();
+				}, 0);
+			}, time_to_swap_image);
+			$('div#div_devi_dmS').hide();
+			$('div#div_devi_dmR').fadeIn('slow');
+			setTimeout(function() {
+				myScroll_devices_dmR.refresh();
+			}, 0);
+			break;
 
-				case "img_devi_goPrevious":
-					setTimeout(function(){
-						$('div#div_devi_dmR').hide();
-						$('div#div_devi_dmS').fadeIn('slow');
-						setTimeout(function() {
-							myScroll_devi_dmS.refresh();
-						}, 0);
-					}, time_to_swap_image);
-					break;
-				}
-			});
-}
-//==========================================LIBRARY SIDE=================================
-function myInitLibrarySide(){
-	$('#btn_select').bind('tap', function(){
-		onClick_SelectAll ($(this));
+		case "img_devi_goPrevious":
+			setTimeout(function() {
+				$('div#div_devi_dmR').hide();
+				$('div#div_devi_dmS').fadeIn('slow');
+				setTimeout(function() {
+					myScroll_devies_dmS.refresh();
+				}, 0);
+			}, time_to_swap_image);
+			$('div#div_devi_dmR').hide();
+			$('div#div_devi_dmS').fadeIn('slow');
+			setTimeout(function() {
+				myScroll_devices_dmS.refresh();
+			}, 0);
+			break;
+		}
 	});
-	
-$('#btn_deselect').bind('tap', function(){
-		onClick_DeselectAll ($(this));
+}
+// ==========================================LIBRARY
+// SIDE=================================
+function myInitLibrarySide() {
+	$('#btn_select').bind('tap', function() {
+		onClick_SelectAll($(this));
+	});
+
+	$('#btn_deselect').bind('tap', function() {
+		onClick_DeselectAll($(this));
 	});
 }
 
@@ -249,24 +269,25 @@ function disablePrevPageButton() {
 	$('#btn_prevPage').attr("enable", "false");
 }
 
-//SELECT ALL and DESELECT ALL EVENT
-function onClick_SelectAll (sender){
+// SELECT ALL and DESELECT ALL EVENT
+function onClick_SelectAll(sender) {
 	console.log('Select all');
 }
 
-function onClick_DeselectAll (sender){
+function onClick_DeselectAll(sender) {
 	console.log('Deselect all');
 }
-//=============================================YOUTUBE SIDE==============================
-function myInitYoutubeSide (){
-	$('#div_you_toolbar_right img').bind('tap', function (){
-		onClick_search_you ($(this));
+// =============================================YOUTUBE
+// SIDE==============================
+function myInitYoutubeSide() {
+	$('#div_you_toolbar_right img').bind('tap', function() {
+		onClick_search_you($(this));
 	});
-	
-	$('#div_you_proxy img').bind('tap', function (){
-		onClick_activateProxy_you ($(this));
+
+	$('#div_you_proxy img').bind('tap', function() {
+		onClick_activateProxy_you($(this));
 	});
-	
+
 }
 
 // Button search event
@@ -278,132 +299,123 @@ function onClick_search_you(sender) {
 // Button use proxy event
 function onClick_activateProxy_you(sender) {
 	var state = $(sender).attr('data-my-state');
-	if (state == "true"){ //activated
+	if (state == "true") { // activated
 		changeStateImage(sender);
-	}else{
+	} else {
 		changeStateImage(sender);
 	}
 }
 
-//==============================================PLAYLISTS SIDE==============================
+// ==============================================PLAYLISTS
+// SIDE==============================
 
-function myInitPlaylistsSide (){
-	$('#img_media_control_previous').bind('tap', function(){
-		onClick_previous_play ($(this));
+function myInitPlaylistsSide() {
+	$('#img_media_control_previous').bind('tap', function() {
+		onClick_previous_play($(this));
 	});
-	
-	$('#img_media_control_stop').bind('tap', function(){
-		onClick_stop_play ($(this));
+
+	$('#img_media_control_stop').bind('tap', function() {
+		onClick_stop_play($(this));
 	});
-	
-	$('#img_media_control_next').bind('tap', function(){
-		onClick_next_play ($(this));
+
+	$('#img_media_control_next').bind('tap', function() {
+		onClick_next_play($(this));
 	});
-	
-	$('#img_media_control_play').bind('tap', function(){
+
+	$('#img_media_control_play').bind('tap', function() {
 		onClick_play_play($(this));
 	});
-	
-	$('#img_media_control_volume').bind('tap', function(){
+
+	$('#img_media_control_volume').bind('tap', function() {
 		onClick_volume_play($(this));
 	});
-	
-	$('#div_field_seekbar input').bind('change', function(){
+
+	$('#div_field_seekbar input').bind('change', function() {
 		onChange_durationBar($(this));
 	})
-	
-	$('#div_play_volume_left input').bind('change', function(){
+
+	$('#div_play_volume_left input').bind('change', function() {
 		onChange_volumeBar($(this));
 	})
 }
-//Parameter note: sender is seekbar (slider) that you want to set it values
-//This method for init-time (if needed - in myInitPlaylistsSide method)
-//By default (in html file): 
-//	duration-seekbar: currentValue = 0, maxValue = 300
-//	volume-seekbar: currentValue = 50, maxValue = 50
-function setValueForSeekBar (sender, currentValue, maxValue){
+// Parameter note: sender is seekbar (slider) that you want to set it values
+// This method for init-time (if needed - in myInitPlaylistsSide method)
+// By default (in html file):
+// duration-seekbar: currentValue = 0, maxValue = 300
+// volume-seekbar: currentValue = 50, maxValue = 50
+function setValueForSeekBar(sender, currentValue, maxValue) {
 	$(sender).attr('max', maxValue);
 	$(sender).attr('value', currentValue);
 }
 
-//SEEK BAR EVENT-----------------------------------
-//Seek bar - duration of content
-function onChange_durationBar (sender){
+// SEEK BAR EVENT-----------------------------------
+// Seek bar - duration of content
+function onChange_durationBar(sender) {
 	var currentValue = $(sender).attr('value');
 	var maxValue = $(sender).attr('max');
-	
+
 	console.log('max: ' + currentValue);
 	console.log('current: ' + maxValue);
 }
 
-//Seek bar - volume
-function onChange_volumeBar (sender){
+// Seek bar - volume
+function onChange_volumeBar(sender) {
 	var currentValue = $(sender).attr('value');
 	var maxValue = $(sender).attr('max');
-	
+
 	console.log('max: ' + currentValue);
 	console.log('current: ' + maxValue);
 }
 
-
-//MEDIA CONTROLER EVENT-----------------------------
-//OnClick event of PLAY button
-function onClick_play_play (sender){
+// MEDIA CONTROLER EVENT-----------------------------
+// OnClick event of PLAY button
+function onClick_play_play(sender) {
 	var state = $(sender).attr('data-my-state');
-	if (state == "true"){
-		//convert to pausing state
+	if (state == "true") {
+		// convert to pausing state
 		console.log('convert to PAUSING state');
-		changeStateImage(sender);//call when successful
+		changeStateImage(sender);// call when successful
 	} else {
-		//convert to playing state
+		// convert to playing state
 		console.log('convert to PLAYING state');
-		changeStateImage(sender);//call when successful
+		changeStateImage(sender);// call when successful
 	}
 }
 
-//OnClick event of NEXT button
-function onClick_next_play (sender){
+// OnClick event of NEXT button
+function onClick_next_play(sender) {
 	console.log('CLick event on NEXT button');
 }
 
-//OnClick event of PREVIOUS button
-function onClick_previous_play (sender){
+// OnClick event of PREVIOUS button
+function onClick_previous_play(sender) {
 	console.log('CLick event on PREVIOUS button');
 }
 
-//OnClick event of STOP button
-function onClick_stop_play (sender){
+// OnClick event of STOP button
+function onClick_stop_play(sender) {
 	console.log('CLick event on STOP button');
 }
 
-//OnClick event of VOLUME button{
-function onClick_volume_play (sender){
+// OnClick event of VOLUME button{
+function onClick_volume_play(sender) {
 	var state = $(sender).attr('data-my-state');
-	if (state == "true"){
-		//convert to mute state
+	if (state == "true") {
+		// convert to mute state
 		console.log('convert to MUTE state');
-		changeStateImage(sender);//call when successful
-	}else{
-		//convert to activate state
+		changeStateImage(sender);// call when successful
+	} else {
+		// convert to activate state
 		console.log('convert to ACTIVATED state');
-		changeStateImage(sender);//call when successful
+		changeStateImage(sender);// call when successful
 	}
 }
 
 /*
-NOTICE: About state of double-state button (be defined in data-my-state attribute)
-On Youtube-view:
-	+ Proxy button:
-		- true: proxy-mode is ACTIVATED
-		- false: proxy-mode is DEACTIVATED
-		* default: false
-On Playlists-view:
-	+ Play/Pause button:
-		- true: on PLAYING state
-		- false: on PLAUSING state
-		* default: false
-	+ Volume button:
-		- true: on ACTIVATED mode
-		- false: on MUTE mode
-		* default: true
-*/
+ * NOTICE: About state of double-state button (be defined in data-my-state
+ * attribute) On Youtube-view: + Proxy button: - true: proxy-mode is ACTIVATED -
+ * false: proxy-mode is DEACTIVATED default: false On Playlists-view: +
+ * Play/Pause button: - true: on PLAYING state - false: on PLAUSING state
+ * default: false + Volume button: - true: on ACTIVATED mode - false: on MUTE
+ * mode default: true
+ */

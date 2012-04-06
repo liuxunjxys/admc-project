@@ -161,6 +161,7 @@ public class DMSProcessorImpl implements DMSProcessor {
 					} catch (Exception e) {
 						e.printStackTrace();
 						listener.onBrowseFail(e.getMessage());
+						m_traceID.remove(m_traceID.size() - 1);
 					}
 				}
 
