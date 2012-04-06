@@ -68,12 +68,24 @@ public class LibraryPlugin extends Plugin {
 			Log.i(TAG, "Next page");
 			MainActivity.UPNP_PROCESSOR.getDMSProcessor().nextPage(m_lisListner);
 		} else if (ACTION_ADDTOPLAYLIST.equals(action)) {
-			String objectID;
+			String objectID = "";
 			try {
 				objectID = data.getString(0);
 				addToPlaylist(MainActivity.UPNP_PROCESSOR.getDMSProcessor().getDIDLObject(objectID));
 			} catch (JSONException e) {
 				return new PluginResult(Status.JSON_EXCEPTION);
+			}
+		} else if (ACTION_SELECT_ALL.equals(action)) {
+			MainActivity.UPNP_PROCESSOR.getDMSProcessor().addAllToPlaylist(
+					MainActivity.UPNP_PROCESSOR.getPlaylistProcessor());
+			for (DIDLObject object : MainActivity.UPNP_PROCESSOR.getDMSProcessor().getAllObjects()) {
+				sendJavascript("addItemToPlaylist('" + object.getResources().get(0).getValue() + "');");
+			}
+		} else if (ACTION_DESELECT_ALL.equals(action)) {
+			MainActivity.UPNP_PROCESSOR.getDMSProcessor().removeAllFromPlaylist(
+					MainActivity.UPNP_PROCESSOR.getPlaylistProcessor());
+			for (DIDLObject object : MainActivity.UPNP_PROCESSOR.getDMSProcessor().getAllObjects()) {
+				sendJavascript("removeItemFromPlaylist('" + object.getResources().get(0).getValue() + "');");
 			}
 		}
 
@@ -97,14 +109,12 @@ public class LibraryPlugin extends Plugin {
 			item.setType(Type.IMAGE);
 		}
 		if (m_playlistProcessor.addItem(item)) {
-			// UpdateView
 			sendJavascript("addItemToPlaylist('" + object.getResources().get(0).getValue() + "');");
 		} else {
 			if (m_playlistProcessor.isFull()) {
 				Toast.makeText(MainActivity.INSTANCE, "Current playlist is full", Toast.LENGTH_SHORT).show();
 			} else {
 				m_playlistProcessor.removeItem(item);
-				// UpdateView
 				sendJavascript("removeItemFromPlaylist('" + object.getResources().get(0).getValue() + "');");
 			}
 		}
@@ -191,4 +201,5 @@ public class LibraryPlugin extends Plugin {
 			}
 		}
 	};
+
 }
