@@ -14,11 +14,6 @@ LibraryPlugin.prototype.back = function() {
 	PhoneGap.exec(null, null, 'LibraryPlugin', 'back', [ "" ]);
 };
 
-LibraryPlugin.prototype.getCurrentPage = function() {
-	showLoadingIcon();
-	PhoneGap.exec(null, null, 'LibraryPlugin', 'getCurrentPage', [ "" ]);
-};
-
 LibraryPlugin.prototype.nextPage = function() {
 	showLoadingIcon();
 	PhoneGap.exec(null, null, 'LibraryPlugin', 'nextPage', [ "" ]);
@@ -27,6 +22,16 @@ LibraryPlugin.prototype.nextPage = function() {
 LibraryPlugin.prototype.previousPage = function() {
 	showLoadingIcon();
 	PhoneGap.exec(null, null, 'LibraryPlugin', 'previousPage', [ "" ]);
+};
+
+LibraryPlugin.prototype.selectAll = function() {
+	showLoadingIcon();
+	PhoneGap.exec(null, null, 'LibraryPlugin', 'selectAll', [ "" ]);
+};
+
+LibraryPlugin.prototype.deselectAll = function() {
+	showLoadingIcon();
+	PhoneGap.exec(null, null, 'LibraryPlugin', 'deselectAll', [ "" ]);
 };
 
 PhoneGap.addConstructor(function() {

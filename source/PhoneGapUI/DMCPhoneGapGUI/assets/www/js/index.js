@@ -272,10 +272,12 @@ function disablePrevPageButton() {
 // SELECT ALL and DESELECT ALL EVENT
 function onClick_SelectAll(sender) {
 	console.log('Select all');
+	window.plugins.LibraryPlugin.selectAll();
 }
 
 function onClick_DeselectAll(sender) {
 	console.log('Deselect all');
+	window.plugins.LibraryPlugin.deselectAll();
 }
 // =============================================YOUTUBE
 // SIDE==============================

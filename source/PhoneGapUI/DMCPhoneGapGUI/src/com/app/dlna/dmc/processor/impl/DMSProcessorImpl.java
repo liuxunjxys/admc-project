@@ -18,11 +18,16 @@ import org.teleal.cling.support.contentdirectory.DIDLParser;
 import org.teleal.cling.support.model.DIDLContent;
 import org.teleal.cling.support.model.DIDLObject;
 import org.teleal.cling.support.model.container.Container;
+import org.teleal.cling.support.model.item.AudioItem;
 import org.teleal.cling.support.model.item.Item;
+import org.teleal.cling.support.model.item.VideoItem;
 
 import android.util.Log;
 
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor;
+import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
+import com.app.dlna.dmc.processor.playlist.PlaylistItem;
+import com.app.dlna.dmc.processor.playlist.PlaylistItem.Type;
 
 public class DMSProcessorImpl implements DMSProcessor {
 
@@ -138,7 +143,8 @@ public class DMSProcessorImpl implements DMSProcessor {
 					try {
 						DIDLParser parser = new DIDLParser();
 						DIDLContent content = parser.parse(invocation.getOutput("Result").toString());
-						Log.i(TAG, "Container = " + content.getContainers().size() + " Item = " + content.getItems().size());
+						Log.i(TAG, "Container = " + content.getContainers().size() + " Item = "
+								+ content.getItems().size());
 						Map<String, List<? extends DIDLObject>> result = new HashMap<String, List<? extends DIDLObject>>();
 						List<Container> containers = content.getContainers();
 						List<Item> items = content.getItems();
@@ -207,4 +213,60 @@ public class DMSProcessorImpl implements DMSProcessor {
 		}
 		return null;
 	}
+
+	@Override
+	public void removeAllFromPlaylist(PlaylistProcessor playlistProcessor) {
+		if (playlistProcessor == null) {
+			Log.w(TAG, "Playlist processor = null");
+			return;
+		}
+		int count = m_DIDLObjectList.size();
+		for (int i = 0; i < count; ++i) {
+			DIDLObject object = m_DIDLObjectList.get(i);
+			if (object instanceof Item) {
+				PlaylistItem item = new PlaylistItem();
+				item.setTitle(object.getTitle());
+				item.setUrl(object.getResources().get(0).getValue());
+				if (object instanceof AudioItem) {
+					item.setType(Type.AUDIO);
+				} else if (object instanceof VideoItem) {
+					item.setType(Type.VIDEO);
+				} else {
+					item.setType(Type.IMAGE);
+				}
+				playlistProcessor.removeItem(item);
+			}
+		}
+	}
+
+	@Override
+	public void addAllToPlaylist(PlaylistProcessor playlistProcessor) {
+		if (playlistProcessor == null) {
+			Log.w(TAG, "Playlist processor = null");
+			return;
+		}
+		int count = m_DIDLObjectList.size();
+		for (int i = 0; i < count; ++i) {
+			DIDLObject object = m_DIDLObjectList.get(i);
+			if (object instanceof Item) {
+				PlaylistItem item = new PlaylistItem();
+				item.setTitle(object.getTitle());
+				item.setUrl(object.getResources().get(0).getValue());
+				if (object instanceof AudioItem) {
+					item.setType(Type.AUDIO);
+				} else if (object instanceof VideoItem) {
+					item.setType(Type.VIDEO);
+				} else {
+					item.setType(Type.IMAGE);
+				}
+				playlistProcessor.addItem(item);
+			}
+		}
+	}
+
+	@Override
+	public List<DIDLObject> getAllObjects() {
+		return m_DIDLObjectList;
+	}
+
 }

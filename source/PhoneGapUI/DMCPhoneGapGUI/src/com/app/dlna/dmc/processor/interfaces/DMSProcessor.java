@@ -17,10 +17,17 @@ public interface DMSProcessor {
 	void dispose();
 
 	public interface DMSProcessorListner {
-		void onBrowseComplete(String objectID, boolean haveNext, boolean havePrev, Map<String, List<? extends DIDLObject>> result);
+		void onBrowseComplete(String objectID, boolean haveNext, boolean havePrev,
+				Map<String, List<? extends DIDLObject>> result);
 
 		void onBrowseFail(String message);
 	}
 
 	DIDLObject getDIDLObject(String objectID);
+
+	void addAllToPlaylist(PlaylistProcessor playlistProcessor);
+
+	void removeAllFromPlaylist(PlaylistProcessor playlistProcessor);
+
+	List<DIDLObject> getAllObjects();
 }
