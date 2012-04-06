@@ -23,28 +23,34 @@ function showYoutubeResult(e) {
 		var obj = result[i];
 		yt_addItemToListView(obj);
 	}
-	myScroll_libs.scrollTo(0, 0, 0);
 	hideLoadingIcon();
 	youttube_listview.listview('refresh');
 	myScroll_youtube.refresh();
+	myScroll_youtube.scrollTo(0, 0, 0);
 }
 
 function yt_addItemToListView(item) {
-	var html = "<li index='" + item.idx + "'";
+	var html = "<li index='" + item.idx + "' ";
 
 	html += "data-icon='false' ";
-
+	// "name": "Cuong's penis"
 	if (item.url != null) {
 		html += "url='" + item.url + "' ";
 	}
-	html += "onclick='onYoutubeItemClick(\'" + item.idx + "\");'>";
-	html += "<a href='#' style='padding-top: 0px;padding-bottom: 0px' data-icon='delete'><img src='" + item.thumb
-			+ "' style='height: 100%; width: height; padding-left: 4%; float: left;'/><h3>" + item.title + "</h3><p>" + item.duration
-			+ "</p></a></li>";
+	html += "onclick='yt_onYoutubeItemClick(" + item.idx + ");'>";
+	html += "<a href='#' style='padding-top: 0px;padding-bottom: 0px' data-icon='delete'><img src='"
+			+ item.thumb
+			+ "' style='height: 100%; width: height; padding-left: 4%; float: left;'/><h3>"
+			+ item.title + "</h3><p>" + item.duration + "</p></a></li>";
 	youttube_listview.append(html);
-	console.log(html);
 }
 
 function clearYoutubeList() {
 	youttube_listview.html('');
+}
+
+function yt_onYoutubeItemClick(idx) {
+	console.log(idx.toString());
+	// TODO: fix constant here
+	window.plugins.YoutubePlugin.addToPlaylist(idx, false);
 }

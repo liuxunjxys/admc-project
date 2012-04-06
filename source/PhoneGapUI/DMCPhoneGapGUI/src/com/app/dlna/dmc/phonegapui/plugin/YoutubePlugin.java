@@ -8,7 +8,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.ProgressDialog;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -30,7 +29,6 @@ public class YoutubePlugin extends Plugin {
 	private static final String ACTION_QUERY = "query";
 	private static final String ACTION_ADD_TO_PLAYLIST = "addToPlaylist";
 	private List<YoutubeItem> m_resultList;
-	private static ProgressDialog PROGRESS_DIALOG = null;
 
 	@Override
 	public PluginResult execute(String action, JSONArray data, String callbackId) {
@@ -51,7 +49,6 @@ public class YoutubePlugin extends Plugin {
 						executeNoProxy(title, link);
 					}
 				}
-
 			} catch (JSONException e) {
 				e.printStackTrace();
 				return new PluginResult(Status.JSON_EXCEPTION);
@@ -78,7 +75,7 @@ public class YoutubePlugin extends Plugin {
 						for (int i = 0; i < result.size(); ++i) {
 							array.put(createJsonFromYoutubeItem(result.get(i), i));
 						}
-						sendJavascript("showYoutubeResult('" + array.toString() + "');");
+						sendJavascript("showYoutubeResult('" + array.toString().replace("'", "\\'") + "');");
 						Log.i(TAG, "resutl = " + array.toString());
 					}
 
@@ -105,7 +102,7 @@ public class YoutubePlugin extends Plugin {
 		JSONObject result = new JSONObject();
 		try {
 			result.put("idx", String.valueOf(idx));
-			result.put("title", item.getTitle().trim().replace("\"", "\\\"").replace("'", " "));
+			result.put("title", item.getTitle().trim().replace("\"", "\\\""));
 			Log.i(TAG, "title = " + item.getTitle());
 			result.put("thumb", item.getThumbnail());
 			result.put("duration", item.getDuration());
@@ -118,18 +115,42 @@ public class YoutubePlugin extends Plugin {
 	private void insertPlaylistItem(final String title, final String link, final String directlink) {
 		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
 		if (playlistProcessor != null) {
-			PlaylistItem item = new PlaylistItem();
+			final PlaylistItem item = new PlaylistItem();
 			item.setTitle(title);
 			item.setUrl(directlink);
 			item.setType(Type.VIDEO);
 			if (playlistProcessor.addItem(item))
-				Toast.makeText(MainActivity.INSTANCE, "Add item \"" + item.getTitle() + "\" to playlist sucess",
-						Toast.LENGTH_SHORT).show();
+				MainActivity.INSTANCE.runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						sendJavascript("hideLoadingIcon();");
+						Toast.makeText(MainActivity.INSTANCE,
+								"Add item \"" + item.getTitle() + "\" to playlist sucess", Toast.LENGTH_SHORT).show();
+					}
+				});
+
 			else {
 				if (playlistProcessor.isFull()) {
-					Toast.makeText(MainActivity.INSTANCE, "Current playlist is full", Toast.LENGTH_SHORT).show();
+					MainActivity.INSTANCE.runOnUiThread(new Runnable() {
+
+						@Override
+						public void run() {
+							sendJavascript("hideLoadingIcon();");
+							Toast.makeText(MainActivity.INSTANCE, "Current playlist is full", Toast.LENGTH_SHORT)
+									.show();
+						}
+					});
 				} else {
-					Toast.makeText(MainActivity.INSTANCE, "Item already exits in current Playlist", Toast.LENGTH_SHORT).show();
+					MainActivity.INSTANCE.runOnUiThread(new Runnable() {
+
+						@Override
+						public void run() {
+							sendJavascript("hideLoadingIcon();");
+							Toast.makeText(MainActivity.INSTANCE, "Item already exits in current Playlist",
+									Toast.LENGTH_SHORT).show();
+						}
+					});
 				}
 			}
 		}
@@ -162,8 +183,8 @@ public class YoutubePlugin extends Plugin {
 					dismissProgress();
 					String generatedURL;
 					try {
-						generatedURL = new URI("http", HTTPServerData.HOST + ":" + HTTPServerData.PORT, result, null, null)
-								.toString();
+						generatedURL = new URI("http", HTTPServerData.HOST + ":" + HTTPServerData.PORT, result, null,
+								null).toString();
 						Log.i(TAG, "Generated URL = " + generatedURL);
 						insertPlaylistItem(title, link, generatedURL);
 					} catch (URISyntaxException e) {
@@ -227,7 +248,6 @@ public class YoutubePlugin extends Plugin {
 		// Log.i(TAG, "showing...");
 		// }
 		// });
-
 	}
 
 	public static void dismissProgress() {

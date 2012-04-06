@@ -32,10 +32,11 @@ public class LibraryPlugin extends Plugin {
 	private static final String ACTION_BROWSE = "browse";
 	private static final String ACTION_BACK = "back";
 	private static final String ACTION_FILTER = "filter";
-	private static final String ACTION_GETPAGE = "getCurrentPage";
 	private static final String ACTION_NEXTPAGE = "nextPage";
 	private static final String ACTION_PREVIOUSPAGE = "previousPage";
 	private static final String ACTION_ADDTOPLAYLIST = "addToPlaylist";
+	private static final String ACTION_SELECT_ALL = "selectAll";
+	private static final String ACTION_DESELECT_ALL = "deselectAll";
 
 	@Override
 	public PluginResult execute(String action, JSONArray data, String callbackId) {
@@ -60,8 +61,6 @@ public class LibraryPlugin extends Plugin {
 			} else {
 				MainActivity.UPNP_PROCESSOR.getDMSProcessor().back(m_lisListner);
 			}
-		} else if (ACTION_GETPAGE.equals(action)) {
-			Log.i(TAG, "Get current Page");
 		} else if (ACTION_PREVIOUSPAGE.equals(action)) {
 			Log.i(TAG, "Previous page");
 			MainActivity.UPNP_PROCESSOR.getDMSProcessor().previousPage(m_lisListner);
@@ -115,7 +114,7 @@ public class LibraryPlugin extends Plugin {
 		JSONObject result = new JSONObject();
 
 		try {
-			result.put("name", object.getTitle().trim().replace("\"", "\\\"").replace("'", " "));
+			result.put("name", object.getTitle().trim().replace("\"", "\\\""));
 			result.put("id", object.getId());
 			if (object instanceof Item)
 				for (PlaylistItem item : MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getAllItems())
@@ -170,9 +169,9 @@ public class LibraryPlugin extends Plugin {
 				}
 				response.put(object);
 			}
-			
-			sendJavascript("loadBrowseResult('" + response.toString() + "');");
-			
+
+			sendJavascript("loadBrowseResult('" + response.toString().replace("'", "\\'") + "');");
+
 			if (objectID.equals("0")) {
 				sendJavascript("disableBackButton();");
 			} else {
