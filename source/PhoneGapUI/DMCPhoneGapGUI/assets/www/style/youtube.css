@@ -65,18 +65,7 @@
 	background-color: #646464;
 }
 
-
-#div_you_proxy a{
-	position: relative;
-	text-align: center;
-	padding: 0px;
-	margin: 0px;
-	height: 100%;
-	width: 100%;
-	background-color: #646464;
-}
-
-#div_you_proxy a img{
+#div_you_proxy img{
 	padding: 0px;
 	margin: 0px;
 	height: 100%;
