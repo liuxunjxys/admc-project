@@ -65,8 +65,9 @@
 				<div id="div_devi_dmS" class="div_devi_subcontent">
 					<div id="div_devi_dmS_toolbar">
 						<img src="img/go_next_icon.png" id="img_devi_goNext"
-							class="img_devi_navigate"
-							onmousedown="changeImagePath(this, 'img/go_next_icon_hl.png')">
+							class="img_normal"
+							data-highlight-image="img/go_next_icon_hl.png"
+							data-normal-image="img/go_next_icon.png">
 					</div>
 					<div id="div_wrraper_devi_dmS">
 						<ul data-role="listview" data-theme="d">
@@ -77,8 +78,9 @@
 				<div id="div_devi_dmR" class="div_devi_subcontent">
 					<div id="div_devi_dmR_toolbar">
 						<img src="img/go_previous_icon.png" id="img_devi_goPrevious"
-							class="img_devi_navigate"
-							onmousedown="changeImagePath(this, 'img/go_previous_icon_hl.png')">
+							class="img_normal"
+							data-highlight-image="img/go_previous_icon_hl.png"
+							data-normal-image="img/go_previous_icon.png">
 					</div>
 					<div id="div_wrraper_devi_dmR">
 						<ul data-role="listview" data-theme="d">
@@ -91,7 +93,10 @@
 				<div id="div_libs_toolbar">
 					<div id="div_libs_toolbar_left">
 						<img alt="Back Button" src="img/ic_control_back.png"
-							onclick="onBackClick();" id="btn_back">
+							onclick="onBackClick();" id="btn_back"
+							class="img_normal"
+							data-highlight-image="img/ic_control_back_hl.png"
+							data-normal-image="img/ic_control_back.png">
 					</div>
 
 					<div id="div_libs_toolbar_right">
@@ -108,13 +113,30 @@
 					<div align="center">
 						<img src="img/previous_icon.png"
 							style="float: left; padding-left: 5px;"
-							onclick="onClick_previousResult()" id="btn_prevPage" /> <img
-							src="img/selected_icon.png" />
+							onclick="onClick_previousResult()" id="btn_prevPage" 
+							class="img_normal"
+							data-highlight-image="img/previous_icon_hl.png"
+							data-normal-image="img/previous_icon.png"/> 
+							
+						<img src="img/selected_icon.png" 
+							id="btn_select"
+							class="img_normal"
+							data-highlight-image="img/selected_icon_hl.png"
+							data-normal-image="img/selected_icon.png"/>
 					</div>
 					<div align="center">
-						<img src="img/remove_icon.png" /> <img src="img/next_icon.png"
+						<img src="img/remove_icon.png" 
+							id="btn_deselect"
+							class="img_normal"
+							data-highlight-image="img/remove_icon_hl.png"
+							data-normal-image="img/remove_icon.png"/> 
+						
+						<img src="img/next_icon.png"
 							style="float: right; padding-right: 5px;"
-							onclick="onClick_nextResult()" id="btn_nextPage" />
+							onclick="onClick_nextResult()" id="btn_nextPage" 
+							class="img_normal"
+							data-highlight-image="img/next_icon_hl.png"
+							data-normal-image="img/next_icon.png"/>
 					</div>
 				</div>
 			</div>
@@ -135,7 +157,6 @@
 				<div id="div_wrapper_you" class="div_youtube_list">
 					<ul data-role="listview" data-theme="d">
 					</ul>
-
 				</div>
 
 				<div id="div_you_proxy">

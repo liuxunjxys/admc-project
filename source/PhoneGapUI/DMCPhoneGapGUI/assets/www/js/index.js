@@ -16,6 +16,7 @@ $(document).ready(function() {
 	iScrollConfig();
 	myInitPage();
 	myInitDevicesSide();
+	myInitLibrarySide();
 	myInitYoutubeSide();
 	myInitPlaylistsSide();
 });
@@ -162,29 +163,43 @@ function myInitDevicesSide() {
 		myScroll_devi_dmS.refresh();
 	}, 0);
 
-	$('div.div_devi_subcontent div img.img_devi_navigate').live('click',
+	$('div.div_devi_subcontent div img.img_normal').live('tap',
 			function() {
 				var id = $(this).attr('id');
 				switch (id) {
 				case "img_devi_goNext":
-					$('div#div_devi_dmS').hide();
-					$('div#div_devi_dmR').fadeIn('slow');
-					setTimeout(function() {
-						myScroll_devi_dmR.refresh();
-					}, 0);
+					setTimeout(function(){
+						$('div#div_devi_dmS').hide();
+						$('div#div_devi_dmR').fadeIn('slow');
+						setTimeout(function() {
+							myScroll_devi_dmR.refresh();
+						}, 0);
+					}, time_to_swap_image);
 					break;
 
 				case "img_devi_goPrevious":
-					$('div#div_devi_dmR').hide();
-					$('div#div_devi_dmS').fadeIn('slow');
-					setTimeout(function() {
-						myScroll_devi_dmS.refresh();
-					}, 0);
+					setTimeout(function(){
+						$('div#div_devi_dmR').hide();
+						$('div#div_devi_dmS').fadeIn('slow');
+						setTimeout(function() {
+							myScroll_devi_dmS.refresh();
+						}, 0);
+					}, time_to_swap_image);
 					break;
 				}
 			});
 }
 //==========================================LIBRARY SIDE=================================
+function myInitLibrarySide(){
+	$('#btn_select').bind('tap', function(){
+		onClick_SelectAll ($(this));
+	});
+	
+$('#btn_deselect').bind('tap', function(){
+		onClick_DeselectAll ($(this));
+	});
+}
+
 function onClick_previousResult() {
 	console.log('view previous result');
 	var btn_prev = $('#btn_prevPage');
@@ -234,6 +249,14 @@ function disablePrevPageButton() {
 	$('#btn_prevPage').attr("enable", "false");
 }
 
+//SELECT ALL and DESELECT ALL EVENT
+function onClick_SelectAll (sender){
+	console.log('Select all');
+}
+
+function onClick_DeselectAll (sender){
+	console.log('Deselect all');
+}
 //=============================================YOUTUBE SIDE==============================
 function myInitYoutubeSide (){
 	$('#div_you_toolbar_right img').bind('tap', function (){
