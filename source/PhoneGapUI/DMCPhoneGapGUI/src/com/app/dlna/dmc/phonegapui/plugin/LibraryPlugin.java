@@ -76,25 +76,26 @@ public class LibraryPlugin extends Plugin {
 				return new PluginResult(Status.JSON_EXCEPTION);
 			}
 		} else if (ACTION_SELECT_ALL.equals(action)) {
-			MainActivity.UPNP_PROCESSOR.getDMSProcessor().addAllToPlaylist(
-					MainActivity.UPNP_PROCESSOR.getPlaylistProcessor());
+			MainActivity.UPNP_PROCESSOR.getDMSProcessor().addAllToPlaylist(MainActivity.UPNP_PROCESSOR.getPlaylistProcessor());
 			for (DIDLObject object : MainActivity.UPNP_PROCESSOR.getDMSProcessor().getAllObjects()) {
 				sendJavascript("addItemToPlaylist('" + object.getResources().get(0).getValue() + "');");
 			}
+			sendJavascript("hideLoadingIcon();");
 		} else if (ACTION_DESELECT_ALL.equals(action)) {
 			MainActivity.UPNP_PROCESSOR.getDMSProcessor().removeAllFromPlaylist(
 					MainActivity.UPNP_PROCESSOR.getPlaylistProcessor());
 			for (DIDLObject object : MainActivity.UPNP_PROCESSOR.getDMSProcessor().getAllObjects()) {
 				sendJavascript("removeItemFromPlaylist('" + object.getResources().get(0).getValue() + "');");
 			}
+			sendJavascript("hideLoadingIcon();");
 		}
 
 		return null;
 	}
 
 	protected void addToPlaylist(DIDLObject object) {
-		PlaylistProcessor m_playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
-		if (m_playlistProcessor == null) {
+		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
+		if (playlistProcessor == null) {
 			Toast.makeText(MainActivity.INSTANCE, "Cannot get playlist processor", Toast.LENGTH_SHORT).show();
 			return;
 		}
@@ -108,13 +109,13 @@ public class LibraryPlugin extends Plugin {
 		} else {
 			item.setType(Type.IMAGE);
 		}
-		if (m_playlistProcessor.addItem(item)) {
+		if (playlistProcessor.addItem(item)) {
 			sendJavascript("addItemToPlaylist('" + object.getResources().get(0).getValue() + "');");
 		} else {
-			if (m_playlistProcessor.isFull()) {
+			if (playlistProcessor.isFull()) {
 				Toast.makeText(MainActivity.INSTANCE, "Current playlist is full", Toast.LENGTH_SHORT).show();
 			} else {
-				m_playlistProcessor.removeItem(item);
+				playlistProcessor.removeItem(item);
 				sendJavascript("removeItemFromPlaylist('" + object.getResources().get(0).getValue() + "');");
 			}
 		}
