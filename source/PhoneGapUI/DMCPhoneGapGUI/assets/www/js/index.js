@@ -9,6 +9,7 @@ var dms_listview; // list dms
 var dmr_listview; // list dmr
 var library_listview;
 var youttube_listview;
+var playlist_listview;
 
 var swipeLeftReady_devices;
 var swipeRightReady_devices;
@@ -111,6 +112,7 @@ function myInitPage() {
 		case "content_playlists":
 			setTimeout(function() {
 				myScroll_playlist.refresh();
+				window.plugins.PlaylistPlugin.loadPlaylist();
 			}, 0);
 			break;
 		}
@@ -122,6 +124,7 @@ function myInitPage() {
 	dmr_listview = $('#div_wrraper_devi_dmR ul:first');
 	library_listview = $('#div_wrapper_libs ul:first');
 	youttube_listview = $('#div_wrapper_you ul:first');
+	playlist_listview = $('#div_wrapper_play ul:first');
 
 	icon_loading = $('#icon_loading');
 	icon_loading.hide();
