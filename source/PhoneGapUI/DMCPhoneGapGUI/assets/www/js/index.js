@@ -181,16 +181,16 @@ function myInitDevicesSide() {
 		myScroll_devices_dmS.refresh();
 	}, 0);
 
-	$('#div_devi_dmS').bind('swipeleft', function(){
-		if (swipeLeftReady_devices){
+	$('#div_devi_dmS').bind('swipeleft', function() {
+		if (swipeLeftReady_devices) {
 			swipeLeftReady_devices = false;
 			swipeLeft_contentView_device();
 			swipeLeft_toolbar_device();
 		}
 	});
-	
-	$('#div_devi_dmR').bind('swiperight', function(){
-		if (swipeRightReady_devices){
+
+	$('#div_devi_dmR').bind('swiperight', function() {
+		if (swipeRightReady_devices) {
 			swipeRightReady_devices = false;
 			swipeRight_contentView_device();
 			swipeRight_toolbar_device();
@@ -198,62 +198,85 @@ function myInitDevicesSide() {
 	});
 }
 
-function swipeLeft_contentView_device (){
+function swipeLeft_contentView_device() {
 	var widthValue = $('#div_devi_dmS').width();
-	$('#div_devi_dmS').animate({width: 0}, "slow");
+	$('#div_devi_dmS').animate({
+		width : 0
+	}, "slow");
 	$('#div_devi_dmR').css('width', "0%");
 	$('#div_devi_dmR').show();
-	$('#div_devi_dmR').animate({width: widthValue}, "slow", function(){
+	$('#div_devi_dmR').animate({
+		width : widthValue
+	}, "slow", function() {
 		swipeRightReady_devices = true;
 	});
 }
 
-function swipeLeft_toolbar_device (){
+function swipeLeft_toolbar_device() {
 	var rightOnCenter = "33.3%";
 	var heightOnCenter = "100%";
 	var topOnCenter = "0%";
 	var widthOnCenter = "33.3%";
-	
+
 	var leftOnLeft = "0%";
 	var heightOnLeft = "50%";
 	var topOnLeft = "25%";
 	var widthOnLeft = "16.65%";
-	
-	$('#img_dmS_label_icon').animate({left: leftOnLeft, 
-		height: heightOnLeft, top: topOnLeft, width: widthOnLeft}, "slow");
-	$('#img_dmR_label_icon').animate({right: rightOnCenter, 
-		height: heightOnCenter, top: topOnCenter, width: widthOnCenter}, "slow");
+
+	$('#img_dmS_label_icon').animate({
+		left : leftOnLeft,
+		height : heightOnLeft,
+		top : topOnLeft,
+		width : widthOnLeft
+	}, "slow");
+	$('#img_dmR_label_icon').animate({
+		right : rightOnCenter,
+		height : heightOnCenter,
+		top : topOnCenter,
+		width : widthOnCenter
+	}, "slow");
 }
 
-function swipeRight_contentView_device (){
+function swipeRight_contentView_device() {
 	var widthValue = $('#div_devi_dmR').width();
-	$('#div_devi_dmR').animate({width: 0}, "slow");
-	
+	$('#div_devi_dmR').animate({
+		width : 0
+	}, "slow");
+
 	$('#div_devi_dmS').css('width', "0%");
 	$('#div_devi_dmS').show();
-	$('#div_devi_dmS').animate({width: widthValue}, "slow", function(){
+	$('#div_devi_dmS').animate({
+		width : widthValue
+	}, "slow", function() {
 		swipeLeftReady_devices = true;
 	});
 }
 
-function swipeRight_toolbar_device (){
+function swipeRight_toolbar_device() {
 	var leftOnCenter = "33.3%";
 	var heightOnCenter = "100%";
 	var topOnCenter = "0%";
 	var widthOnCenter = "33.3%";
-	
+
 	var rightOnRight = "0%";
 	var heightOnRight = "50%";
 	var topOnRight = "25%";
 	var widthOnRight = "16.65%";
-	
-	$('#img_dmS_label_icon').animate({left: leftOnCenter, 
-		height: heightOnCenter, top: topOnCenter, width: widthOnCenter}, "slow");
-	$('#img_dmR_label_icon').animate({right: rightOnRight, 
-		height: heightOnRight, top: topOnRight, width: widthOnRight}, "slow");
+
+	$('#img_dmS_label_icon').animate({
+		left : leftOnCenter,
+		height : heightOnCenter,
+		top : topOnCenter,
+		width : widthOnCenter
+	}, "slow");
+	$('#img_dmR_label_icon').animate({
+		right : rightOnRight,
+		height : heightOnRight,
+		top : topOnRight,
+		width : widthOnRight
+	}, "slow");
 }
-// ==========================================LIBRARY
-// SIDE=================================
+// ==========================================LIBRARY-SIDE=================================
 function myInitLibrarySide() {
 	$('#btn_select').bind('tap', function() {
 		onClick_SelectAll($(this));
@@ -346,14 +369,14 @@ function onClick_search_you(sender) {
 function onClick_activateProxy_you(sender) {
 	var state = $(sender).attr('data-my-state');
 	if (state == "true") { // activated
-		changeStateImage(sender);
+		proxy = false;
 	} else {
-		changeStateImage(sender);
+		proxy = true;
 	}
+	changeStateImage(sender);
 }
 
-// ==============================================PLAYLISTS
-// SIDE==============================
+// ==============================================PLAYLISTS-SIDE==============================
 
 function myInitPlaylistsSide() {
 	$('#img_media_control_previous').bind('tap', function() {
@@ -420,26 +443,31 @@ function onClick_play_play(sender) {
 	if (state == "true") {
 		// convert to pausing state
 		console.log('convert to PAUSING state');
-		changeStateImage(sender);// call when successful
+		window.plugins.PlaylistPlugin.play();
+		//changeStateImage(sender);// call when successful
 	} else {
 		// convert to playing state
 		console.log('convert to PLAYING state');
-		changeStateImage(sender);// call when successful
+		window.plugins.PlaylistPlugin.pause();
+		//changeStateImage(sender);// call when successful
 	}
 }
 
 // OnClick event of NEXT button
 function onClick_next_play(sender) {
+	window.plugins.PlaylistPlugin.next();
 	console.log('CLick event on NEXT button');
 }
 
 // OnClick event of PREVIOUS button
 function onClick_previous_play(sender) {
+	window.plugins.PlaylistPlugin.prev();
 	console.log('CLick event on PREVIOUS button');
 }
 
 // OnClick event of STOP button
 function onClick_stop_play(sender) {
+	window.plugins.PlaylistPlugin.stop();
 	console.log('CLick event on STOP button');
 }
 

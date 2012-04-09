@@ -6,6 +6,8 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.teleal.cling.model.message.UpnpResponse;
+import org.teleal.cling.model.meta.Action;
 import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.model.meta.Icon;
 import org.teleal.cling.model.meta.RemoteDevice;
@@ -14,6 +16,7 @@ import org.teleal.cling.model.types.UDN;
 import android.util.Log;
 
 import com.app.dlna.dmc.phonegapui.MainActivity;
+import com.app.dlna.dmc.processor.interfaces.DMRProcessor.DMRProcessorListner;
 import com.app.dlna.dmc.processor.interfaces.UpnpProcessor.UpnpProcessorListener;
 import com.phonegap.api.PhonegapActivity;
 import com.phonegap.api.Plugin;
@@ -85,12 +88,68 @@ public class DevicesPlugin extends Plugin implements UpnpProcessorListener {
 		MainActivity.UPNP_PROCESSOR.setCurrentDMR(new UDN(udn));
 		Device device = MainActivity.UPNP_PROCESSOR.getCurrentDMR();
 		if (device != null) {
+			MainActivity.UPNP_PROCESSOR.getDMRProcessor().addListener(DMRListener);
 			sendJavascript("setCurrentDMR('" + device.getIdentity().getUdn().getIdentifierString() + "');");
 		} else {
 			Log.i(TAG, "Selected device is null");
 		}
 
 	}
+
+	private static DMRProcessorListner DMRListener = new DMRProcessorListner() {
+
+		@Override
+		public void onUpdatePosition(long current, long max) {
+			// Log.i(TAG, "Update Position, current = " + current + " max = " +
+			// max);
+		}
+
+		@Override
+		public void onStoped() {
+			Log.i(TAG, "On Stop");
+			PlaylistPlugin playlistPlugin = new PlaylistPlugin();
+			playlistPlugin.setContext(MainActivity.INSTANCE);
+			playlistPlugin.sendJavascript("playlist_onStop();");
+
+		}
+
+		@Override
+		public void onPlaying() {
+			Log.i(TAG, "On Playing");
+			PlaylistPlugin playlistPlugin = new PlaylistPlugin();
+			playlistPlugin.setContext(MainActivity.INSTANCE);
+			playlistPlugin.sendJavascript("playlist_onPlaying();");
+		}
+
+		@Override
+		public void onPaused() {
+			Log.i(TAG, "On Paused");
+			PlaylistPlugin playlistPlugin = new PlaylistPlugin();
+			playlistPlugin.setContext(MainActivity.INSTANCE);
+			playlistPlugin.sendJavascript("playlist_onPause();");
+		}
+
+		@Override
+		public void onErrorEvent(String error) {
+			Log.i(TAG, "OnError: " + error);
+			
+		}
+
+		@Override
+		public void onEndTrack() {
+			Log.i(TAG, "OnEndtrack");
+			PlaylistPlugin playlistPlugin = new PlaylistPlugin();
+			playlistPlugin.setContext(MainActivity.INSTANCE);
+			playlistPlugin.sendJavascript("playlist_onEndtrack();");
+		}
+
+		@SuppressWarnings("rawtypes")
+		@Override
+		public void onActionFail(Action actionCallback, UpnpResponse response, String cause) {
+			// TODO Auto-generated method stub
+
+		}
+	};
 
 	@SuppressWarnings("rawtypes")
 	private void setDMS(String udn) {

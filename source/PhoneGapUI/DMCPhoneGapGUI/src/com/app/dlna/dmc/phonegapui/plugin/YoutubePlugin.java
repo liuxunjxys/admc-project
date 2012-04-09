@@ -44,8 +44,10 @@ public class YoutubePlugin extends Plugin {
 					String title = item.getTitle();
 					String link = item.getUrl();
 					if (proxy) {
+						Log.i(TAG, "proxy mode");
 						executeProxyMode(title, link);
 					} else {
+						Log.i(TAG, "no proxy mode");
 						executeNoProxy(title, link);
 					}
 				}

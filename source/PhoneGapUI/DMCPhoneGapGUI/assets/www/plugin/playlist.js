@@ -1,3 +1,13 @@
+//private static final String ACTION_NEXT = "next";
+//	private static final String ACTION_PREV = "prev";
+//	private static final String ACTION_PLAY = "play";
+//	private static final String ACTION_PAUSE = "pause";
+//	private static final String ACTION_STOP = "stop";
+//	private static final String ACTION_SET_VOLUME = "setVolume";
+//	private static final String ACTION_SEEK = "seek";
+
+var playlist_currentState = "STOP";
+
 var PlaylistPlugin = function() {
 };
 
@@ -9,6 +19,41 @@ PlaylistPlugin.prototype.loadPlaylist = function() {
 PlaylistPlugin.prototype.itemClick = function(idx) {
 	showLoadingIcon();
 	PhoneGap.exec(null, null, 'PlaylistPlugin', 'itemClick', [ idx ]);
+};
+
+PlaylistPlugin.prototype.play = function() {
+	showLoadingIcon();
+	PhoneGap.exec(null, null, 'PlaylistPlugin', 'play', [ "" ]);
+};
+
+PlaylistPlugin.prototype.pause = function() {
+	showLoadingIcon();
+	PhoneGap.exec(null, null, 'PlaylistPlugin', 'pause', [ "" ]);
+};
+
+PlaylistPlugin.prototype.next = function() {
+	showLoadingIcon();
+	PhoneGap.exec(null, null, 'PlaylistPlugin', 'next', [ "" ]);
+};
+
+PlaylistPlugin.prototype.prev = function() {
+	showLoadingIcon();
+	PhoneGap.exec(null, null, 'PlaylistPlugin', 'prev', [ "" ]);
+};
+
+PlaylistPlugin.prototype.stop = function() {
+	showLoadingIcon();
+	PhoneGap.exec(null, null, 'PlaylistPlugin', 'stop', [ "" ]);
+};
+
+PlaylistPlugin.prototype.setVolume = function() {
+	showLoadingIcon();
+	PhoneGap.exec(null, null, 'PlaylistPlugin', 'setVolume', [ "" ]);
+};
+
+PlaylistPlugin.prototype.seek = function() {
+	showLoadingIcon();
+	PhoneGap.exec(null, null, 'PlaylistPlugin', 'seek', [ "" ]);
 };
 
 PhoneGap.addConstructor(function() {
@@ -38,9 +83,13 @@ function addPlaylistItem(item) {
 
 	html += "onclick='onPlaylistItemClick(\"" + item.idx + "\");'>";
 
-	html += "<a href='#' style='padding-top: 0px;padding-bottom: 0px' data-icon='delete'><img src='" + item.icon
-			+ "' style='height: 100%; width: height; padding-left: 4%; float: left;'/><h3>" + item.name + "</h3><p>"
-			+ (item.childCount != null ? (item.childCount.toString() + " childs") : " ") + "</p></a></li>";
+	html += "<a href='#' style='padding-top: 0px;padding-bottom: 0px' data-icon='delete'><img src='"
+			+ item.icon
+			+ "' style='height: 100%; width: height; padding-left: 4%; float: left;'/><h3>"
+			+ item.name
+			+ "</h3><p>"
+			+ (item.childCount != null ? (item.childCount.toString() + " childs")
+					: " ") + "</p></a></li>";
 	playlist_listview.append(html);
 }
 
@@ -51,4 +100,47 @@ function onPlaylistItemClick(e) {
 function clearPlaylist() {
 	playlist_listview.html("");
 	playlist_listview.listview("refresh");
+}
+
+function playlist_onStop() {
+	console.log("js on stop");
+	if (playlist_currentState != "STOP" && playlist_currentState != "PAUSE") {
+		playlist_currentState = "STOP";
+		playlist_updateMediaButton();
+	}
+}
+
+function playlist_onPlaying() {
+	console.log("js on playing");
+	console.log("current state" + playlist_currentState);
+	if (playlist_currentState != "PLAY") {
+		playlist_currentState = "PLAY";
+		playlist_updateMediaButton();
+	}
+}
+
+function playlist_onPause() {
+	console.log("js on pause");
+	if (playlist_currentState != "STOP" && playlist_currentState != "PAUSE") {
+		playlist_currentState = "PAUSE";
+		playlist_updateMediaButton();
+	}
+
+}
+
+function playlist_onEndtrack() {
+	console.log("js on endtrack");
+	playlist_currentState = "END_TRACK";
+}
+
+function playlist_updateMediaButton() {
+	console.log("----------------------change play button image");
+	changeStateImage($('#img_media_control_play'));
+	// if (playlist_currentState == "PLAY") {
+	// changeStateImage($('#img_media_control_play'));
+	// } else if (playlist_currentState == "STOP"
+	// || playlist_currentState == "PAUSE") {
+	// changeStateImage($('#img_media_control_play'));
+	//
+	// }
 }
