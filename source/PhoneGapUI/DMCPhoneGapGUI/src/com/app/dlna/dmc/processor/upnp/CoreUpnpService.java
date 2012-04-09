@@ -222,7 +222,7 @@ public class CoreUpnpService extends Service {
 		}
 
 		public void setCurrentDMS(UDN uDN) {
-			m_dmrProcessor = null;
+			m_dmsProcessor = null;
 			m_currentDMS = upnpService.getRegistry().getDevice(uDN, true);
 			if (m_currentDMS != null) {
 				Log.d(TAG, "CURRENT DMS:" + m_currentDMS.toString());

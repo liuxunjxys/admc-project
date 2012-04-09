@@ -48,9 +48,7 @@ public class YoutubeProcessorImpl implements YoutubeProcessor {
 					String inputLine;
 					String directlink = null;
 					while ((inputLine = in.readLine()) != null) {
-						System.out.println(inputLine);
 						if (inputLine.contains("img.src")) {
-							System.out.println(" Line = " + inputLine);
 							directlink = inputLine.substring(inputLine.indexOf('"') + 1, inputLine.lastIndexOf('"'))
 									.replace("\\u0026", "&").replace("\\", "").replace("generate_204", "videoplayback");
 							System.out.println(" Direct Link = " + directlink);
@@ -127,7 +125,7 @@ public class YoutubeProcessorImpl implements YoutubeProcessor {
 					URLConnection jc = jsonURL.openConnection();
 					InputStream is = jc.getInputStream();
 					String jsonTxt = IOUtils.toString(is);
-					Log.i(TAG,"jsonTxt = " + jsonTxt);
+					Log.i(TAG, "jsonTxt = " + jsonTxt);
 					JSONObject jj = new JSONObject(jsonTxt);
 
 					JSONObject jdata = jj.getJSONObject("data");

@@ -1,7 +1,7 @@
 var YoutubePlugin = function() {
 };
 
-YoutubePlugin.prototype.addToPlaylist = function(idx, proxy) {
+YoutubePlugin.prototype.addToPlaylist = function(idx) {
 	showLoadingIcon();
 	PhoneGap.exec(null, null, 'YoutubePlugin', 'addToPlaylist', [ idx, proxy ]);
 };
@@ -14,6 +14,8 @@ YoutubePlugin.prototype.query = function(queryString) {
 PhoneGap.addConstructor(function() {
 	PhoneGap.addPlugin("YoutubePlugin", new YoutubePlugin());
 });
+
+var proxy = false;
 
 function showYoutubeResult(e) {
 	clearYoutubeList();
@@ -33,7 +35,6 @@ function yt_addItemToListView(item) {
 	var html = "<li index='" + item.idx + "' ";
 
 	html += "data-icon='false' ";
-	// "name": "Cuong's penis"
 	if (item.url != null) {
 		html += "url='" + item.url + "' ";
 	}
@@ -52,5 +53,5 @@ function clearYoutubeList() {
 function yt_onYoutubeItemClick(idx) {
 	console.log(idx.toString());
 	// TODO: fix constant here
-	window.plugins.YoutubePlugin.addToPlaylist(idx, false);
+	window.plugins.YoutubePlugin.addToPlaylist(idx);
 }
