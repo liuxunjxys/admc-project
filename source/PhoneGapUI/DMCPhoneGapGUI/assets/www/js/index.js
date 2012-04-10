@@ -131,33 +131,41 @@ function myInitPage() {
 
 	// Mapping process for all image on page
 	$('.img_normal').live('vmousedown', function() {
-		changeImagePath($(this), $(this).attr('data-highlight-image'));
+		if ($(this).attr("data-enable") == "true"){
+			changeImagePath($(this), $(this).attr('data-highlight-image'));
+		}
 	});
 
 	$('.img_normal').live(
 			'vmouseup',
 			function() {
-				changeImagePathWithTimeOut($(this), $(this).attr(
-						'data-normal-image'), time_to_swap_image);
+				if ($(this).attr("data-enable") == "true"){
+					changeImagePathWithTimeOut($(this), $(this).attr(
+							'data-normal-image'), time_to_swap_image);
+				}
 			});
 
 	$('.img_double_state').live('vmousedown', function() {
-		var currentPath = $(this).attr('data-current-path');
-		var stateAImgPath = $(this).attr('data-state-a');
-		var highlightImagePath = "";
-		if (currentPath == stateAImgPath) {
-			highlightImagePath = $(this).attr('data-highlight-a');
-		} else {
-			highlightImagePath = $(this).attr('data-highlight-b');
+		if ($(this).attr("data-enable") == "true"){
+			var currentPath = $(this).attr('data-current-path');
+			var stateAImgPath = $(this).attr('data-state-a');
+			var highlightImagePath = "";
+			if (currentPath == stateAImgPath) {
+				highlightImagePath = $(this).attr('data-highlight-a');
+			} else {
+				highlightImagePath = $(this).attr('data-highlight-b');
+			}
+			changeImagePath($(this), highlightImagePath);
 		}
-		changeImagePath($(this), highlightImagePath);
 	});
 
 	$('.img_double_state').live(
 			'vmouseup',
 			function() {
-				changeImagePathWithTimeOut($(this), $(this).attr(
-						'data-current-path'), time_to_swap_image);
+				if ($(this).attr("data-enable") == "true"){
+					changeImagePathWithTimeOut($(this), $(this).attr(
+							'data-current-path'), time_to_swap_image);
+				}
 			});
 }
 
@@ -173,8 +181,11 @@ function hideLoadingIcon() {
 // ================================================DEVICES
 // SIDE===========================
 function myInitDevicesSide() {
+	//global variable
 	swipeLeftReady_devices = true;
 	swipeRightReady_devices = false;
+	currentDiviceView = "dmS";
+	
 	$('div#content_devices div.div_devi_subcontent').hide();
 	$('div#div_devi_dmS').show();
 	setTimeout(function() {
@@ -184,6 +195,7 @@ function myInitDevicesSide() {
 	$('#div_devi_dmS').bind('swipeleft', function() {
 		if (swipeLeftReady_devices) {
 			swipeLeftReady_devices = false;
+			currentDiviceView = "dmR";
 			swipeLeft_contentView_device();
 			swipeLeft_toolbar_device();
 		}
@@ -192,8 +204,28 @@ function myInitDevicesSide() {
 	$('#div_devi_dmR').bind('swiperight', function() {
 		if (swipeRightReady_devices) {
 			swipeRightReady_devices = false;
+			currentDiviceView = "dmS";
 			swipeRight_contentView_device();
 			swipeRight_toolbar_device();
+		}
+	});
+	
+	$('#img_dmS_label_icon').bind('tap', function (){
+		if (swipeRightReady_devices ==  true && currentDiviceView == "dmR") {
+			swipeRightReady_devices = false;
+			currentDiviceView = "dmS";
+			swipeRight_contentView_device();
+			swipeRight_toolbar_device();
+		}
+	});
+	
+	
+	$('#img_dmR_label_icon').bind('tap', function (){
+		if (swipeLeftReady_devices ==  true && currentDiviceView == "dmS") {
+			swipeLeftReady_devices = false;
+			currentDiviceView = "dmR";
+			swipeLeft_contentView_device();
+			swipeLeft_toolbar_device();
 		}
 	});
 }
@@ -290,7 +322,7 @@ function myInitLibrarySide() {
 function onClick_previousResult() {
 	console.log('view previous result');
 	var btn_prev = $('#btn_prevPage');
-	if (btn_prev.attr("enable") == "true") {
+	if (btn_prev.attr("data-enable") == "true") {
 		console.log('previous page');
 		window.plugins.LibraryPlugin.previousPage();
 	}
@@ -300,7 +332,7 @@ function onClick_previousResult() {
 function onClick_nextResult() {
 	console.log('view next result');
 	var btn_next = $('#btn_nextPage');
-	if (btn_next.attr("enable") == "true") {
+	if (btn_next.attr("data-enable") == "true") {
 		console.log('next page');
 		window.plugins.LibraryPlugin.nextPage();
 	}
@@ -308,34 +340,45 @@ function onClick_nextResult() {
 
 function enableBackButton() {
 	console.log('enable back button');
-	$('#btn_back').attr("enable", "true");
+	enableButton($('#btn_back'));
 }
 
 function disableBackButton() {
 	console.log('disable back button');
-	$('#btn_back').attr("enable", "false");
+	disableButton($('#btn_back'));
 }
 
 function enableNextPageButton() {
 	console.log('enable next page button');
-	$('#btn_nextPage').attr("enable", "true");
+	enableButton($('#btn_nextPage'));
 }
 
 function disableNextPageButton() {
 	console.log('disable next page button');
-	$('#btn_nextPage').attr("enable", "false");
+	disableButton($('#btn_nextPage'));
 }
 
 function enablePrevPageButton() {
 	console.log('enable prev page button');
-	$('#btn_prevPage').attr("enable", "true");
+	enableButton($('#btn_prevPage'));
 }
 
 function disablePrevPageButton() {
 	console.log('disable prev page button');
-	$('#btn_prevPage').attr("enable", "false");
+	disableButton($('#btn_prevPage'));
 }
 
+function disableButton (sender){
+	sender.attr("data-enable", "false");
+	var disableImagePath = sender.attr("data-disable-image");
+	sender.attr("src", disableImagePath);
+}
+
+function enableButton (sender){
+	sender.attr("data-enable", "true");
+	var enableImagePath = sender.attr("data-normal-image");
+	sender.attr("src", enableImagePath);
+}
 // SELECT ALL and DESELECT ALL EVENT
 function onClick_SelectAll(sender) {
 	console.log('Select all');

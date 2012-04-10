@@ -89,7 +89,7 @@ function onItemClick(id) {
 
 function onBackClick() {
 	var backButton = $("#btn_back");
-	if (backButton.attr("enable") == "true")
+	if (backButton.attr("data-enable") == "true")
 		window.plugins.LibraryPlugin.back();
 }
 
