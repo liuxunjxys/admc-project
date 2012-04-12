@@ -102,11 +102,15 @@ public class DevicesPlugin extends Plugin implements UpnpProcessorListener {
 		public void onUpdatePosition(long current, long max) {
 			// Log.i(TAG, "Update Position, current = " + current + " max = " +
 			// max);
+			Log.d(TAG, "On UpdatePosition");
+			PlaylistPlugin playlistPlugin = new PlaylistPlugin();
+			playlistPlugin.setContext(MainActivity.INSTANCE);
+			playlistPlugin.sendJavascript("playlist_updateDurationSeekbar(" + current + ", " + max + ");");
 		}
 
 		@Override
 		public void onStoped() {
-			Log.i(TAG, "On Stop");
+			Log.d(TAG, "On Stop");
 			PlaylistPlugin playlistPlugin = new PlaylistPlugin();
 			playlistPlugin.setContext(MainActivity.INSTANCE);
 			playlistPlugin.sendJavascript("playlist_onStop();");
@@ -115,7 +119,7 @@ public class DevicesPlugin extends Plugin implements UpnpProcessorListener {
 
 		@Override
 		public void onPlaying() {
-			Log.i(TAG, "On Playing");
+			Log.d(TAG, "On Playing");
 			PlaylistPlugin playlistPlugin = new PlaylistPlugin();
 			playlistPlugin.setContext(MainActivity.INSTANCE);
 			playlistPlugin.sendJavascript("playlist_onPlaying();");
@@ -123,7 +127,7 @@ public class DevicesPlugin extends Plugin implements UpnpProcessorListener {
 
 		@Override
 		public void onPaused() {
-			Log.i(TAG, "On Paused");
+			Log.d(TAG, "On Paused");
 			PlaylistPlugin playlistPlugin = new PlaylistPlugin();
 			playlistPlugin.setContext(MainActivity.INSTANCE);
 			playlistPlugin.sendJavascript("playlist_onPause();");
@@ -131,8 +135,8 @@ public class DevicesPlugin extends Plugin implements UpnpProcessorListener {
 
 		@Override
 		public void onErrorEvent(String error) {
-			Log.i(TAG, "OnError: " + error);
-			
+			Log.d(TAG, "OnError: " + error);
+
 		}
 
 		@Override
