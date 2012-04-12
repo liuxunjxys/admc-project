@@ -83,13 +83,9 @@ function addPlaylistItem(item) {
 
 	html += "onclick='onPlaylistItemClick(\"" + item.idx + "\");'>";
 
-	html += "<a href='#' style='padding-top: 0px;padding-bottom: 0px' data-icon='delete'><img src='"
-			+ item.icon
-			+ "' style='height: 100%; width: height; padding-left: 4%; float: left;'/><h3>"
-			+ item.name
-			+ "</h3><p>"
-			+ (item.childCount != null ? (item.childCount.toString() + " childs")
-					: " ") + "</p></a></li>";
+	html += "<a href='#' style='padding-top: 0px;padding-bottom: 0px' data-icon='delete'><img src='" + item.icon
+			+ "' style='height: 100%; width: height; padding-left: 4%; float: left;'/><h3>" + item.name + "</h3><p>"
+			+ (item.childCount != null ? (item.childCount.toString() + " childs") : " ") + "</p></a></li>";
 	playlist_listview.append(html);
 }
 
@@ -130,17 +126,24 @@ function playlist_onPause() {
 
 function playlist_onEndtrack() {
 	console.log("js on endtrack");
-	playlist_currentState = "END_TRACK";
+	window.plugins.PlaylistPlugin.next();
 }
 
 function playlist_updateMediaButton() {
-	console.log("----------------------change play button image");
-	changeStateImage($('#img_media_control_play'));
-	// if (playlist_currentState == "PLAY") {
-	// changeStateImage($('#img_media_control_play'));
-	// } else if (playlist_currentState == "STOP"
-	// || playlist_currentState == "PAUSE") {
-	// changeStateImage($('#img_media_control_play'));
-	//
-	// }
+	var playButton = $('#img_media_control_play');
+
+	var stateAImgPath = $(playButton).attr('data-state-a');
+	var stateBImgPath = $(playButton).attr('data-state-b');
+	if (playlist_currentState == "PLAY") {
+		$(playButton).attr('data-current-path', stateBImgPath);
+		$(playButton).attr('data-my-state', 'true');
+	} else {
+		$(playButton).attr('data-current-path', stateAImgPath);
+		$(playButton).attr('data-my-state', 'false');
+	}
+	changeImagePathWithTimeOut(playButton, $(playButton).attr('data-current-path'), time_to_swap_image);
+}
+
+function playlist_updateDurationSeekbar(current, max) {
+	setValueForSeekBar($('#div_field_seekbar input'), current, max);
 }

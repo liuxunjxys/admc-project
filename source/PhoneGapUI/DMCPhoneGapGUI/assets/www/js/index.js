@@ -71,13 +71,11 @@ function changeStateImage(sender) {
 	} else {
 		$(sender).attr('data-current-path', stateAImgPath);
 	}
-	changeImagePathWithTimeOut(sender, $(sender).attr('data-current-path'),
-			time_to_swap_image);
-	var currentState = $(sender).attr('data-my-state');
-	if (currentState == 'true') {
-		currentState = 'false';
+	changeImagePathWithTimeOut(sender, $(sender).attr('data-current-path'), time_to_swap_image);
+	if ($(sender).attr('data-my-state') == 'true') {
+		$(sender).attr('data-my-state', 'false');
 	} else {
-		currentState = 'true';
+		$(sender).attr('data-my-state', 'true');
 	}
 }
 // =========================================PAGE
@@ -131,22 +129,19 @@ function myInitPage() {
 
 	// Mapping process for all image on page
 	$('.img_normal').live('vmousedown', function() {
-		if ($(this).attr("data-enable") == "true"){
+		if ($(this).attr("data-enable") == "true") {
 			changeImagePath($(this), $(this).attr('data-highlight-image'));
 		}
 	});
 
-	$('.img_normal').live(
-			'vmouseup',
-			function() {
-				if ($(this).attr("data-enable") == "true"){
-					changeImagePathWithTimeOut($(this), $(this).attr(
-							'data-normal-image'), time_to_swap_image);
-				}
-			});
+	$('.img_normal').live('vmouseup', function() {
+		if ($(this).attr("data-enable") == "true") {
+			changeImagePathWithTimeOut($(this), $(this).attr('data-normal-image'), time_to_swap_image);
+		}
+	});
 
 	$('.img_double_state').live('vmousedown', function() {
-		if ($(this).attr("data-enable") == "true"){
+		if ($(this).attr("data-enable") == "true") {
 			var currentPath = $(this).attr('data-current-path');
 			var stateAImgPath = $(this).attr('data-state-a');
 			var highlightImagePath = "";
@@ -159,14 +154,11 @@ function myInitPage() {
 		}
 	});
 
-	$('.img_double_state').live(
-			'vmouseup',
-			function() {
-				if ($(this).attr("data-enable") == "true"){
-					changeImagePathWithTimeOut($(this), $(this).attr(
-							'data-current-path'), time_to_swap_image);
-				}
-			});
+	$('.img_double_state').live('vmouseup', function() {
+		if ($(this).attr("data-enable") == "true") {
+			changeImagePathWithTimeOut($(this), $(this).attr('data-current-path'), time_to_swap_image);
+		}
+	});
 }
 
 /* User interface */
@@ -181,11 +173,11 @@ function hideLoadingIcon() {
 // ================================================DEVICES
 // SIDE===========================
 function myInitDevicesSide() {
-	//global variable
+	// global variable
 	swipeLeftReady_devices = true;
 	swipeRightReady_devices = false;
 	currentDiviceView = "dmS";
-	
+
 	$('div#content_devices div.div_devi_subcontent').hide();
 	$('div#div_devi_dmS').show();
 	setTimeout(function() {
@@ -209,19 +201,18 @@ function myInitDevicesSide() {
 			swipeRight_toolbar_device();
 		}
 	});
-	
-	$('#img_dmS_label_icon').bind('tap', function (){
-		if (swipeRightReady_devices ==  true && currentDiviceView == "dmR") {
+
+	$('#img_dmS_label_icon').bind('tap', function() {
+		if (swipeRightReady_devices == true && currentDiviceView == "dmR") {
 			swipeRightReady_devices = false;
 			currentDiviceView = "dmS";
 			swipeRight_contentView_device();
 			swipeRight_toolbar_device();
 		}
 	});
-	
-	
-	$('#img_dmR_label_icon').bind('tap', function (){
-		if (swipeLeftReady_devices ==  true && currentDiviceView == "dmS") {
+
+	$('#img_dmR_label_icon').bind('tap', function() {
+		if (swipeLeftReady_devices == true && currentDiviceView == "dmS") {
 			swipeLeftReady_devices = false;
 			currentDiviceView = "dmR";
 			swipeLeft_contentView_device();
@@ -368,13 +359,13 @@ function disablePrevPageButton() {
 	disableButton($('#btn_prevPage'));
 }
 
-function disableButton (sender){
+function disableButton(sender) {
 	sender.attr("data-enable", "false");
 	var disableImagePath = sender.attr("data-disable-image");
 	sender.attr("src", disableImagePath);
 }
 
-function enableButton (sender){
+function enableButton(sender) {
 	sender.attr("data-enable", "true");
 	var enableImagePath = sender.attr("data-normal-image");
 	sender.attr("src", enableImagePath);
@@ -412,17 +403,17 @@ function onClick_search_you(sender) {
 function onClick_activateProxy_you(sender) {
 	var state = $(sender).attr('data-my-state');
 	if (state == "true") { // activated
-		//proxy = false;
+		// proxy = false;
 		$(sender).attr('data-my-state', 'false');
 		changeStateImage(sender);
-		setTimeout (function(){
+		setTimeout(function() {
 			$('#img_proxy_label').attr('src', 'img/proxy_deactivate_lb.png');
 		}, time_to_swap_image);
 	} else {
-		//proxy = true;
+		// proxy = true;
 		$(sender).attr('data-my-state', 'true');
 		changeStateImage(sender);
-		setTimeout (function(){
+		setTimeout(function() {
 			$('#img_proxy_label').attr('src', 'img/proxy_activate_lb.png');
 		}, time_to_swap_image);
 	}
@@ -450,11 +441,11 @@ function myInitPlaylistsSide() {
 	$('#img_media_control_volume').bind('tap', function() {
 		onClick_volume_play($(this));
 	});
-	
+
 	$('#div_field_seekbar input').siblings('.ui-slider').bind('vmouseup', function() {
 		onChange_durationBar($('#div_field_seekbar input'));
 	});
-	
+
 	$('#div_play_volume_left input').siblings('.ui-slider').bind('vmouseup', function() {
 		onChange_volumeBar($('#div_play_volume_left input'));
 	});
@@ -467,6 +458,7 @@ function myInitPlaylistsSide() {
 function setValueForSeekBar(sender, currentValue, maxValue) {
 	$(sender).attr('max', maxValue);
 	$(sender).attr('value', currentValue);
+	$(sender).slider("refresh");
 }
 
 // SEEK BAR EVENT-----------------------------------
@@ -492,16 +484,10 @@ function onChange_volumeBar(sender) {
 // OnClick event of PLAY button
 function onClick_play_play(sender) {
 	var state = $(sender).attr('data-my-state');
-	if (state == "true") {
-		// convert to pausing state
-		console.log('convert to PAUSING state');
-		window.plugins.PlaylistPlugin.play();
-		//changeStateImage(sender);// call when successful
-	} else {
-		// convert to playing state
-		console.log('convert to PLAYING state');
+	if (state == 'true') {
 		window.plugins.PlaylistPlugin.pause();
-		//changeStateImage(sender);// call when successful
+	} else {
+		window.plugins.PlaylistPlugin.play();
 	}
 }
 
