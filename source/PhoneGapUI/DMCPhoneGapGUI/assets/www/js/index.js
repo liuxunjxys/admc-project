@@ -412,11 +412,20 @@ function onClick_search_you(sender) {
 function onClick_activateProxy_you(sender) {
 	var state = $(sender).attr('data-my-state');
 	if (state == "true") { // activated
-		proxy = false;
+		//proxy = false;
+		$(sender).attr('data-my-state', 'false');
+		changeStateImage(sender);
+		setTimeout (function(){
+			$('#img_proxy_label').attr('src', 'img/proxy_deactivate_lb.png');
+		}, time_to_swap_image);
 	} else {
-		proxy = true;
+		//proxy = true;
+		$(sender).attr('data-my-state', 'true');
+		changeStateImage(sender);
+		setTimeout (function(){
+			$('#img_proxy_label').attr('src', 'img/proxy_activate_lb.png');
+		}, time_to_swap_image);
 	}
-	changeStateImage(sender);
 }
 
 // ==============================================PLAYLISTS-SIDE==============================
@@ -442,13 +451,22 @@ function myInitPlaylistsSide() {
 		onClick_volume_play($(this));
 	});
 
-	$('#div_field_seekbar input').bind('change', function() {
-		onChange_durationBar($(this));
-	})
+	$('#div_field_seekbar input').siblings('.ui-slider').children('.ui-slider-handle').bind('vmouseup', function() {
+		onChange_durationBar($('#div_field_seekbar input'));
+	});
+	
+	$('#div_field_seekbar input').siblings('.ui-slider').bind('tap', function() {
+		onChange_durationBar($('#div_field_seekbar input'));
+	});
+	
 
-	$('#div_play_volume_left input').bind('change', function() {
-		onChange_volumeBar($(this));
-	})
+	$('#div_play_volume_left input').siblings('.ui-slider').children('.ui-slider-handle').bind('vmouseup', function() {
+		onChange_volumeBar($('#div_play_volume_left input'));
+	});
+	
+	$('#div_play_volume_left input').siblings('.ui-slider').bind('tap', function() {
+		onChange_volumeBar($('#div_play_volume_left input'));
+	});
 }
 // Parameter note: sender is seekbar (slider) that you want to set it values
 // This method for init-time (if needed - in myInitPlaylistsSide method)
