@@ -450,21 +450,12 @@ function myInitPlaylistsSide() {
 	$('#img_media_control_volume').bind('tap', function() {
 		onClick_volume_play($(this));
 	});
-
-	$('#div_field_seekbar input').siblings('.ui-slider').children('.ui-slider-handle').bind('vmouseup', function() {
+	
+	$('#div_field_seekbar input').siblings('.ui-slider').bind('vmouseup', function() {
 		onChange_durationBar($('#div_field_seekbar input'));
 	});
 	
-	$('#div_field_seekbar input').siblings('.ui-slider').bind('tap', function() {
-		onChange_durationBar($('#div_field_seekbar input'));
-	});
-	
-
-	$('#div_play_volume_left input').siblings('.ui-slider').children('.ui-slider-handle').bind('vmouseup', function() {
-		onChange_volumeBar($('#div_play_volume_left input'));
-	});
-	
-	$('#div_play_volume_left input').siblings('.ui-slider').bind('tap', function() {
+	$('#div_play_volume_left input').siblings('.ui-slider').bind('vmouseup', function() {
 		onChange_volumeBar($('#div_play_volume_left input'));
 	});
 }
