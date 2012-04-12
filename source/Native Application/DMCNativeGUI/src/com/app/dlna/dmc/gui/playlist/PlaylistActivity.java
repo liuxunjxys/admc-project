@@ -36,23 +36,25 @@ import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 public class PlaylistActivity extends UpnpListenerActivity implements DMRProcessorListner {
 
 	private static final String TAG = PlaylistActivity.class.getName();
-	private ListView m_listView;
-	private PlaylistItemArrayAdapter m_adapter;
+	
 	private DMRProcessor m_dmrProcessor;
 	private PlaylistProcessor m_playlistProcessor;
 	private static final int STATE_PAUSE = 1;
 	private static final int STATE_PLAYING = 2;
 	private static final int STATE_STOP = 3;
 	private int m_currentState;
+	
+	private RelativeLayout m_rl_dmrController;
+	private boolean m_isSeeking = false;
+	private PlaylistItemArrayAdapter m_adapter;
+	private ListView m_listView;
+	private SeekBar m_sb_volume;
+	protected boolean m_isFailed = false;
+	private TextView m_tv_rendererName;
 	private Button m_btn_PlayPause;
 	private Button m_btn_Stop;
 	private SeekBar m_sb_playingProgress;
 	private TextView m_tv_progressTime;
-	private boolean m_isSeeking = false;
-	private SeekBar m_sb_volume;
-	protected boolean m_isFailed = false;
-	private TextView m_tv_rendererName;
-	private RelativeLayout m_rl_dmrController;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

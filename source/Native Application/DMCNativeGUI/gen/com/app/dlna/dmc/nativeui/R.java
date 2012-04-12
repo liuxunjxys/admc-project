@@ -92,7 +92,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int ic_tab_devices_img=0x7f020028;
         public static final int ic_tab_devices_selected=0x7f020029;
         public static final int ic_tab_devices_unselected=0x7f02002a;
-        public static final int ic_tab_library=0x7f02002b;
+        public static final int ic_tab_library_img=0x7f02002b;
         public static final int ic_tab_now_playing_selected=0x7f02002c;
         public static final int ic_tab_now_playing_unselected=0x7f02002d;
         public static final int ic_tab_play_list=0x7f02002e;

@@ -30,7 +30,6 @@ public class PlaylistItemArrayAdapter extends ArrayAdapter<PlaylistItem> {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		if (convertView == null) {
-			Log.e(TAG, "ConvertView = null");
 			convertView = m_inflater.inflate(R.layout.didlobject_listview_item, null, false);
 		}
 		if (convertView.getTag() == null) {
