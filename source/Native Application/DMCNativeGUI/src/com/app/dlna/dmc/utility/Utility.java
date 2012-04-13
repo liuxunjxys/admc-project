@@ -44,19 +44,24 @@ public class Utility {
 
 	public static String createLink(File file) {
 		try {
-			return new URI("http", HTTPServerData.HOST + ":" + HTTPServerData.PORT, file.getAbsolutePath(), null, null).toString();
+			return new URI("http", HTTPServerData.HOST + ":" + HTTPServerData.PORT, file.getAbsolutePath(), null, null)
+					.toString();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
 
-	public static String converTimeToString(int time) {
-		String format = String.format("%%0%dd", 2);
-		String seconds = String.format(format, time % 60);
-		String minutes = String.format(format, (time % 3600) / 60);
-		String hours = String.format(format, time / 3600);
-		return hours + ":" + minutes + ":" + seconds;
+	public static String getTimeString(long seconds) {
+		StringBuilder sb = new StringBuilder();
+
+		long hour = seconds / 3600;
+		long minute = (seconds - hour * 3600) / 60;
+		long second = seconds - hour * 3600 - minute * 60;
+		sb.append(String.format("%02d", hour) + ":" + String.format("%02d", minute) + ":"
+				+ String.format("%02d", second));
+
+		return sb.toString();
 	}
-	
+
 }

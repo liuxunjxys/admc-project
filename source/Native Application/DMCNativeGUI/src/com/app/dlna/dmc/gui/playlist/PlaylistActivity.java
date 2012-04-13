@@ -32,18 +32,19 @@ import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor.DMRProcessorListner;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
+import com.app.dlna.dmc.utility.Utility;
 
 public class PlaylistActivity extends UpnpListenerActivity implements DMRProcessorListner {
 
 	private static final String TAG = PlaylistActivity.class.getName();
-	
+
 	private DMRProcessor m_dmrProcessor;
 	private PlaylistProcessor m_playlistProcessor;
 	private static final int STATE_PAUSE = 1;
 	private static final int STATE_PLAYING = 2;
 	private static final int STATE_STOP = 3;
 	private int m_currentState;
-	
+
 	private RelativeLayout m_rl_dmrController;
 	private boolean m_isSeeking = false;
 	private PlaylistItemArrayAdapter m_adapter;
@@ -135,7 +136,7 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 		public void onStopTrackingTouch(SeekBar seekBar) {
 			m_isSeeking = false;
 			Log.e(TAG, "Progress = " + seekBar.getProgress());
-			m_dmrProcessor.seek(getTimeString(seekBar.getProgress()));
+			m_dmrProcessor.seek(Utility.getTimeString(seekBar.getProgress()));
 		}
 
 		@Override
@@ -146,8 +147,8 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 
 		@Override
 		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-			m_tv_progressTime.setText(getTimeString(m_sb_playingProgress.getProgress()) + " / "
-					+ getTimeString(m_sb_playingProgress.getMax()));
+			m_tv_progressTime.setText(Utility.getTimeString(m_sb_playingProgress.getProgress()) + " / "
+					+ Utility.getTimeString(m_sb_playingProgress.getMax()));
 		}
 	};
 
@@ -298,22 +299,11 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 					m_sb_playingProgress.setMax((int) max);
 					m_sb_playingProgress.setProgress((int) current);
 					m_sb_playingProgress.invalidate();
-					m_tv_progressTime.setText(getTimeString(current) + " / " + getTimeString(max));
+					m_tv_progressTime.setText(Utility.getTimeString(current) + " / " + Utility.getTimeString(max));
 				}
 				m_sb_volume.setProgress(m_dmrProcessor.getVolume());
 			}
 		});
-	}
-
-	private String getTimeString(long seconds) {
-		StringBuilder sb = new StringBuilder();
-
-		long hour = seconds / 3600;
-		long minute = (seconds - hour * 3600) / 60;
-		long second = seconds - hour * 3600 - minute * 60;
-		sb.append(String.format("%02d", hour) + ":" + String.format("%02d", minute) + ":" + String.format("%02d", second));
-
-		return sb.toString();
 	}
 
 	@Override
@@ -458,8 +448,8 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 								break;
 							case 2:
 								if (MainActivity.UPNP_PROCESSOR != null) {
-									MainActivity.UPNP_PROCESSOR.getDownloadProcessor().startDownload(playlistItem.getTitle(),
-											playlistItem.getUri());
+									MainActivity.UPNP_PROCESSOR.getDownloadProcessor().startDownload(
+											playlistItem.getTitle(), playlistItem.getUri());
 								}
 								break;
 							default:

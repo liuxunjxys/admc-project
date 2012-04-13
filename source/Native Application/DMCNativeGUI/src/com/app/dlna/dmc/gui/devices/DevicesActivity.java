@@ -75,11 +75,9 @@ public class DevicesActivity extends UpnpListenerActivity {
 			@Override
 			public Object instantiateItem(ViewGroup container, int position) {
 				if (position == 0) {
-
 					((ViewPager) container).addView(m_dms_page);
 					return m_dms_page;
 				} else if (position == 1) {
-
 					((ViewPager) container).addView(m_dmr_page);
 					return m_dmr_page;
 				} else {
