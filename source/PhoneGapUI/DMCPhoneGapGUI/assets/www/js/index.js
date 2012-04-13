@@ -453,7 +453,7 @@ function myInitPlaylistsSide() {
 			function() {
 				onChange_durationBar($('#div_field_seekbar input'));
 			});
-	
+
 	$('#div_field_seekbar input').siblings('.ui-slider').bind('vmousedown',
 			function() {
 				onSeeking_durationBar($('#div_field_seekbar input'));
@@ -463,16 +463,6 @@ function myInitPlaylistsSide() {
 			function() {
 				onChange_volumeBar($('#div_play_volume_left input'));
 			});
-	// SEEK BAR EVENT --- Tap and Taphold
-	$('#div_field_seekbar input').siblings('.ui-slider').bind('tap',
-			function() {
-				var value = $('#div_field_seekbar input').attr('value');
-				console.log("seekbar value = " + value);
-			});
-	$('#div_field_seekbar input').siblings('.ui-slider a').bind('taphold',
-			function() {
-				makeAjaxChange($(this).parent().siblings('input'));
-			});
 }
 // Parameter note: sender is seekbar (slider) that you want to set it values
 // This method for init-time (if needed - in myInitPlaylistsSide method)
@@ -480,25 +470,23 @@ function myInitPlaylistsSide() {
 // duration-seekbar: currentValue = 0, maxValue = 300
 // volume-seekbar: currentValue = 50, maxValue = 50
 function setValueForSeekBar(sender, currentValue, maxValue) {
-	$(sender).attr('max', maxValue);
-	$(sender).attr('value', currentValue);
-	$(sender).slider("refresh");
+	if (sender.attr('data-seeking') == 'false') {
+		$(sender).attr('max', maxValue);
+		$(sender).attr('value', currentValue);
+		$(sender).slider("refresh");
+	}
 }
 
 // SEEK BAR EVENT-----------------------------------
 // Seek bar - duration of content
 function onChange_durationBar(sender) {
-	var currentValue = $(sender).attr('value');
-	var maxValue = $(sender).attr('max');
-
-	console.log('max: ' + currentValue);
-	console.log('current: ' + maxValue);
-	//reset seeking toggle-variable
+	window.plugins.PlaylistPlugin.seek($(sender).attr('value'));
+	// reset seeking toggle-variable
 	sender.attr('data-seeking', 'false');
 	console.log(sender.attr('data-seeking'));
 }
 
-function onSeeking_durationBar (sender){
+function onSeeking_durationBar(sender) {
 	sender.attr('data-seeking', 'true');
 	console.log(sender.attr('data-seeking'));
 }
