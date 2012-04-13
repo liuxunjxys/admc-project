@@ -26,7 +26,7 @@ function showYoutubeResult(e) {
 		yt_addItemToListView(obj);
 	}
 	hideLoadingIcon();
-	youttube_listview.listview('refresh');
+	youtube_listview.listview('refresh');
 	myScroll_youtube.refresh();
 	myScroll_youtube.scrollTo(0, 0, 0);
 }
@@ -43,11 +43,11 @@ function yt_addItemToListView(item) {
 			+ item.thumb
 			+ "' style='height: 100%; width: height; padding-left: 4%; float: left;'/><h3>"
 			+ item.title + "</h3><p>" + item.duration + "</p></a></li>";
-	youttube_listview.append(html);
+	youtube_listview.append(html);
 }
 
 function clearYoutubeList() {
-	youttube_listview.html('');
+	youtube_listview.html('');
 }
 
 function yt_onYoutubeItemClick(idx) {
