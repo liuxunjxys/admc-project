@@ -453,12 +453,16 @@ function myInitPlaylistsSide() {
 			function() {
 				onChange_durationBar($('#div_field_seekbar input'));
 			});
+	
+	$('#div_field_seekbar input').siblings('.ui-slider').bind('vmousedown',
+			function() {
+				onSeeking_durationBar($('#div_field_seekbar input'));
+			});
 
 	$('#div_play_volume_left input').siblings('.ui-slider').bind('vmouseup',
 			function() {
 				onChange_volumeBar($('#div_play_volume_left input'));
 			});
-
 	// SEEK BAR EVENT --- Tap and Taphold
 	$('#div_field_seekbar input').siblings('.ui-slider').bind('tap',
 			function() {
@@ -489,6 +493,14 @@ function onChange_durationBar(sender) {
 
 	console.log('max: ' + currentValue);
 	console.log('current: ' + maxValue);
+	//reset seeking toggle-variable
+	sender.attr('data-seeking', 'false');
+	console.log(sender.attr('data-seeking'));
+}
+
+function onSeeking_durationBar (sender){
+	sender.attr('data-seeking', 'true');
+	console.log(sender.attr('data-seeking'));
 }
 
 // Seek bar - volume
