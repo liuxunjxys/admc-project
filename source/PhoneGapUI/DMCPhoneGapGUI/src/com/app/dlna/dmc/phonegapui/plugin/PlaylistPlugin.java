@@ -15,6 +15,7 @@ import com.app.dlna.dmc.phonegapui.MainActivity;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
+import com.app.dlna.dmc.utility.Utility;
 import com.phonegap.api.Plugin;
 import com.phonegap.api.PluginResult;
 import com.phonegap.api.PluginResult.Status;
@@ -42,7 +43,6 @@ public class PlaylistPlugin extends Plugin {
 				Log.i(TAG, "item click idx = " + data.getInt(0));
 				playItem(data.getInt(0));
 			} catch (JSONException e) {
-				e.printStackTrace();
 				return new PluginResult(Status.JSON_EXCEPTION);
 			}
 		} else if (ACTION_NEXT.equals(action)) {
@@ -56,7 +56,11 @@ public class PlaylistPlugin extends Plugin {
 		} else if (ACTION_STOP.equals(action)) {
 			doStop();
 		} else if (ACTION_SEEK.equals(action)) {
-			doSeek();
+			try {
+				doSeek(data.getInt(0));
+			} catch (JSONException e) {
+				return new PluginResult(Status.JSON_EXCEPTION);
+			}
 		} else if (ACTION_SET_VOLUME.equals(action)) {
 			doSetVolume();
 		}
@@ -66,12 +70,14 @@ public class PlaylistPlugin extends Plugin {
 
 	private void doSetVolume() {
 		Log.i(TAG, "SetVolume");
-		
+
 	}
 
-	private void doSeek() {
+	private void doSeek(int seekTo) {
 		Log.i(TAG, "Seek");
-
+		if (MainActivity.UPNP_PROCESSOR.getDMRProcessor() != null) {
+			MainActivity.UPNP_PROCESSOR.getDMRProcessor().seek(Utility.getTimeString(seekTo));
+		}
 	}
 
 	private void doStop() {
