@@ -7,14 +7,14 @@ var icon_loading;
 
 var dms_listview; // list dms
 var dmr_listview; // list dmr
-var library_listview;
-var youttube_listview;
-var playlist_listview;
+var library_listview; // list library items
+var youtube_listview; // list youtube items
+var playlist_listview; // list playlist items
 
 var swipeLeftReady_devices;
 var swipeRightReady_devices;
 
-var time_to_swap_image = 200;
+var time_to_swap_image = 150;
 
 $(document).ready(function() {
 	iScrollConfig();
@@ -71,7 +71,8 @@ function changeStateImage(sender) {
 	} else {
 		$(sender).attr('data-current-path', stateAImgPath);
 	}
-	changeImagePathWithTimeOut(sender, $(sender).attr('data-current-path'), time_to_swap_image);
+	changeImagePathWithTimeOut(sender, $(sender).attr('data-current-path'),
+			time_to_swap_image);
 	if ($(sender).attr('data-my-state') == 'true') {
 		$(sender).attr('data-my-state', 'false');
 	} else {
@@ -121,7 +122,7 @@ function myInitPage() {
 	dms_listview = $('#div_wrraper_devi_dmS ul:first');
 	dmr_listview = $('#div_wrraper_devi_dmR ul:first');
 	library_listview = $('#div_wrapper_libs ul:first');
-	youttube_listview = $('#div_wrapper_you ul:first');
+	youtube_listview = $('#div_wrapper_you ul:first');
 	playlist_listview = $('#div_wrapper_play ul:first');
 
 	icon_loading = $('#icon_loading');
@@ -134,11 +135,14 @@ function myInitPage() {
 		}
 	});
 
-	$('.img_normal').live('vmouseup', function() {
-		if ($(this).attr("data-enable") == "true") {
-			changeImagePathWithTimeOut($(this), $(this).attr('data-normal-image'), time_to_swap_image);
-		}
-	});
+	$('.img_normal').live(
+			'vmouseup',
+			function() {
+				if ($(this).attr("data-enable") == "true") {
+					changeImagePathWithTimeOut($(this), $(this).attr(
+							'data-normal-image'), time_to_swap_image);
+				}
+			});
 
 	$('.img_double_state').live('vmousedown', function() {
 		if ($(this).attr("data-enable") == "true") {
@@ -154,11 +158,14 @@ function myInitPage() {
 		}
 	});
 
-	$('.img_double_state').live('vmouseup', function() {
-		if ($(this).attr("data-enable") == "true") {
-			changeImagePathWithTimeOut($(this), $(this).attr('data-current-path'), time_to_swap_image);
-		}
-	});
+	$('.img_double_state').live(
+			'vmouseup',
+			function() {
+				if ($(this).attr("data-enable") == "true") {
+					changeImagePathWithTimeOut($(this), $(this).attr(
+							'data-current-path'), time_to_swap_image);
+				}
+			});
 }
 
 /* User interface */
@@ -442,13 +449,26 @@ function myInitPlaylistsSide() {
 		onClick_volume_play($(this));
 	});
 
-	$('#div_field_seekbar input').siblings('.ui-slider').bind('vmouseup', function() {
-		onChange_durationBar($('#div_field_seekbar input'));
-	});
+	$('#div_field_seekbar input').siblings('.ui-slider').bind('vmouseup',
+			function() {
+				onChange_durationBar($('#div_field_seekbar input'));
+			});
 
-	$('#div_play_volume_left input').siblings('.ui-slider').bind('vmouseup', function() {
-		onChange_volumeBar($('#div_play_volume_left input'));
-	});
+	$('#div_play_volume_left input').siblings('.ui-slider').bind('vmouseup',
+			function() {
+				onChange_volumeBar($('#div_play_volume_left input'));
+			});
+
+	// SEEK BAR EVENT --- Tap and Taphold
+	$('#div_field_seekbar input').siblings('.ui-slider').bind('tap',
+			function() {
+				var value = $('#div_field_seekbar input').attr('value');
+				console.log("seekbar value = " + value);
+			});
+	$('#div_field_seekbar input').siblings('.ui-slider a').bind('taphold',
+			function() {
+				makeAjaxChange($(this).parent().siblings('input'));
+			});
 }
 // Parameter note: sender is seekbar (slider) that you want to set it values
 // This method for init-time (if needed - in myInitPlaylistsSide method)

@@ -18,6 +18,7 @@ import android.util.Log;
 import com.app.dlna.dmc.phonegapui.MainActivity;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor.DMRProcessorListner;
 import com.app.dlna.dmc.processor.interfaces.UpnpProcessor.UpnpProcessorListener;
+import com.app.dlna.dmc.utility.Utility;
 import com.phonegap.api.PhonegapActivity;
 import com.phonegap.api.Plugin;
 import com.phonegap.api.PluginResult;
@@ -90,8 +91,10 @@ public class DevicesPlugin extends Plugin implements UpnpProcessorListener {
 		if (device != null) {
 			MainActivity.UPNP_PROCESSOR.getDMRProcessor().addListener(DMRListener);
 			sendJavascript("setCurrentDMR('" + device.getIdentity().getUdn().getIdentifierString() + "');");
+			sendJavascript("playlist_updateDMRName('" + device.getDetails().getFriendlyName() + "');");
 		} else {
 			Log.i(TAG, "Selected device is null");
+			sendJavascript("playlist_updateDMRName('Please chose a DMR to play');");
 		}
 
 	}
@@ -106,6 +109,8 @@ public class DevicesPlugin extends Plugin implements UpnpProcessorListener {
 			PlaylistPlugin playlistPlugin = new PlaylistPlugin();
 			playlistPlugin.setContext(MainActivity.INSTANCE);
 			playlistPlugin.sendJavascript("playlist_updateDurationSeekbar(" + current + ", " + max + ");");
+			playlistPlugin.sendJavascript("playlist_updateDurationString('" + Utility.getTimeString(current) + " / "
+					+ Utility.getTimeString(max) + "');");
 		}
 
 		@Override
