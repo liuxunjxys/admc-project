@@ -176,11 +176,23 @@ public class MainActivity extends UpnpListenerTabActivity {
 	@Override
 	public void finishFromChild(Activity child) {
 		Log.e(TAG, "Finish from child " + m_tabHost.getCurrentTabTag());
-		if (m_tabHost.getCurrentTabTag().equals("Devices")) {
-			finish();
-		} else {
+		// if (m_tabHost.getCurrentTabTag().equals("Devices")) {
+		// finish();
+		// } else {
+		// m_tabHost.setCurrentTab(DEFAULT_TAB_INDEX);
+		// }
+		if (child instanceof DevicesActivity)
+			new AlertDialog.Builder(MainActivity.this).setTitle("Confirm exit").setMessage("Do you want to exist?")
+					.setPositiveButton("OK", new OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							finish();
+						}
+					}).setNegativeButton("No", null).create().show();
+
+		else
 			m_tabHost.setCurrentTab(DEFAULT_TAB_INDEX);
-		}
 	}
 
 	@Override
