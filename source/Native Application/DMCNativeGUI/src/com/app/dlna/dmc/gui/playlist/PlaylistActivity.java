@@ -236,6 +236,8 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 
 			@Override
 			public void run() {
+				Log.e(TAG, "Action fail: " + actionCallback.toString() + "; response = " + operation.toString() + "; cause = "
+						+ cause);
 				m_dmrProcessor.dispose();
 				MainActivity.UPNP_PROCESSOR.setCurrentDMR(new UDN("null"));
 				if (!m_isFailed) {
@@ -266,6 +268,7 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 
 			@Override
 			public void run() {
+				Log.e(TAG, "onErrorEvent: " + error);
 				m_dmrProcessor.dispose();
 				MainActivity.UPNP_PROCESSOR.setCurrentDMR(new UDN("null"));
 				if (!m_isFailed) {
@@ -448,8 +451,8 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 								break;
 							case 2:
 								if (MainActivity.UPNP_PROCESSOR != null) {
-									MainActivity.UPNP_PROCESSOR.getDownloadProcessor().startDownload(
-											playlistItem.getTitle(), playlistItem.getUri());
+									MainActivity.UPNP_PROCESSOR.getDownloadProcessor().startDownload(playlistItem.getTitle(),
+											playlistItem.getUri());
 								}
 								break;
 							default:
