@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="highlight">#33b5e5</color>
+    <color name="toptext">#ffffff</color>
+    <color name="toptext2">#cdc9c9</color>
+    <color name="topbackground">#333333</color>
+    <color name="red">#CC0000</color>
+    <color name="green">#669900</color>
+    
+    <color name="actionbar_title_color">#224894</color>
+</resources>
