@@ -46,10 +46,10 @@ function loadBrowseResult(e) {
 		var obj = result[i];
 		addItemToListView(obj);
 	}
-	myScroll_library.scrollTo(0, 0, 0);
+//	myScroll_library.scrollTo(0, 0, 0);
 	hideLoadingIcon();
 	library_listview.listview('refresh');
-	myScroll_library.refresh();
+	// myScroll_library.refresh();
 }
 
 function clearLibraryList() {

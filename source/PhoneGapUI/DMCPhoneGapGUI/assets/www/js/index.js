@@ -28,28 +28,28 @@ $(document).ready(function() {
 // =============================GLOBAL
 // MEDTHODS==========================================
 function iScrollConfig() {
-	setTimeout(function() {
-		myScroll_devices_dmS = new iScroll('div_wrraper_devi_dmS', {
-			hScroll : false,
-			vScrollbar : false
-		});
-		myScroll_devices_dmR = new iScroll('div_wrraper_devi_dmR', {
-			hScroll : false,
-			vScrollbar : false
-		});
-		myScroll_library = new iScroll('div_wrapper_libs', {
-			hScroll : false,
-			vScrollbar : false
-		});
-		myScroll_youtube = new iScroll('div_wrapper_you', {
-			hScroll : false,
-			vScrollbar : false
-		});
-		myScroll_playlist = new iScroll('div_wrapper_play', {
-			hScroll : false,
-			vScrollbar : false
-		});
-	}, 200);
+	// setTimeout(function() {
+	// myScroll_devices_dmS = new iScroll('div_wrraper_devi_dmS', {
+	// hScroll : false,
+	// vScrollbar : false
+	// });
+	// myScroll_devices_dmR = new iScroll('div_wrraper_devi_dmR', {
+	// hScroll : false,
+	// vScrollbar : false
+	// });
+	// myScroll_library = new iScroll('div_wrapper_libs', {
+	// hScroll : false,
+	// vScrollbar : false
+	// });
+	// myScroll_youtube = new iScroll('div_wrapper_you', {
+	// hScroll : false,
+	// vScrollbar : false
+	// });
+	// myScroll_playlist = new iScroll('div_wrapper_play', {
+	// hScroll : false,
+	// vScrollbar : false
+	//		});
+	//	}, 200);
 }
 
 function changeImagePath(sender, imgPath) {

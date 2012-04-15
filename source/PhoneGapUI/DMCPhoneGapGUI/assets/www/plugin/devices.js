@@ -23,11 +23,11 @@ var add_device = function(element, type) {
 	if (type == 'dms') {
 		dms_listview.append(html);
 		dms_listview.listview('refresh');
-		myScroll_devices_dmS.refresh();
+//		myScroll_devices_dmS.refresh();
 	} else {
 		dmr_listview.append(html);
 		dmr_listview.listview('refresh');
-		myScroll_devices_dmR.refresh();
+//		myScroll_devices_dmR.refresh();
 	}
 };
 

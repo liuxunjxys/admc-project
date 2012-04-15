@@ -1,4 +1,4 @@
-#div_app_page{
+#div_app_page {
 	padding: 0px;
 	margin: 0px;
 	position: relative;
@@ -8,7 +8,7 @@
 	width: 100%;
 }
 
-#di_main_tool_bar{
+#di_main_tool_bar {
 	position: relative;
 	padding: 0px;
 	margin: 0px;
@@ -16,16 +16,15 @@
 	/*background-color: gray;*/
 }
 
-#di_main_tool_bar img{
+#di_main_tool_bar img {
 	padding: 0px;
 	margin: 0px;
 	height: 100%;
 	width: height;
-	float: right;	
+	float: right;
 }
 
-
-#div_header{
+#div_header {
 	position: relative;
 	padding: 0px;
 	margin: 0px;
@@ -33,15 +32,14 @@
 	/*background-color: blue;*/
 }
 
-
-.div_navbar{
+.div_navbar {
 	padding: 0px;
 	margin: 0px;
 	position: relative;
 	height: 100%;
 }
 
-.div_navbar div{
+.div_navbar div {
 	position: absolute;
 	height: 100%;
 	width: 25%;
@@ -49,34 +47,34 @@
 	margin: 0px;
 }
 
-.div_navbar div#div_navbar_1{
+.div_navbar div#div_navbar_1 {
 	top: 0px;
 	left: 0px;
 }
 
-.div_navbar div#div_navbar_2{
+.div_navbar div#div_navbar_2 {
 	top: 0px;
 	left: 25%;
 }
 
-.div_navbar div#div_navbar_3{
+.div_navbar div#div_navbar_3 {
 	top: 0px;
 	left: 50%;
 }
 
-.div_navbar div#div_navbar_4{
+.div_navbar div#div_navbar_4 {
 	top: 0px;
 	left: 75%;
 }
 
-.div_navbar div a{
+.div_navbar div a {
 	padding: 0px;
 	margin: 0px;
 	height: 99%;
 	width: 100%;
 }
 
-.div_navbar div a img{
+.div_navbar div a img {
 	position: relative;
 	padding: 0px;
 	margin: 0px;
@@ -85,18 +83,16 @@
 }
 
 /*---------------------------------------*/
-
-#div_content{
+#div_content {
 	position: relative;
 	height: 79%;
 	/*background-color: blue;*/
 }
 
-.div_subcontent{
+.div_subcontent {
 	position: relative;
 	left: 0px;
-	height:100%;
+	height: 100%;
 	/*background-color: red;*/
 	display: none;
 }
-

@@ -103,9 +103,6 @@ public class DevicesPlugin extends Plugin implements UpnpProcessorListener {
 
 		@Override
 		public void onUpdatePosition(long current, long max) {
-			// Log.i(TAG, "Update Position, current = " + current + " max = " +
-			// max);
-			Log.d(TAG, "On UpdatePosition");
 			PlaylistPlugin playlistPlugin = new PlaylistPlugin();
 			playlistPlugin.setContext(MainActivity.INSTANCE);
 			playlistPlugin.sendJavascript("playlist_updateDurationSeekbar(" + current + ", " + max + ");");
@@ -115,7 +112,6 @@ public class DevicesPlugin extends Plugin implements UpnpProcessorListener {
 
 		@Override
 		public void onStoped() {
-			Log.d(TAG, "On Stop");
 			PlaylistPlugin playlistPlugin = new PlaylistPlugin();
 			playlistPlugin.setContext(MainActivity.INSTANCE);
 			playlistPlugin.sendJavascript("playlist_onStop();");
@@ -124,7 +120,6 @@ public class DevicesPlugin extends Plugin implements UpnpProcessorListener {
 
 		@Override
 		public void onPlaying() {
-			Log.d(TAG, "On Playing");
 			PlaylistPlugin playlistPlugin = new PlaylistPlugin();
 			playlistPlugin.setContext(MainActivity.INSTANCE);
 			playlistPlugin.sendJavascript("playlist_onPlaying();");
@@ -132,7 +127,6 @@ public class DevicesPlugin extends Plugin implements UpnpProcessorListener {
 
 		@Override
 		public void onPaused() {
-			Log.d(TAG, "On Paused");
 			PlaylistPlugin playlistPlugin = new PlaylistPlugin();
 			playlistPlugin.setContext(MainActivity.INSTANCE);
 			playlistPlugin.sendJavascript("playlist_onPause();");
@@ -140,13 +134,11 @@ public class DevicesPlugin extends Plugin implements UpnpProcessorListener {
 
 		@Override
 		public void onErrorEvent(String error) {
-			Log.d(TAG, "OnError: " + error);
 
 		}
 
 		@Override
 		public void onEndTrack() {
-			Log.i(TAG, "OnEndtrack");
 			PlaylistPlugin playlistPlugin = new PlaylistPlugin();
 			playlistPlugin.setContext(MainActivity.INSTANCE);
 			playlistPlugin.sendJavascript("playlist_onEndtrack();");
@@ -155,7 +147,6 @@ public class DevicesPlugin extends Plugin implements UpnpProcessorListener {
 		@SuppressWarnings("rawtypes")
 		@Override
 		public void onActionFail(Action actionCallback, UpnpResponse response, String cause) {
-			// TODO Auto-generated method stub
 
 		}
 	};
