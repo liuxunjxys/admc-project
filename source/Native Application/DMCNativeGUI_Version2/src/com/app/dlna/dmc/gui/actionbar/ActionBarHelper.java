@@ -21,7 +21,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 
-import com.app.dlna.dmc.nativeui.R;
+import com.app.dlna.controller.nativegui.R;
 
 /**
  * An abstract class that handles some common action bar-related functionality

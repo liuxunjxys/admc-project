@@ -40,8 +40,8 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.app.dlna.controller.nativegui.R;
 import com.app.dlna.dmc.gui.MainActivity;
-import com.app.dlna.dmc.nativeui.R;
 import com.app.dlna.dmc.processor.http.HTTPServerData;
 import com.app.dlna.dmc.processor.http.MainHttpProcessor;
 import com.app.dlna.dmc.processor.impl.DMRProcessorImpl;

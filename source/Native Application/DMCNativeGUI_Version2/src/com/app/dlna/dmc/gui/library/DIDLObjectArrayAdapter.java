@@ -21,7 +21,7 @@ import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.app.dlna.dmc.nativeui.R;
+import com.app.dlna.controller.nativegui.R;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 
 public class DIDLObjectArrayAdapter extends ArrayAdapter<DIDLObject> {

@@ -29,9 +29,9 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.app.dlna.controller.nativegui.R;
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerActivity;
-import com.app.dlna.dmc.nativeui.R;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor.DMSProcessorListner;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;

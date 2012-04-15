@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Android DMC</string>
+    <string name="app_name">Digital Media Controller</string>
     <string name="upnp_service">Upnp Service</string>
     <string name="refresh">Refresh</string>
     <string name="str_play">Play</string>
@@ -12,13 +12,6 @@
     <string name="video">Video</string>
     <string name="photo">Photo</string>
     <string name="youtube">YouTube</string>
-    <string name="link1">http://www.youtube.com/watch?v=4bNe8WlNAaU</string>
-    <string name="link2">http://www.youtube.com/watch?v=J8r9WArliy4</string>
-    <string name="link3">http://www.youtube.com/watch?v=kPKZNgbC4co</string>
-    <string name="link4">http://www.youtube.com/watch?v=o95Wddd9AQw</string>
-    <string name="link5">http://www.youtube.com/watch?v=oCg4ZgAtd9o</string>
-    <string name="link6">http://www.youtube.com/watch?v=f0NdZ37GSGQ</string>
-    <string name="link7">http://192.168.163.1:7777/abc</string>
     <string name="youtube_proxy_port">7576</string>
     <string name="play_to_httpserver_port">7677</string>
     <string name="submit">Submit</string>

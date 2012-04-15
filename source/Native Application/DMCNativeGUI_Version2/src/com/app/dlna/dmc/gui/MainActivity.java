@@ -18,12 +18,12 @@ import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabSpec;
 import android.widget.Toast;
 
+import com.app.dlna.controller.nativegui.R;
 import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerTabActivity;
 import com.app.dlna.dmc.gui.devices.DevicesActivity;
 import com.app.dlna.dmc.gui.library.LibraryActivity;
 import com.app.dlna.dmc.gui.playlist.PlaylistActivity;
 import com.app.dlna.dmc.gui.youtube.YoutubeActivity;
-import com.app.dlna.dmc.nativeui.R;
 import com.app.dlna.dmc.processor.impl.UpnpProcessorImpl;
 import com.app.dlna.dmc.processor.interfaces.UpnpProcessor;
 import com.app.dlna.dmc.processor.localdevice.service.LocalContentDirectoryService;

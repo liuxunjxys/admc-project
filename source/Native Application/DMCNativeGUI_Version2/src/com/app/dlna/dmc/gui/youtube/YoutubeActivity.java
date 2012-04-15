@@ -15,9 +15,9 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.app.dlna.controller.nativegui.R;
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerActivity;
-import com.app.dlna.dmc.nativeui.R;
 import com.app.dlna.dmc.processor.http.HTTPServerData;
 import com.app.dlna.dmc.processor.impl.YoutubeProcessorImpl;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
@@ -151,12 +151,14 @@ public class YoutubeActivity extends UpnpListenerActivity {
 					item.setUrl(directlink);
 					item.setType(Type.VIDEO);
 					if (m_playlistProcessor.addItem(item))
-						Toast.makeText(YoutubeActivity.this, "Add item \"" + item.getTitle() + "\" to playlist sucess", Toast.LENGTH_SHORT).show();
+						Toast.makeText(YoutubeActivity.this, "Add item \"" + item.getTitle() + "\" to playlist sucess",
+								Toast.LENGTH_SHORT).show();
 					else {
 						if (m_playlistProcessor.isFull()) {
 							Toast.makeText(YoutubeActivity.this, "Current playlist is full", Toast.LENGTH_SHORT).show();
 						} else {
-							Toast.makeText(YoutubeActivity.this, "Item already exits in current Playlist", Toast.LENGTH_SHORT).show();
+							Toast.makeText(YoutubeActivity.this, "Item already exits in current Playlist", Toast.LENGTH_SHORT)
+									.show();
 						}
 					}
 				}
@@ -185,7 +187,8 @@ public class YoutubeActivity extends UpnpListenerActivity {
 					dissmissProgressDialog();
 					String generatedURL;
 					try {
-						generatedURL = new URI("http", HTTPServerData.HOST + ":" + HTTPServerData.PORT, result, null, null).toString();
+						generatedURL = new URI("http", HTTPServerData.HOST + ":" + HTTPServerData.PORT, result, null, null)
+								.toString();
 						Log.i(TAG, "Generated URL = " + generatedURL);
 						insertPlaylistItem(title, link, generatedURL);
 					} catch (URISyntaxException e) {
