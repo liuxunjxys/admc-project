@@ -312,23 +312,38 @@ public class DMRProcessorImpl implements DMRProcessor {
 					play();
 				} else {
 					Log.e(TAG, "set AV uri = " + uri);
-					m_controlPoint.execute(new SetAVTransportURI(m_avtransportService, uri, null) {
+					Stop stop = new Stop(m_avtransportService) {
 						@Override
 						public void success(ActionInvocation invocation) {
 							super.success(invocation);
-							m_controlPoint.execute(new Play(m_avtransportService) {
-
+							fireUpdatePositionEvent(0, 0);
+							m_isBusy = false;
+							m_state = STOP;
+							m_controlPoint.execute(new SetAVTransportURI(m_avtransportService, uri, null) {
 								@Override
-								public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
-									Log.e(TAG, "Call fail");
-									fireOnFailEvent(invocation.getAction(), operation, defaultMsg);
-									m_isBusy = false;
+								public void success(ActionInvocation invocation) {
+									super.success(invocation);
+									m_controlPoint.execute(new Play(m_avtransportService) {
+
+										@Override
+										public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
+											Log.e(TAG, "Call fail");
+											fireOnFailEvent(invocation.getAction(), operation, defaultMsg);
+											m_isBusy = false;
+										}
+
+										public void success(ActionInvocation invocation) {
+											m_isBusy = false;
+											m_state = PLAYING;
+										};
+									});
 								}
 
-								public void success(ActionInvocation invocation) {
+								@Override
+								public void failure(ActionInvocation invocation, UpnpResponse response, String defaultMsg) {
+									fireOnFailEvent(invocation.getAction(), response, defaultMsg);
 									m_isBusy = false;
-									m_state = PLAYING;
-								};
+								}
 							});
 						}
 
@@ -336,8 +351,10 @@ public class DMRProcessorImpl implements DMRProcessor {
 						public void failure(ActionInvocation invocation, UpnpResponse response, String defaultMsg) {
 							fireOnFailEvent(invocation.getAction(), response, defaultMsg);
 							m_isBusy = false;
+							m_user_stop = false;
 						}
-					});
+					};
+					m_controlPoint.execute(stop);
 				}
 			}
 		});
