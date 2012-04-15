@@ -74,8 +74,12 @@ public class DIDLObjectArrayAdapter extends ArrayAdapter<DIDLObject> {
 			ViewHolder holder = (ViewHolder) convertView.getTag();
 
 			DIDLObject object = getItem(position);
-			convertView.setVisibility(View.VISIBLE);
 			holder.name.setText(object.getTitle());
+			if (object.getId().equals("-1")) {
+				holder.icon.setVisibility(View.GONE);
+				return convertView;
+			}
+			holder.icon.setVisibility(View.VISIBLE);
 			if (object instanceof Container) {
 				holder.icon.setImageResource(R.drawable.folder);
 			} else {

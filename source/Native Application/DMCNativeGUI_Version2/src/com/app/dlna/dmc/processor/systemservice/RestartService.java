@@ -1,10 +1,10 @@
 package com.app.dlna.dmc.processor.systemservice;
 
-import com.app.dlna.dmc.gui.MainActivity;
-
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+
+import com.app.dlna.dmc.gui.MainActivity;
 
 public class RestartService extends Service {
 

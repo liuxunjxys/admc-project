@@ -1,6 +1,5 @@
 package com.app.dlna.dmc.gui.library;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -38,16 +37,77 @@ import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem.Type;
 
-public class LibraryActivity extends UpnpListenerActivity implements DMSProcessorListner {
+public class LibraryActivity extends UpnpListenerActivity {
 	private static final String TAG = LibraryActivity.class.getName();
 	private DMSProcessor m_dmsProcessor;
 	private DIDLObjectArrayAdapter m_adapter;
 	private ListView m_listView;
 	private ProgressDialog m_progressDlg;
-	private List<String> m_traceID;
 	private String m_currentDMSUDN;
 	private PlaylistProcessor m_playlistProcessor;
 	private EditText m_filterText;
+	private boolean m_loadMore;
+	protected boolean m_isRoot;
+
+	private DMSProcessorListner m_listener = new DMSProcessorListner() {
+
+		@Override
+		public void onBrowseFail(final String message) {
+			runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					m_progressDlg.dismiss();
+					new AlertDialog.Builder(LibraryActivity.this).setTitle("Error occurs").setMessage(message)
+							.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									LibraryActivity.this.finish();
+								}
+							}).show();
+
+				}
+			});
+
+		}
+
+		@Override
+		public void onBrowseComplete(final String objectID, final boolean haveNext, boolean havePrev,
+				final Map<String, List<? extends DIDLObject>> result) {
+			Log.i(TAG, "browse complete: object id = " + objectID + " haveNext = " + haveNext + "; havePrev =" + havePrev
+					+ "; result size = " + result.size());
+			m_isRoot = objectID.equals("0");
+			runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					if (m_progressDlg.isShowing()) {
+						if (m_loadMore) {
+							m_adapter.remove(m_adapter.getItem(m_adapter.getCount() - 1));
+						} else
+							m_adapter.clear();
+						for (DIDLObject container : result.get("Containers"))
+							m_adapter.add(container);
+
+						for (DIDLObject item : result.get("Items"))
+							m_adapter.add(item);
+
+						if (haveNext) {
+							Item item = new Item();
+							item.setTitle("Load more result");
+							item.setId("-1");
+							m_adapter.add(item);
+						}
+
+						m_progressDlg.dismiss();
+						m_adapter.notifyDataSetChanged();
+					}
+				}
+			});
+
+		}
+	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -61,12 +121,14 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 		m_listView.setOnItemClickListener(itemClickListener);
 		m_listView.setOnItemLongClickListener(itemLongClickListener);
 
-		m_traceID = new ArrayList<String>();
-		m_traceID.add("-1");
-
 		m_filterText = (EditText) findViewById(R.id.search_box);
 		m_filterText.addTextChangedListener(filterTextWatcher);
+		m_progressDlg = new ProgressDialog(LibraryActivity.this);
+		m_progressDlg.setTitle("Loading");
+		m_progressDlg.setMessage("Waiting for loading items");
+		m_progressDlg.setCancelable(true);
 
+		m_loadMore = false;
 	}
 
 	private TextWatcher filterTextWatcher = new TextWatcher() {
@@ -98,11 +160,8 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 		String newUDN = MainActivity.UPNP_PROCESSOR.getCurrentDMS().getIdentity().getUdn().toString();
 		if (m_currentDMSUDN == null || !m_currentDMSUDN.equals(newUDN)) {
 			m_currentDMSUDN = newUDN;
-			m_traceID = new ArrayList<String>();
-			m_traceID.add("-1");
 			m_dmsProcessor = MainActivity.UPNP_PROCESSOR.getDMSProcessor();
-			m_dmsProcessor.addListener(LibraryActivity.this);
-			browse("0");
+			browse("0", 0);
 		} else {
 			m_adapter.notifyDataSetChanged();
 		}
@@ -132,9 +191,16 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 		public void onItemClick(AdapterView<?> adapter, View view, int position, long arg3) {
 			final DIDLObject object = m_adapter.getItem(position);
 			if (object instanceof Container) {
-				browse(object.getId());
+				browse(object.getId(), 0);
 			} else if (object instanceof Item) {
-				addToPlaylist(object);
+				if (object.getId().equals("-1")) {
+					// load more items
+					m_loadMore = true;
+					m_progressDlg.show();
+					m_dmsProcessor.nextPage(m_listener);
+				} else {
+					addToPlaylist(object);
+				}
 			}
 		}
 	};
@@ -163,16 +229,12 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 		}
 	}
 
-	private void browse(String id) {
+	private void browse(String id, int pageIndex) {
 		m_filterText.setText("");
 		Log.e(TAG, "Browse id = " + id);
-		m_traceID.add(id);
-		m_progressDlg = ProgressDialog.show(LibraryActivity.this, "Loading", "Loading...");
-		m_progressDlg.setCancelable(true);
-		m_dmsProcessor.browse(id);
-		for (String _id : m_traceID) {
-			Log.e(TAG, _id);
-		}
+		m_progressDlg.show();
+		m_loadMore = false;
+		m_dmsProcessor.browse(id, pageIndex, m_listener);
 	}
 
 	protected void addToPlaylist(DIDLObject object) {
@@ -203,66 +265,17 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 	}
 
 	@Override
-	public void onBrowseComplete(final Map<String, List<? extends DIDLObject>> result) {
-		runOnUiThread(new Runnable() {
-
-			@Override
-			public void run() {
-				if (m_progressDlg.isShowing()) {
-					m_adapter.clear();
-
-					for (DIDLObject container : result.get("Containers"))
-						m_adapter.add(container);
-
-					for (DIDLObject item : result.get("Items"))
-						m_adapter.add(item);
-
-					m_progressDlg.dismiss();
-				} else {
-					m_traceID.remove(m_traceID.size() - 1);
-				}
-			}
-		});
-
-	}
-
-	@Override
-	public void onBrowseFail(final String message) {
-		runOnUiThread(new Runnable() {
-
-			@Override
-			public void run() {
-				m_progressDlg.dismiss();
-				new AlertDialog.Builder(LibraryActivity.this).setTitle("Error occurs").setMessage(message)
-						.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								LibraryActivity.this.finish();
-							}
-						}).show();
-
-			}
-		});
-	}
-
-	@Override
 	public void onBackPressed() {
 		upOneLevel();
 	}
 
 	private void upOneLevel() {
-		int traceSize = m_traceID.size();
-		if (traceSize > 2) {
-			String parentID = m_traceID.get(traceSize - 2);
-			browse(parentID);
-			m_traceID.remove(m_traceID.size() - 1);
-			m_traceID.remove(m_traceID.size() - 1);
-		} else {
-			Toast.makeText(LibraryActivity.this,
-					"You are in the root of this MediaServer. Press Back again to chose other MediaServer", Toast.LENGTH_SHORT)
-					.show();
-			finish();
+		if (m_isRoot)
+			Toast.makeText(LibraryActivity.this, "You are in root of this data source", Toast.LENGTH_SHORT).show();
+		else if (m_dmsProcessor != null) {
+			m_progressDlg.show();
+			m_loadMore = false;
+			m_dmsProcessor.back(m_listener);
 		}
 	}
 
@@ -271,10 +284,7 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 	}
 
 	public void onRefreshButtonClick(View view) {
-		int currentIdIdx = m_traceID.size() - 1;
-		String currentContainerId = m_traceID.get(currentIdIdx);
-		m_traceID.remove(currentIdIdx);
-		browse(currentContainerId);
+
 	}
 
 	public void onSelectAllButtonClick(View view) {
@@ -285,6 +295,8 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 		int count = m_adapter.getCount();
 		for (int i = 0; i < count; ++i) {
 			DIDLObject object = m_adapter.getItem(i);
+			if (object.getId().equals("-1"))
+				continue;
 			if (object instanceof Item) {
 				PlaylistItem item = new PlaylistItem();
 				item.setTitle(object.getTitle());
@@ -310,6 +322,8 @@ public class LibraryActivity extends UpnpListenerActivity implements DMSProcesso
 		int count = m_adapter.getCount();
 		for (int i = 0; i < count; ++i) {
 			DIDLObject object = m_adapter.getItem(i);
+			if (object.getId().equals("-1"))
+				continue;
 			if (object instanceof Item) {
 				PlaylistItem item = new PlaylistItem();
 				item.setTitle(object.getTitle());

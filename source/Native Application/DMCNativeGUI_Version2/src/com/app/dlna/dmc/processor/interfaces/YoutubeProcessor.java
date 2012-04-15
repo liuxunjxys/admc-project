@@ -2,7 +2,7 @@ package com.app.dlna.dmc.processor.interfaces;
 
 import java.util.List;
 
-import com.app.dlna.dmc.processor.localdevice.YoutubeItem;
+import com.app.dlna.dmc.processor.youtube.YoutubeItem;
 
 public interface YoutubeProcessor {
 
@@ -15,7 +15,7 @@ public interface YoutubeProcessor {
 	public interface IYoutubeProcessorListener {
 		void onStartPorcess();
 
-		void onComplete(String result);
+		void onGetDirectLinkComplete(String result);
 
 		void onFail(Exception ex);
 

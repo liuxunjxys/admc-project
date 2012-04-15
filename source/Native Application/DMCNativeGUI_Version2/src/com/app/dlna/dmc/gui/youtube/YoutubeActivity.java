@@ -23,9 +23,9 @@ import com.app.dlna.dmc.processor.impl.YoutubeProcessorImpl;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.interfaces.YoutubeProcessor;
 import com.app.dlna.dmc.processor.interfaces.YoutubeProcessor.IYoutubeProcessorListener;
-import com.app.dlna.dmc.processor.localdevice.YoutubeItem;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem.Type;
+import com.app.dlna.dmc.processor.youtube.YoutubeItem;
 
 public class YoutubeActivity extends UpnpListenerActivity {
 	private static final String TAG = YoutubeActivity.class.getName();
@@ -99,12 +99,6 @@ public class YoutubeActivity extends UpnpListenerActivity {
 				}
 
 				@Override
-				public void onComplete(String result) {
-					dissmissProgressDialog();
-					insertPlaylistItem(title, link, result);
-				}
-
-				@Override
 				public void onFail(Exception ex) {
 					dissmissProgressDialog();
 				}
@@ -112,6 +106,12 @@ public class YoutubeActivity extends UpnpListenerActivity {
 				@Override
 				public void onSearchComplete(List<YoutubeItem> result) {
 
+				}
+
+				@Override
+				public void onGetDirectLinkComplete(String result) {
+					dissmissProgressDialog();
+					insertPlaylistItem(title, link, result);
 				}
 
 			});
@@ -183,7 +183,12 @@ public class YoutubeActivity extends UpnpListenerActivity {
 				}
 
 				@Override
-				public void onComplete(String result) {
+				public void onSearchComplete(List<YoutubeItem> result) {
+
+				}
+
+				@Override
+				public void onGetDirectLinkComplete(String result) {
 					dissmissProgressDialog();
 					String generatedURL;
 					try {
@@ -194,12 +199,6 @@ public class YoutubeActivity extends UpnpListenerActivity {
 					} catch (URISyntaxException e) {
 						e.printStackTrace();
 					}
-
-				}
-
-				@Override
-				public void onSearchComplete(List<YoutubeItem> result) {
-
 				}
 			});
 
@@ -219,6 +218,16 @@ public class YoutubeActivity extends UpnpListenerActivity {
 				}
 
 				@Override
+				public void onFail(Exception ex) {
+					dissmissProgressDialog();
+				}
+
+				@Override
+				public void onGetDirectLinkComplete(String result) {
+					dissmissProgressDialog();
+				}
+
+				@Override
 				public void onSearchComplete(final List<YoutubeItem> result) {
 					dissmissProgressDialog();
 					runOnUiThread(new Runnable() {
@@ -233,16 +242,6 @@ public class YoutubeActivity extends UpnpListenerActivity {
 							}
 						}
 					});
-				}
-
-				@Override
-				public void onFail(Exception ex) {
-					dissmissProgressDialog();
-				}
-
-				@Override
-				public void onComplete(String result) {
-					dissmissProgressDialog();
 				}
 			});
 	}

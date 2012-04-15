@@ -211,10 +211,11 @@ public class LocalContentDirectoryService extends AbstractContentDirectoryServic
 				content.addContainer(new StorageFolder("0/3", "0", "Photo", "Android Local DMS", m_listPhoto.size(), 0l));
 				count = 3;
 			}
-
 			if (objectID.equals("0/1"))
 				synchronized (m_listMusic) {
-					for (DIDLObject didlObject : m_listMusic) {
+					int toIndex = (firstResult + maxResults) < (m_listMusic.size() - 1) ? (int) (firstResult + maxResults)
+							: (m_listMusic.size() - 1);
+					for (DIDLObject didlObject : m_listMusic.subList((int) firstResult, toIndex)) {
 						if (didlObject != null) {
 							content.addItem((Item) didlObject);
 						}
@@ -223,7 +224,9 @@ public class LocalContentDirectoryService extends AbstractContentDirectoryServic
 				}
 			if (objectID.equals("0/2"))
 				synchronized (m_listVideo) {
-					for (DIDLObject didlObject : m_listVideo) {
+					int toIndex = (firstResult + maxResults) < (m_listVideo.size() - 1) ? (int) (firstResult + maxResults)
+							: (m_listVideo.size() - 1);
+					for (DIDLObject didlObject : m_listVideo.subList((int) firstResult, toIndex)) {
 						if (didlObject != null) {
 							content.addItem((Item) didlObject);
 						}
@@ -232,7 +235,9 @@ public class LocalContentDirectoryService extends AbstractContentDirectoryServic
 				}
 			if (objectID.equals("0/3"))
 				synchronized (m_listPhoto) {
-					for (DIDLObject didlObject : m_listPhoto) {
+					int toIndex = (firstResult + maxResults) < (m_listPhoto.size() - 1) ? (int) (firstResult + maxResults)
+							: (m_listPhoto.size() - 1);
+					for (DIDLObject didlObject : m_listPhoto.subList((int) firstResult, toIndex)) {
 						if (didlObject != null) {
 							content.addItem((Item) didlObject);
 						}
