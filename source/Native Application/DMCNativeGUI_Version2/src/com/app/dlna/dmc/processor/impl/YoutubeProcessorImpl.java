@@ -18,7 +18,7 @@ import android.util.Log;
 
 import com.app.dlna.dmc.processor.http.HTTPLinkManager;
 import com.app.dlna.dmc.processor.interfaces.YoutubeProcessor;
-import com.app.dlna.dmc.processor.localdevice.YoutubeItem;
+import com.app.dlna.dmc.processor.youtube.YoutubeItem;
 import com.app.dlna.dmc.utility.Utility;
 
 public class YoutubeProcessorImpl implements YoutubeProcessor {
@@ -48,11 +48,9 @@ public class YoutubeProcessorImpl implements YoutubeProcessor {
 					String inputLine;
 					String directlink = null;
 					while ((inputLine = in.readLine()) != null) {
-						System.out.println(inputLine);
 						if (inputLine.contains("img.src")) {
-							System.out.println(" Line = " + inputLine);
-							directlink = inputLine.substring(inputLine.indexOf('"') + 1, inputLine.lastIndexOf('"')).replace("\\u0026", "&").replace("\\", "")
-									.replace("generate_204", "videoplayback");
+							directlink = inputLine.substring(inputLine.indexOf('"') + 1, inputLine.lastIndexOf('"'))
+									.replace("\\u0026", "&").replace("\\", "").replace("generate_204", "videoplayback");
 							System.out.println(" Direct Link = " + directlink);
 							// TODO: find out what is crossdomain.xml
 							// if (!directlink.contains("crossdomain.xml"))
@@ -61,7 +59,7 @@ public class YoutubeProcessorImpl implements YoutubeProcessor {
 					}
 					in.close();
 					ps.close();
-					callback.onComplete(directlink);
+					callback.onGetDirectLinkComplete(directlink);
 				} catch (Exception ex) {
 					Log.e(TAG, "Get Direct Link Fail");
 					ex.printStackTrace();
@@ -88,14 +86,14 @@ public class YoutubeProcessorImpl implements YoutubeProcessor {
 			}
 
 			@Override
-			public void onComplete(String result) {
+			public void onGetDirectLinkComplete(String result) {
 				String disget = Utility.getMD5(result);
 				String disgetLink = "/" + disget.substring(0, disget.length() - 1) + ".mp4";
 				try {
 					HTTPLinkManager.LINK_MAP.put(disgetLink, result);
 					Log.d(TAG, "DirectLink = " + result);
 					Log.d(TAG, "DisgetLink = " + disgetLink);
-					callback.onComplete(disgetLink);
+					callback.onGetDirectLinkComplete(disgetLink);
 				} catch (Exception ex) {
 					ex.printStackTrace();
 					callback.onFail(ex);
@@ -120,12 +118,14 @@ public class YoutubeProcessorImpl implements YoutubeProcessor {
 			@Override
 			public void run() {
 				try {
+					Log.i(TAG, "Execute search, query = " + query);
 					String _query = query.replace(" ", "%20");
-					URL jsonURL = new URL("http://gdata.youtube.com/feeds/api/videos?q=" + _query + "&orderby=updated&v=2&alt=jsonc");
+					URL jsonURL = new URL("http://gdata.youtube.com/feeds/api/videos?q=" + _query
+							+ "&orderby=updated&v=2&alt=jsonc");
 					URLConnection jc = jsonURL.openConnection();
 					InputStream is = jc.getInputStream();
 					String jsonTxt = IOUtils.toString(is);
-
+					Log.i(TAG, "jsonTxt = " + jsonTxt);
 					JSONObject jj = new JSONObject(jsonTxt);
 
 					JSONObject jdata = jj.getJSONObject("data");

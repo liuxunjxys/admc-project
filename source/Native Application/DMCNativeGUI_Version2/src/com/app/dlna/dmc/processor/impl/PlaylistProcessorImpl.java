@@ -3,10 +3,13 @@ package com.app.dlna.dmc.processor.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.util.Log;
+
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 
 public class PlaylistProcessorImpl implements PlaylistProcessor {
+	private static final String TAG = PlaylistProcessorImpl.class.getName();
 	private List<PlaylistItem> m_playlistItems;
 	private int m_currentItemIdx;
 	private int m_maxSize = 100;
@@ -84,6 +87,7 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 				return false;
 			m_playlistItems.add(item);
 			m_listURI.add(item.getUri());
+			Log.i(TAG, "Added Item, playlist size: " + m_playlistItems.size());
 			if (m_playlistItems.size() == 1) {
 				m_currentItemIdx = 0;
 			}
@@ -97,6 +101,7 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 			if (m_playlistItems.contains(item)) {
 				m_playlistItems.remove(item);
 				m_listURI.remove(item.getUri());
+				Log.i(TAG, "Removed Item, playlist size: " + m_playlistItems.size());
 				return true;
 			}
 			return false;

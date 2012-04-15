@@ -6,17 +6,28 @@ import java.util.Map;
 import org.teleal.cling.support.model.DIDLObject;
 
 public interface DMSProcessor {
-	void browse(String objectID);
+	void browse(String objectID, int pageIndex, DMSProcessorListner listener);
+
+	void nextPage(DMSProcessorListner listener);
+
+	void previousPage(DMSProcessorListner listener);
+
+	void back(DMSProcessorListner listener);
 
 	void dispose();
 
-	void addListener(DMSProcessorListner listener);
-
-	void removeListener(DMSProcessorListner listener);
-
 	public interface DMSProcessorListner {
-		void onBrowseComplete(Map<String, List<? extends DIDLObject>> result);
+		void onBrowseComplete(String objectID, boolean haveNext, boolean havePrev,
+				Map<String, List<? extends DIDLObject>> result);
 
 		void onBrowseFail(String message);
 	}
+
+	DIDLObject getDIDLObject(String objectID);
+
+	void addAllToPlaylist(PlaylistProcessor playlistProcessor);
+
+	void removeAllFromPlaylist(PlaylistProcessor playlistProcessor);
+
+	List<DIDLObject> getAllObjects();
 }
