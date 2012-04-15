@@ -10,7 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.app.dlna.dmc.nativeui.R;
+import com.app.dlna.controller.nativegui.R;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 
 public class PlaylistItemArrayAdapter extends ArrayAdapter<PlaylistItem> {

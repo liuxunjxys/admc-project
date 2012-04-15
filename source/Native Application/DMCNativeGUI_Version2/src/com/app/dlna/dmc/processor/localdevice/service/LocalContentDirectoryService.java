@@ -31,7 +31,7 @@ import android.os.Environment;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
-import com.app.dlna.dmc.nativeui.R;
+import com.app.dlna.controller.nativegui.R;
 import com.app.dlna.dmc.processor.http.HTTPServerData;
 import com.app.dlna.dmc.utility.Utility;
 

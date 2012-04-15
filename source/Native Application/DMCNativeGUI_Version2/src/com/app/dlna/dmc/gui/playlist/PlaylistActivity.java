@@ -23,9 +23,9 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.app.dlna.controller.nativegui.R;
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerActivity;
-import com.app.dlna.dmc.nativeui.R;
 import com.app.dlna.dmc.processor.http.HTTPServerData;
 import com.app.dlna.dmc.processor.impl.LocalDMRProcessorImpl;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
@@ -448,8 +448,8 @@ public class PlaylistActivity extends UpnpListenerActivity implements DMRProcess
 								break;
 							case 2:
 								if (MainActivity.UPNP_PROCESSOR != null) {
-									MainActivity.UPNP_PROCESSOR.getDownloadProcessor().startDownload(
-											playlistItem.getTitle(), playlistItem.getUri());
+									MainActivity.UPNP_PROCESSOR.getDownloadProcessor().startDownload(playlistItem.getTitle(),
+											playlistItem.getUri());
 								}
 								break;
 							default:

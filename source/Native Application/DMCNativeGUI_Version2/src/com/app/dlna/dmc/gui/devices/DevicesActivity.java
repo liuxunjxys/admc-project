@@ -15,9 +15,9 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
+import com.app.dlna.controller.nativegui.R;
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerActivity;
-import com.app.dlna.dmc.nativeui.R;
 
 public class DevicesActivity extends UpnpListenerActivity {
 	private static final String TAG = DevicesActivity.class.getName();
