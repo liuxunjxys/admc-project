@@ -16,6 +16,8 @@ import org.teleal.cling.support.model.item.VideoItem;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +25,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import app.dlna.controller.R;
+
+import com.app.dlna.dmc.gui.MainActivity;
+import com.app.dlna.dmc.utility.Utility;
 
 public class LocalNetworkArrayAdapter extends ArrayAdapter<ListviewItem> {
 	private LayoutInflater m_inflater = null;
@@ -37,7 +42,7 @@ public class LocalNetworkArrayAdapter extends ArrayAdapter<ListviewItem> {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		if (convertView == null) {
+		if (convertView == null || convertView instanceof TextView) {
 			convertView = m_inflater.inflate(R.layout.lvitem_localnetwork, null, false);
 		}
 		if (convertView.getTag() == null) {
@@ -48,8 +53,19 @@ public class LocalNetworkArrayAdapter extends ArrayAdapter<ListviewItem> {
 		final ViewHolder holder = (ViewHolder) convertView.getTag();
 		if (object.getData() instanceof Device)
 			setDeviceItem((Device) object.getData(), holder);
-		else
-			setDIDLObject((DIDLObject) object.getData(), holder);
+		else if (object.getData() instanceof DIDLObject) {
+			DIDLObject didlObject = (DIDLObject) object.getData();
+			if (didlObject.getId().equals("-1")) {
+				TextView tv = new TextView(getContext());
+				tv.setHeight(48);
+				tv.setGravity(Gravity.CENTER);
+				tv.setText("Load more items");
+				tv.setTextColor(Color.BLUE);
+				return tv;
+			} else {
+				setDIDLObject(didlObject, holder);
+			}
+		}
 
 		return convertView;
 	}
@@ -80,31 +96,29 @@ public class LocalNetworkArrayAdapter extends ArrayAdapter<ListviewItem> {
 								try {
 									final RemoteDevice remoteDevice = (RemoteDevice) device;
 
-									String urlString = remoteDevice.getIdentity().getDescriptorURL().getProtocol() + "://"
-											+ remoteDevice.getIdentity().getDescriptorURL().getAuthority()
+									String urlString = remoteDevice.getIdentity().getDescriptorURL().getProtocol()
+											+ "://" + remoteDevice.getIdentity().getDescriptorURL().getAuthority()
 											+ icons[0].getUri().toString();
 									URL url = new URL(urlString);
-									final Bitmap icon = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+									final Bitmap icon = BitmapFactory.decodeStream(url.openConnection()
+											.getInputStream());
 									m_cacheDMSIcon.put(udn, icon);
-									// m_mainActivity.runOnUiThread(new
-									// Runnable() {
-									//
-									// @Override
-									// public void run() {
-									// DeviceArrayAdapter.this.notifyDataSetChanged();
-									// }
-									// });
+									MainActivity.INSTANCE.runOnUiThread(new Runnable() {
+
+										@Override
+										public void run() {
+											LocalNetworkArrayAdapter.this.notifyDataSetChanged();
+										}
+									});
 
 								} catch (Exception ex) {
-									// m_mainActivity.runOnUiThread(new
-									// Runnable() {
-									//
-									// @Override
-									// public void run() {
-									// holder.icon.setImageResource(R.drawable.icon_dms);
-									// }
-									// });
-									holder.icon.setImageBitmap(null);
+									MainActivity.INSTANCE.runOnUiThread(new Runnable() {
+
+										@Override
+										public void run() {
+											holder.icon.setImageBitmap(null);
+										}
+									});
 									ex.printStackTrace();
 								}
 							}
@@ -125,11 +139,21 @@ public class LocalNetworkArrayAdapter extends ArrayAdapter<ListviewItem> {
 		holder.name.setText(object.getTitle());
 		if (object.getId().equals("-1")) {
 			holder.icon.setVisibility(View.GONE);
+			holder.desc.setText("");
 			return;
 		}
 		holder.icon.setVisibility(View.VISIBLE);
 		if (object instanceof Container) {
 			holder.icon.setImageResource(R.drawable.ic_didlobject_container);
+			int childCount = ((Container) object).getChildCount();
+			String childCountStr = "";
+			if (childCount == 0)
+				childCountStr = "empty";
+			else if (childCount == 1)
+				childCountStr = "1 child";
+			else
+				childCountStr = childCount + " childs";
+			holder.desc.setText(childCountStr);
 		} else {
 			if (object instanceof MusicTrack) {
 				holder.icon.setImageResource(R.drawable.ic_didlobject_audio);
@@ -139,6 +163,9 @@ public class LocalNetworkArrayAdapter extends ArrayAdapter<ListviewItem> {
 				holder.icon.setImageResource(R.drawable.ic_didlobject_image);
 			} else {
 				holder.icon.setImageResource(R.drawable.ic_didlobject_unknow);
+			}
+			if (object.getResources().size() > 0) {
+				holder.desc.setText(Utility.convertSizeToString(object.getResources().get(0).getSize()));
 			}
 		}
 	}
@@ -150,7 +177,7 @@ public class LocalNetworkArrayAdapter extends ArrayAdapter<ListviewItem> {
 		viewHolder.icon = (ImageView) view.findViewById(R.id.icon);
 		view.setTag(viewHolder);
 	}
-
+	
 	private class ViewHolder {
 		TextView desc;
 		TextView name;
