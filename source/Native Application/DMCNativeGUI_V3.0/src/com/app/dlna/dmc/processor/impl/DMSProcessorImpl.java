@@ -152,8 +152,7 @@ public class DMSProcessorImpl implements DMSProcessor {
 						if (containers.size() > ITEM_PER_PAGE) {
 							haveNext = true;
 							containers.remove(containers.size() - 1);
-						}
-						if (items.size() > ITEM_PER_PAGE) {
+						} else if (items.size() > ITEM_PER_PAGE || items.size() + containers.size() > ITEM_PER_PAGE) {
 							haveNext = true;
 							items.remove(items.size() - 1);
 						}

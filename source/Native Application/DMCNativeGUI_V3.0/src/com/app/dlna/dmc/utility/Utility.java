@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.MessageDigest;
+import java.text.DecimalFormat;
 
 import com.app.dlna.dmc.processor.http.HTTPServerData;
 
@@ -15,15 +16,6 @@ public class Utility {
 	}
 
 	public static String getMD5(String input) {
-		// try {
-		// byte[] bytesOfMessage = input.getBytes("UTF-8");
-		// MessageDigest md = MessageDigest.getInstance("MD5");
-		// byte[] disgest = md.digest(bytesOfMessage);
-		// return Base64.encodeToString(disgest, Base64.CRLF);
-		// } catch (Exception ex) {
-		// Log.e(TAG, "Create hash fail. input = " + input);
-		// return null;
-		// }
 		try {
 			MessageDigest md = MessageDigest.getInstance("MD5");
 
@@ -62,6 +54,14 @@ public class Utility {
 				+ String.format("%02d", second));
 
 		return sb.toString();
+	}
+
+	public static String convertSizeToString(long size) {
+		if (size <= 0)
+			return "0";
+		final String[] units = new String[] { "B", "KB", "MB", "GB", "TB" };
+		int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
+		return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
 	}
 
 }

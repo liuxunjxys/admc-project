@@ -20,15 +20,18 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 import app.dlna.controller.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
-import com.app.dlna.dmc.processor.interfaces.DMSProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor.DMSProcessorListner;
 import com.app.dlna.dmc.processor.interfaces.UpnpProcessor.UpnpProcessorListener;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
@@ -42,21 +45,111 @@ public class LocalNetworkView extends LinearLayout {
 	private ProgressDialog m_progressDlg;
 	private boolean m_loadMore;
 	private boolean m_isRoot;
+	private boolean m_isBrowsing;
+	private ImageView m_btn_back;
 
+	@SuppressWarnings("rawtypes")
 	public LocalNetworkView(Context context) {
 		super(context);
+		m_isBrowsing = false;
 		m_inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		m_inflater.inflate(R.layout.cv_localdevice, this);
+		m_inflater.inflate(R.layout.cv_homenetwork, this);
 		m_listView = (ListView) findViewById(R.id.listView);
 		m_adapter = new LocalNetworkArrayAdapter(context, 0);
 		m_listView.setAdapter(m_adapter);
 		m_listView.setOnItemClickListener(m_itemClick);
+		m_listView.setOnScrollListener(m_scrollListener);
 		m_progressDlg = new ProgressDialog(MainActivity.INSTANCE);
 		m_progressDlg.setTitle("Loading");
 		m_progressDlg.setMessage("Waiting for loading items");
 		m_progressDlg.setCancelable(true);
 		MainActivity.UPNP_PROCESSOR.addListener(m_upnpListener);
+
+		m_btn_back = ((ImageView) findViewById(R.id.btn_back));
+		m_btn_back.setOnClickListener(onBackClick);
+		m_btn_back.setEnabled(false);
+
+		((ImageView) findViewById(R.id.btn_selectAll)).setOnClickListener(onSelectAll);
+		((ImageView) findViewById(R.id.btn_deselectAll)).setOnClickListener(onDeselectAll);
+
+		for (Device device : MainActivity.UPNP_PROCESSOR.getDMSList()) {
+			m_adapter.add(new ListviewItem(device));
+		}
 	}
+
+	private OnClickListener onBackClick = new OnClickListener() {
+
+		@SuppressWarnings("rawtypes")
+		@Override
+		public void onClick(View v) {
+			if (m_isBrowsing) {
+				if (m_isRoot) {
+					// return to device list
+					m_adapter.clear();
+					for (Device dms : MainActivity.UPNP_PROCESSOR.getDMSList()) {
+						if (dms instanceof LocalDevice)
+							m_adapter.insert(new ListviewItem(dms), 0);
+						else
+							m_adapter.add(new ListviewItem(dms));
+					}
+					m_isBrowsing = false;
+					m_btn_back.setEnabled(false);
+				} else {
+					upOneLevel();
+				}
+			}
+		}
+	};
+
+	private void upOneLevel() {
+		if (m_isRoot)
+			Toast.makeText(getContext(), "You are in root of this data source", Toast.LENGTH_SHORT).show();
+		else if (MainActivity.UPNP_PROCESSOR.getDMSProcessor() != null) {
+			m_progressDlg.show();
+			m_loadMore = false;
+			MainActivity.UPNP_PROCESSOR.getDMSProcessor().back(m_listener);
+		}
+	}
+
+	private OnClickListener onSelectAll = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+
+		}
+	};
+
+	private OnClickListener onDeselectAll = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+
+		}
+	};
+
+	private OnScrollListener m_scrollListener = new OnScrollListener() {
+
+		@Override
+		public void onScrollStateChanged(AbsListView view, int scrollState) {
+		}
+
+		@Override
+		public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+			try {
+				if (MainActivity.UPNP_PROCESSOR.getDMSProcessor() != null
+						&& m_progressDlg != null
+						&& !m_progressDlg.isShowing()
+						&& firstVisibleItem + visibleItemCount == totalItemCount
+						&& m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData() instanceof DIDLObject
+						&& ((DIDLObject) m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData()).getId()
+								.equals("-1")) {
+					doLoadMoreItems();
+				}
+			} catch (Exception ex) {
+
+			}
+		}
+	};
 
 	private OnItemClickListener m_itemClick = new OnItemClickListener() {
 
@@ -69,24 +162,33 @@ public class LocalNetworkView extends LinearLayout {
 				MainActivity.UPNP_PROCESSOR.setCurrentDMS(udn);
 				m_progressDlg.show();
 				browse("0", 0);
+				m_isBrowsing = true;
+				m_btn_back.setEnabled(true);
 			} else {
 				final DIDLObject object = (DIDLObject) item.getData();
-				DMSProcessor dmsProcessor = MainActivity.UPNP_PROCESSOR.getDMSProcessor();
 				if (object instanceof Container) {
-					browse(object.getId(), 0);
+					if (((Container) object).getChildCount() == 0)
+						Toast.makeText(getContext(), "Folder is empty", Toast.LENGTH_SHORT).show();
+					else
+						browse(object.getId(), 0);
 				} else if (object instanceof Item) {
 					if (object.getId().equals("-1")) {
 						// load more items
-						m_loadMore = true;
-						m_progressDlg.show();
-						dmsProcessor.nextPage(m_listener);
+						doLoadMoreItems();
 					} else {
 						addToPlaylist(object);
 					}
 				}
 			}
 		}
+
 	};
+
+	private void doLoadMoreItems() {
+		m_loadMore = true;
+		m_progressDlg.show();
+		MainActivity.UPNP_PROCESSOR.getDMSProcessor().nextPage(m_listener);
+	}
 
 	private void browse(String id, int pageIndex) {
 		Log.e(TAG, "Browse id = " + id);
@@ -95,7 +197,7 @@ public class LocalNetworkView extends LinearLayout {
 		MainActivity.UPNP_PROCESSOR.getDMSProcessor().browse(id, pageIndex, m_listener);
 	}
 
-	protected void addToPlaylist(DIDLObject object) {
+	private void addToPlaylist(DIDLObject object) {
 		if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor() == null) {
 			Toast.makeText(MainActivity.INSTANCE, "Cannot get playlist processor", Toast.LENGTH_SHORT).show();
 			return;
@@ -148,8 +250,8 @@ public class LocalNetworkView extends LinearLayout {
 		@Override
 		public void onBrowseComplete(final String objectID, final boolean haveNext, boolean havePrev,
 				final Map<String, List<? extends DIDLObject>> result) {
-			Log.i(TAG, "browse complete: object id = " + objectID + " haveNext = " + haveNext + "; havePrev =" + havePrev
-					+ "; result size = " + result.size());
+			Log.i(TAG, "browse complete: object id = " + objectID + " haveNext = " + haveNext + "; havePrev ="
+					+ havePrev + "; result size = " + result.size());
 			m_isRoot = objectID.equals("0");
 			MainActivity.INSTANCE.runOnUiThread(new Runnable() {
 
@@ -273,4 +375,5 @@ public class LocalNetworkView extends LinearLayout {
 			}
 		});
 	}
+
 }

@@ -4,10 +4,20 @@
     android:layout_height="match_parent"
     android:orientation="horizontal" >
 
+    <com.app.dlna.dmc.gui.customview.renderer.RendererCompactView
+        android:id="@+id/cv_compact_dmr"
+        android:layout_width="fill_parent"
+        android:layout_height="64dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true" >
+    </com.app.dlna.dmc.gui.customview.renderer.RendererCompactView>
+
     <android.support.v4.view.ViewPager
         android:id="@+id/viewPager"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent" >
+        android:layout_height="fill_parent"
+        android:layout_above="@id/cv_compact_dmr"
+        android:layout_alignParentTop="true" >
 
         <android.support.v4.view.PagerTitleStrip
             android:id="@+id/viewPagerStrip"
