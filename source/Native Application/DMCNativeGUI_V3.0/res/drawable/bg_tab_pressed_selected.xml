@@ -15,5 +15,12 @@
             <solid android:color="@color/tab_background_selected" />
         </shape>
     </item>
+    <item>
+        <shape android:shape="rectangle" >
+            <stroke android:color="@color/blue_transparent" />
+
+            <solid android:color="@color/blue_transparent" />
+        </shape>
+    </item>
 
 </layer-list>

@@ -2,7 +2,7 @@
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/selector_tab_mediasource"
+    android:background="@drawable/bg_tab"
     android:gravity="center"
     android:textSize="18dp"
     android:textStyle="bold" />

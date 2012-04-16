@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabSpec;
@@ -65,7 +66,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 
 		@Override
 		public void onTabChanged(String tabId) {
-
+			setTabTextColor();
 		}
 	};
 
@@ -146,7 +147,21 @@ public class MainActivity extends UpnpListenerTabActivity {
 		m_tabHost.setOnTabChangedListener(changeListener);
 
 		m_tabHost.refreshDrawableState();
+		setTabTextColor();
+	}
 
+	private void setTabTextColor() {
+		for (int i = 0; i < m_tabHost.getTabWidget().getChildCount(); ++i) {
+			View view = m_tabHost.getTabWidget().getChildAt(i);
+			int color = -1;
+			if (i == m_tabHost.getCurrentTab()) {
+				color = getResources().getColor(R.color.blue);
+			} else {
+				color = getResources().getColor(R.color.blue_transparent);
+			}
+			if (view instanceof TextView)
+				((TextView) view).setTextColor(color);
+		}
 	}
 
 	@Override
@@ -203,8 +218,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 			public void run() {
 				if (m_routerProgressDialog != null)
 					m_routerProgressDialog.dismiss();
-				new AlertDialog.Builder(MainActivity.this).setTitle("Network error").setMessage(cause)
-						.setCancelable(false).setPositiveButton("OK", new OnClickListener() {
+				new AlertDialog.Builder(MainActivity.this).setTitle("Network error").setMessage(cause).setCancelable(false)
+						.setPositiveButton("OK", new OnClickListener() {
 
 							@Override
 							public void onClick(DialogInterface dialog, int which) {

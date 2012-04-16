@@ -16,13 +16,12 @@ import org.teleal.cling.support.model.item.VideoItem;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import app.dlna.controller.R;
 
@@ -42,7 +41,7 @@ public class LocalNetworkArrayAdapter extends ArrayAdapter<ListviewItem> {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		if (convertView == null || convertView instanceof TextView) {
+		if (convertView == null || convertView instanceof ProgressBar) {
 			convertView = m_inflater.inflate(R.layout.lvitem_localnetwork, null, false);
 		}
 		if (convertView.getTag() == null) {
@@ -56,12 +55,7 @@ public class LocalNetworkArrayAdapter extends ArrayAdapter<ListviewItem> {
 		else if (object.getData() instanceof DIDLObject) {
 			DIDLObject didlObject = (DIDLObject) object.getData();
 			if (didlObject.getId().equals("-1")) {
-				TextView tv = new TextView(getContext());
-				tv.setHeight(48);
-				tv.setGravity(Gravity.CENTER);
-				tv.setText("Load more items");
-				tv.setTextColor(Color.BLUE);
-				return tv;
+				return m_inflater.inflate(R.layout.lvitem_loadmoreitem, null);
 			} else {
 				setDIDLObject(didlObject, holder);
 			}
@@ -96,12 +90,11 @@ public class LocalNetworkArrayAdapter extends ArrayAdapter<ListviewItem> {
 								try {
 									final RemoteDevice remoteDevice = (RemoteDevice) device;
 
-									String urlString = remoteDevice.getIdentity().getDescriptorURL().getProtocol()
-											+ "://" + remoteDevice.getIdentity().getDescriptorURL().getAuthority()
+									String urlString = remoteDevice.getIdentity().getDescriptorURL().getProtocol() + "://"
+											+ remoteDevice.getIdentity().getDescriptorURL().getAuthority()
 											+ icons[0].getUri().toString();
 									URL url = new URL(urlString);
-									final Bitmap icon = BitmapFactory.decodeStream(url.openConnection()
-											.getInputStream());
+									final Bitmap icon = BitmapFactory.decodeStream(url.openConnection().getInputStream());
 									m_cacheDMSIcon.put(udn, icon);
 									MainActivity.INSTANCE.runOnUiThread(new Runnable() {
 
@@ -145,7 +138,7 @@ public class LocalNetworkArrayAdapter extends ArrayAdapter<ListviewItem> {
 		holder.icon.setVisibility(View.VISIBLE);
 		if (object instanceof Container) {
 			holder.icon.setImageResource(R.drawable.ic_didlobject_container);
-			int childCount = ((Container) object).getChildCount();
+			int childCount = ((Container) object).getChildCount() != null ? ((Container) object).getChildCount() : 1;
 			String childCountStr = "";
 			if (childCount == 0)
 				childCountStr = "empty";
@@ -165,7 +158,8 @@ public class LocalNetworkArrayAdapter extends ArrayAdapter<ListviewItem> {
 				holder.icon.setImageResource(R.drawable.ic_didlobject_unknow);
 			}
 			if (object.getResources().size() > 0) {
-				holder.desc.setText(Utility.convertSizeToString(object.getResources().get(0).getSize()));
+				if (object.getResources().get(0) != null && object.getResources().get(0).getSize() != null)
+					holder.desc.setText(Utility.convertSizeToString(object.getResources().get(0).getSize()));
 			}
 		}
 	}
@@ -177,7 +171,7 @@ public class LocalNetworkArrayAdapter extends ArrayAdapter<ListviewItem> {
 		viewHolder.icon = (ImageView) view.findViewById(R.id.icon);
 		view.setTag(viewHolder);
 	}
-	
+
 	private class ViewHolder {
 		TextView desc;
 		TextView name;

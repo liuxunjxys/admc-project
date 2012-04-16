@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnLongClickListener;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
@@ -67,6 +68,7 @@ public class LocalNetworkView extends LinearLayout {
 
 		m_btn_back = ((ImageView) findViewById(R.id.btn_back));
 		m_btn_back.setOnClickListener(onBackClick);
+		m_btn_back.setOnLongClickListener(onBackLongclick);
 		m_btn_back.setEnabled(false);
 
 		((ImageView) findViewById(R.id.btn_selectAll)).setOnClickListener(onSelectAll);
@@ -78,26 +80,38 @@ public class LocalNetworkView extends LinearLayout {
 	}
 
 	private OnClickListener onBackClick = new OnClickListener() {
-
-		@SuppressWarnings("rawtypes")
 		@Override
 		public void onClick(View v) {
 			if (m_isBrowsing) {
 				if (m_isRoot) {
 					// return to device list
-					m_adapter.clear();
-					for (Device dms : MainActivity.UPNP_PROCESSOR.getDMSList()) {
-						if (dms instanceof LocalDevice)
-							m_adapter.insert(new ListviewItem(dms), 0);
-						else
-							m_adapter.add(new ListviewItem(dms));
-					}
-					m_isBrowsing = false;
-					m_btn_back.setEnabled(false);
+					backToDeviceList();
 				} else {
 					upOneLevel();
 				}
 			}
+		}
+	};
+
+	@SuppressWarnings("rawtypes")
+	private void backToDeviceList() {
+		m_adapter.clear();
+		for (Device dms : MainActivity.UPNP_PROCESSOR.getDMSList()) {
+			if (dms instanceof LocalDevice)
+				m_adapter.insert(new ListviewItem(dms), 0);
+			else
+				m_adapter.add(new ListviewItem(dms));
+		}
+		m_isBrowsing = false;
+		m_btn_back.setEnabled(false);
+	}
+
+	private OnLongClickListener onBackLongclick = new OnLongClickListener() {
+
+		@Override
+		public boolean onLongClick(View v) {
+			backToDeviceList();
+			return true;
 		}
 	};
 
@@ -141,8 +155,8 @@ public class LocalNetworkView extends LinearLayout {
 						&& !m_progressDlg.isShowing()
 						&& firstVisibleItem + visibleItemCount == totalItemCount
 						&& m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData() instanceof DIDLObject
-						&& ((DIDLObject) m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData()).getId()
-								.equals("-1")) {
+						&& ((DIDLObject) m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData()).getId().equals(
+								"-1")) {
 					doLoadMoreItems();
 				}
 			} catch (Exception ex) {
@@ -167,7 +181,7 @@ public class LocalNetworkView extends LinearLayout {
 			} else {
 				final DIDLObject object = (DIDLObject) item.getData();
 				if (object instanceof Container) {
-					if (((Container) object).getChildCount() == 0)
+					if (((Container) object).getChildCount() != null && ((Container) object).getChildCount() == 0)
 						Toast.makeText(getContext(), "Folder is empty", Toast.LENGTH_SHORT).show();
 					else
 						browse(object.getId(), 0);
@@ -250,8 +264,8 @@ public class LocalNetworkView extends LinearLayout {
 		@Override
 		public void onBrowseComplete(final String objectID, final boolean haveNext, boolean havePrev,
 				final Map<String, List<? extends DIDLObject>> result) {
-			Log.i(TAG, "browse complete: object id = " + objectID + " haveNext = " + haveNext + "; havePrev ="
-					+ havePrev + "; result size = " + result.size());
+			Log.i(TAG, "browse complete: object id = " + objectID + " haveNext = " + haveNext + "; havePrev =" + havePrev
+					+ "; result size = " + result.size());
 			m_isRoot = objectID.equals("0");
 			MainActivity.INSTANCE.runOnUiThread(new Runnable() {
 
@@ -353,6 +367,8 @@ public class LocalNetworkView extends LinearLayout {
 			@Override
 			public void run() {
 				synchronized (m_adapter) {
+					if (m_isBrowsing)
+						return;
 					if (device instanceof LocalDevice)
 						m_adapter.insert(new ListviewItem(device), 0);
 					else
@@ -370,6 +386,8 @@ public class LocalNetworkView extends LinearLayout {
 			@Override
 			public void run() {
 				synchronized (m_adapter) {
+					if (m_isBrowsing)
+						return;
 					m_adapter.remove(new ListviewItem(device));
 				}
 			}
