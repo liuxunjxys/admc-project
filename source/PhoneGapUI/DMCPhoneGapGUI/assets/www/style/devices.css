@@ -1,77 +1,12 @@
-/*
-#div_devi_dmS{
-	height: 100%;
-	width: 100%;
-	padding: 0px;
-	margin: 0px;
-	position: relative;
-	float: left;
-}
-
-#div_devi_dmS div#div_devi_dmS_toolbar{
-	height: 12%;
-	width: 100%;
-	padding: 0px;
-	margin: 0px;
-	position: relative;
-}
-
-#div_devi_dmS div#div_devi_dmS_toolbar img{
-	padding: 0px;
-	margin: 0px;
-	height: 100%;
-	width: height;
-	float: right;
-}
-
-#div_devi_dmS div#div_wrraper_devi_dmS{
-	height: 88%;
-	width: 100%;
-	padding: 0px;
-	margin: 0px;
-	position: relative;
-}
-
-#div_devi_dmR{
-	height: 100%;
-	width: 100%;
-	padding: 0px;
-	margin: 0px;
-	position: relative;
-	float: right;
-}
-
-#div_devi_dmR div#div_devi_dmR_toolbar{
-	height: 12%;
-	width: 100%;
-	padding: 0px;
-	margin: 0px;
-	position: relative;
-}
-
-#div_devi_dmR div#div_devi_dmR_toolbar img{
-	padding: 0px;
-	margin: 0px;
-	height: 100%;
-	width: height;
-	float: left;
-}
-
-#div_devi_dmR div#div_wrraper_devi_dmR{
-	height: 88%;
-	width: 100%;
-	padding: 0px;
-	margin: 0px;
-	position: relative;
-}
-*/
-
 #div_devi_toolbar{
-	height: 12%;
+	position: fixed;
+	height: 9.48%; /*12%;*/
 	width: 100%;
 	padding: 0px;
 	margin: 0px;
-	position: relative;
+	top: 20.8%;
+	z-index: 11;
+	background-color: #eeeeee;
 }
 
 #div_devi_toolbar img{
@@ -95,12 +30,15 @@
 }
 
 #div_devi_dmS{
-	height: 88%;
+	position: relative;
+	top: 12%;
+	min-height: 88%;
+	max-height: auto;
 	width: 100%;
 	padding: 0px;
 	margin: 0px;
-	position: relative;
 	float: left;
+	background-color: #eeeeee;
 }
 
 #div_devi_dmS div#div_wrraper_devi_dmS{
@@ -112,12 +50,15 @@
 }
 
 #div_devi_dmR{
-	height: 88%;
+	position: relative;
+	top: 12%;
+	min-height: 88%;
+	max-height: auto;
 	width: 100%;
 	padding: 0px;
 	margin: 0px;
-	position: relative;
 	float: right;
+	background-color: #eeeeee;
 }
 
 #div_devi_dmR div#div_wrraper_devi_dmR{

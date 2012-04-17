@@ -15,6 +15,7 @@ var swipeLeftReady_devices;
 var swipeRightReady_devices;
 
 var time_to_swap_image = 150;
+var preventTouchMove; // is a function to prevent scrolling page
 
 $(document).ready(function() {
 	iScrollConfig();
@@ -97,20 +98,19 @@ function myInitPage() {
 
 		case "content_library":
 			setTimeout(function() {
-				myScroll_library.refresh();
+				//myScroll_library.refresh();
 			}, 0);
 			break;
 
 		case "content_youtube":
 			setTimeout(function() {
-				myScroll_youtube.refresh();
-				console.log('refresh done!');
+				//myScroll_youtube.refresh();
 			}, 0);
 			break;
 
 		case "content_playlists":
 			setTimeout(function() {
-				myScroll_playlist.refresh();
+				//myScroll_playlist.refresh();
 				window.plugins.PlaylistPlugin.loadPlaylist();
 			}, 0);
 			break;
@@ -124,10 +124,16 @@ function myInitPage() {
 	library_listview = $('#div_wrapper_libs ul:first');
 	youtube_listview = $('#div_wrapper_you ul:first');
 	playlist_listview = $('#div_wrapper_play ul:first');
+	myScroll_playlist = $('#div_wrapper_play ul');
 
 	icon_loading = $('#icon_loading');
 	icon_loading.hide();
 
+	//Prevent scrolling on global container
+	preventTouchMove = function(event) {
+		event.preventDefault();
+		};
+	
 	// Mapping process for all image on page
 	$('.img_normal').live('vmousedown', function() {
 		if ($(this).attr("data-enable") == "true") {
@@ -184,14 +190,12 @@ function myInitDevicesSide() {
 	swipeLeftReady_devices = true;
 	swipeRightReady_devices = false;
 	currentDiviceView = "dmS";
-
+	
+	
 	$('div#content_devices div.div_devi_subcontent').hide();
 	$('div#div_devi_dmS').show();
-	setTimeout(function() {
-		myScroll_devices_dmS.refresh();
-	}, 0);
 
-	$('#div_devi_dmS').bind('swipeleft', function() {
+	$('#content_devices').bind('swipeleft', function() {
 		if (swipeLeftReady_devices) {
 			swipeLeftReady_devices = false;
 			currentDiviceView = "dmR";
@@ -200,7 +204,7 @@ function myInitDevicesSide() {
 		}
 	});
 
-	$('#div_devi_dmR').bind('swiperight', function() {
+	$('#content_devices').bind('swiperight', function() {
 		if (swipeRightReady_devices) {
 			swipeRightReady_devices = false;
 			currentDiviceView = "dmS";
@@ -208,7 +212,8 @@ function myInitDevicesSide() {
 			swipeRight_toolbar_device();
 		}
 	});
-
+	
+	/*
 	$('#img_dmS_label_icon').bind('tap', function() {
 		if (swipeRightReady_devices == true && currentDiviceView == "dmR") {
 			swipeRightReady_devices = false;
@@ -226,13 +231,18 @@ function myInitDevicesSide() {
 			swipeLeft_toolbar_device();
 		}
 	});
+	*/
 }
 
 function swipeLeft_contentView_device() {
 	var widthValue = $('#div_devi_dmS').width();
+
 	$('#div_devi_dmS').animate({
 		width : 0
-	}, "slow");
+	}, "slow", function(){
+		$('#div_devi_dmS').hide();
+	});
+	
 	$('#div_devi_dmR').css('width', "0%");
 	$('#div_devi_dmR').show();
 	$('#div_devi_dmR').animate({
@@ -271,7 +281,9 @@ function swipeRight_contentView_device() {
 	var widthValue = $('#div_devi_dmR').width();
 	$('#div_devi_dmR').animate({
 		width : 0
-	}, "slow");
+	}, "slow", function(){
+		$('#div_devi_dmR').hide();
+	});
 
 	$('#div_devi_dmS').css('width', "0%");
 	$('#div_devi_dmS').show();
@@ -411,14 +423,14 @@ function onClick_activateProxy_you(sender) {
 	var state = $(sender).attr('data-my-state');
 	if (state == "true") { // activated
 		// proxy = false;
-		$(sender).attr('data-my-state', 'false');
+		//$(sender).attr('data-my-state', 'false');
 		changeStateImage(sender);
 		setTimeout(function() {
 			$('#img_proxy_label').attr('src', 'img/proxy_deactivate_lb.png');
 		}, time_to_swap_image);
 	} else {
 		// proxy = true;
-		$(sender).attr('data-my-state', 'true');
+		//$(sender).attr('data-my-state', 'true');
 		changeStateImage(sender);
 		setTimeout(function() {
 			$('#img_proxy_label').attr('src', 'img/proxy_activate_lb.png');
