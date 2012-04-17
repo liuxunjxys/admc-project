@@ -57,10 +57,10 @@ function loadPlaylistItems(e) {
 		var obj = result[i];
 		addPlaylistItem(obj);
 	}
-	myScroll_playlist.scrollTo(0, 0, 0);
+	//myScroll_playlist.scrollTo(0, 0, 0);
 	hideLoadingIcon();
 	playlist_listview.listview('refresh');
-	myScroll_playlist.refresh();
+	//myScroll_playlist.refresh();
 }
 
 function addPlaylistItem(item) {

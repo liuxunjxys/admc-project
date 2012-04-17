@@ -1,29 +1,39 @@
 
 #div_play_toolbar{
 	position: relative;
-	height: 2%;
+	height: 2%; /*2%*/
 	margin: 0px;
 	padding: 0px;
 	clear: both;
 }
+
 /*---------------------1---------------------*/
 
 .div_play_media_list
 {
+	clear: both;
 	position: relative;
-	height: 53%;
+	min-height: 53%; /*53 -> 55*/
+	max-height: auto;
 	margin: 0px;
 	padding: 0px;
-	clear: both;
+	padding-bottom: 52%;
+	background-color: #eeeeee;
 }
 
 /*---------------------2---------------------*/
 #div_play_media_controller
 {
-	position: relative;
-	height: 38%;
+	position: fixed;
+	height: 30.02%; /*38%*/
+	bottom: 5.53%; /*7%*/
+	width: 100%;
+	margin: 0px;
+	padding: 0px;
+	border-top: 1px solid #CCC;
+	background-color: #646464;
+	z-index: 11;
 }
-
 
 #div_play_media_controller div#div_field_controlbar div{
 	padding: 0px;
@@ -146,10 +156,14 @@
 
 /*---------------------4---------------------*/
 #div_play_dmr_info{
-	position: relative;
-	height: 7%;
+	position: fixed;
+	height: 5.53%; /*7%*/
+	bottom: 0%; /*7%*/
+	width: 100%;
 	margin: 0px;
 	padding: 0px;
-	text-align: center;
 	border-top: 1px solid #CCC;
+	background-color: #646464;
+	text-align: center;
+	z-index: 11;
 }

@@ -4,16 +4,26 @@
 	position: relative;
 	left: 0px;
 	top: 0px;
-	height: 100%;
 	width: 100%;
+	height: 100%;
+}
+
+#div_global_container{
+	position: fixed;
+	display: block;
+	height: 21%;
+	top: 0px;
+	width: 100%;
+	z-index: 10;
+	background-color: #eeeeee;
 }
 
 #di_main_tool_bar {
 	position: relative;
 	padding: 0px;
 	margin: 0px;
-	height: 7%;
-	/*background-color: gray;*/
+	height: 34%;
+	width: 100%;
 }
 
 #di_main_tool_bar img {
@@ -28,7 +38,8 @@
 	position: relative;
 	padding: 0px;
 	margin: 0px;
-	height: 14%;
+	height: 66%;
+	width: 100%;
 	/*background-color: blue;*/
 }
 
@@ -85,14 +96,14 @@
 /*---------------------------------------*/
 #div_content {
 	position: relative;
+	top: 21%;
 	height: 79%;
-	/*background-color: blue;*/
 }
 
 .div_subcontent {
 	position: relative;
 	left: 0px;
 	height: 100%;
-	/*background-color: red;*/
+	width: 100%;
 	display: none;
 }
