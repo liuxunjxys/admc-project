@@ -2,6 +2,9 @@ package com.app.dlna.dmc.gui.customview.localnetwork;
 
 import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.model.meta.LocalDevice;
+import org.teleal.cling.support.model.item.AudioItem;
+import org.teleal.cling.support.model.item.Item;
+import org.teleal.cling.support.model.item.VideoItem;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -14,6 +17,9 @@ import app.dlna.controller.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.customview.adapter.AdapterItem;
+import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
+import com.app.dlna.dmc.processor.playlist.PlaylistItem;
+import com.app.dlna.dmc.processor.playlist.PlaylistItem.Type;
 
 public class HomeNetworkToolbar extends LinearLayout {
 	private HomeNetworkView m_localNetworkView;
@@ -28,6 +34,9 @@ public class HomeNetworkToolbar extends LinearLayout {
 		m_btn_back.setOnClickListener(onBackClick);
 		m_btn_back.setOnLongClickListener(onBackLongclick);
 		m_btn_back.setEnabled(false);
+
+		((ImageView) findViewById(R.id.btn_selectAll)).setOnClickListener(onSelectAll);
+		((ImageView) findViewById(R.id.btn_deselectAll)).setOnClickListener(onDeselectAll);
 	}
 
 	public void setLocalNetworkView(HomeNetworkView localNetworkView) {
@@ -86,4 +95,41 @@ public class HomeNetworkToolbar extends LinearLayout {
 		m_btn_back.setEnabled(enabled);
 	}
 
+	private OnClickListener onSelectAll = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
+			if (playlistProcessor == null) {
+				Toast.makeText(MainActivity.INSTANCE, "Cannot get playlist processor", Toast.LENGTH_SHORT).show();
+				return;
+			}
+			int count = m_homeNetworkAdapter.getCount();
+			for (int i = 0; i < count; ++i) {
+				if (m_homeNetworkAdapter.getItem(i).getData() instanceof Item) {
+					Item didlItem = (Item) m_homeNetworkAdapter.getItem(i).getData();
+					PlaylistItem playlistItem = new PlaylistItem();
+					playlistItem.setTitle(didlItem.getTitle());
+					playlistItem.setUrl(didlItem.getResources().get(0).getValue());
+					if (didlItem instanceof AudioItem) {
+						playlistItem.setType(Type.AUDIO);
+					} else if (didlItem instanceof VideoItem) {
+						playlistItem.setType(Type.VIDEO);
+					} else {
+						playlistItem.setType(Type.IMAGE);
+					}
+					playlistProcessor.addItem(playlistItem);
+					m_homeNetworkAdapter.notifyDataSetChanged();
+				}
+			}
+		}
+	};
+
+	private OnClickListener onDeselectAll = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+
+		}
+	};
 }

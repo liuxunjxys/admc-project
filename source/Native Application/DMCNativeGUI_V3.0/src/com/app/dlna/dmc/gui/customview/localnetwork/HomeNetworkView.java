@@ -69,29 +69,10 @@ public class HomeNetworkView extends LinearLayout {
 		m_toolbar = (HomeNetworkToolbar) findViewById(R.id.botToolbar);
 		m_toolbar.setLocalNetworkView(this);
 
-		((ImageView) findViewById(R.id.btn_selectAll)).setOnClickListener(onSelectAll);
-		((ImageView) findViewById(R.id.btn_deselectAll)).setOnClickListener(onDeselectAll);
-
 		for (Device device : MainActivity.UPNP_PROCESSOR.getDMSList()) {
 			m_adapter.add(new AdapterItem(device));
 		}
 	}
-
-	private OnClickListener onSelectAll = new OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-
-		}
-	};
-
-	private OnClickListener onDeselectAll = new OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-
-		}
-	};
 
 	private OnScrollListener m_scrollListener = new OnScrollListener() {
 
