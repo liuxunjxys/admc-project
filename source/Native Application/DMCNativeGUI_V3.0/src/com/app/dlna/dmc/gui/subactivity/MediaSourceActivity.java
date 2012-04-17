@@ -1,6 +1,6 @@
 package com.app.dlna.dmc.gui.subactivity;
 
-import com.app.dlna.dmc.gui.customview.localnetwork.LocalNetworkView;
+import com.app.dlna.dmc.gui.customview.localnetwork.HomeNetworkView;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -20,7 +20,7 @@ public class MediaSourceActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		m_homeNetwork = new LocalNetworkView(this);
+		m_homeNetwork = new HomeNetworkView(this);
 		m_internet = new LinearLayout(this);
 		setContentView(R.layout.mediasource_activity);
 		m_pager = (ViewPager) findViewById(R.id.viewPager);
