@@ -7,7 +7,7 @@
     <com.app.dlna.dmc.gui.customview.renderer.RendererCompactView
         android:id="@+id/cv_compact_dmr"
         android:layout_width="fill_parent"
-        android:layout_height="64dp"
+        android:layout_height="72dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true" >
     </com.app.dlna.dmc.gui.customview.renderer.RendererCompactView>
@@ -24,7 +24,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
-            android:background="@color/pager_tiltle_stip"
+            android:background="@drawable/bg_pager_title_strip"
             android:textColor="@color/blue" />
     </android.support.v4.view.ViewPager>
 

@@ -20,12 +20,10 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnLongClickListener;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -33,30 +31,32 @@ import android.widget.Toast;
 import app.dlna.controller.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
+import com.app.dlna.dmc.gui.customview.adapter.AdapterItem;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor.DMSProcessorListner;
 import com.app.dlna.dmc.processor.interfaces.UpnpProcessor.UpnpProcessorListener;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem.Type;
 
-public class LocalNetworkView extends LinearLayout {
-	private static final String TAG = LocalNetworkView.class.getName();
+public class HomeNetworkView extends LinearLayout {
+	private static final String TAG = HomeNetworkView.class.getName();
 	private ListView m_listView;
 	private LayoutInflater m_inflater;
-	private LocalNetworkArrayAdapter m_adapter;
+	private HomeNetworkArrayAdapter m_adapter;
 	private ProgressDialog m_progressDlg;
 	private boolean m_loadMore;
 	private boolean m_isRoot;
 	private boolean m_isBrowsing;
-	private ImageView m_btn_back;
+
+	private HomeNetworkToolbar m_toolbar;
 
 	@SuppressWarnings("rawtypes")
-	public LocalNetworkView(Context context) {
+	public HomeNetworkView(Context context) {
 		super(context);
 		m_isBrowsing = false;
 		m_inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		m_inflater.inflate(R.layout.cv_homenetwork, this);
 		m_listView = (ListView) findViewById(R.id.listView);
-		m_adapter = new LocalNetworkArrayAdapter(context, 0);
+		m_adapter = new HomeNetworkArrayAdapter(context, 0);
 		m_listView.setAdapter(m_adapter);
 		m_listView.setOnItemClickListener(m_itemClick);
 		m_listView.setOnScrollListener(m_scrollListener);
@@ -66,62 +66,14 @@ public class LocalNetworkView extends LinearLayout {
 		m_progressDlg.setCancelable(true);
 		MainActivity.UPNP_PROCESSOR.addListener(m_upnpListener);
 
-		m_btn_back = ((ImageView) findViewById(R.id.btn_back));
-		m_btn_back.setOnClickListener(onBackClick);
-		m_btn_back.setOnLongClickListener(onBackLongclick);
-		m_btn_back.setEnabled(false);
+		m_toolbar = (HomeNetworkToolbar) findViewById(R.id.botToolbar);
+		m_toolbar.setLocalNetworkView(this);
 
 		((ImageView) findViewById(R.id.btn_selectAll)).setOnClickListener(onSelectAll);
 		((ImageView) findViewById(R.id.btn_deselectAll)).setOnClickListener(onDeselectAll);
 
 		for (Device device : MainActivity.UPNP_PROCESSOR.getDMSList()) {
-			m_adapter.add(new ListviewItem(device));
-		}
-	}
-
-	private OnClickListener onBackClick = new OnClickListener() {
-		@Override
-		public void onClick(View v) {
-			if (m_isBrowsing) {
-				if (m_isRoot) {
-					// return to device list
-					backToDeviceList();
-				} else {
-					upOneLevel();
-				}
-			}
-		}
-	};
-
-	@SuppressWarnings("rawtypes")
-	private void backToDeviceList() {
-		m_adapter.clear();
-		for (Device dms : MainActivity.UPNP_PROCESSOR.getDMSList()) {
-			if (dms instanceof LocalDevice)
-				m_adapter.insert(new ListviewItem(dms), 0);
-			else
-				m_adapter.add(new ListviewItem(dms));
-		}
-		m_isBrowsing = false;
-		m_btn_back.setEnabled(false);
-	}
-
-	private OnLongClickListener onBackLongclick = new OnLongClickListener() {
-
-		@Override
-		public boolean onLongClick(View v) {
-			backToDeviceList();
-			return true;
-		}
-	};
-
-	private void upOneLevel() {
-		if (m_isRoot)
-			Toast.makeText(getContext(), "You are in root of this data source", Toast.LENGTH_SHORT).show();
-		else if (MainActivity.UPNP_PROCESSOR.getDMSProcessor() != null) {
-			m_progressDlg.show();
-			m_loadMore = false;
-			MainActivity.UPNP_PROCESSOR.getDMSProcessor().back(m_listener);
+			m_adapter.add(new AdapterItem(device));
 		}
 	}
 
@@ -155,8 +107,8 @@ public class LocalNetworkView extends LinearLayout {
 						&& !m_progressDlg.isShowing()
 						&& firstVisibleItem + visibleItemCount == totalItemCount
 						&& m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData() instanceof DIDLObject
-						&& ((DIDLObject) m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData()).getId().equals(
-								"-1")) {
+						&& ((DIDLObject) m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData()).getId()
+								.equals("-1")) {
 					doLoadMoreItems();
 				}
 			} catch (Exception ex) {
@@ -170,14 +122,14 @@ public class LocalNetworkView extends LinearLayout {
 		@SuppressWarnings("rawtypes")
 		@Override
 		public void onItemClick(AdapterView<?> adapter, View view, int position, long arg3) {
-			ListviewItem item = m_adapter.getItem(position);
+			AdapterItem item = m_adapter.getItem(position);
 			if (item.getData() instanceof Device) {
 				UDN udn = ((Device) item.getData()).getIdentity().getUdn();
 				MainActivity.UPNP_PROCESSOR.setCurrentDMS(udn);
 				m_progressDlg.show();
 				browse("0", 0);
 				m_isBrowsing = true;
-				m_btn_back.setEnabled(true);
+				m_toolbar.setBackButtonEnabled(true);
 			} else {
 				final DIDLObject object = (DIDLObject) item.getData();
 				if (object instanceof Container) {
@@ -201,14 +153,14 @@ public class LocalNetworkView extends LinearLayout {
 	private void doLoadMoreItems() {
 		m_loadMore = true;
 		m_progressDlg.show();
-		MainActivity.UPNP_PROCESSOR.getDMSProcessor().nextPage(m_listener);
+		MainActivity.UPNP_PROCESSOR.getDMSProcessor().nextPage(m_browseListener);
 	}
 
 	private void browse(String id, int pageIndex) {
 		Log.e(TAG, "Browse id = " + id);
 		m_progressDlg.show();
 		m_loadMore = false;
-		MainActivity.UPNP_PROCESSOR.getDMSProcessor().browse(id, pageIndex, m_listener);
+		MainActivity.UPNP_PROCESSOR.getDMSProcessor().browse(id, pageIndex, m_browseListener);
 	}
 
 	private void addToPlaylist(DIDLObject object) {
@@ -238,7 +190,7 @@ public class LocalNetworkView extends LinearLayout {
 		}
 	}
 
-	private DMSProcessorListner m_listener = new DMSProcessorListner() {
+	private DMSProcessorListner m_browseListener = new DMSProcessorListner() {
 
 		@Override
 		public void onBrowseFail(final String message) {
@@ -252,7 +204,9 @@ public class LocalNetworkView extends LinearLayout {
 
 								@Override
 								public void onClick(DialogInterface dialog, int which) {
-
+									m_isBrowsing = false;
+									m_isRoot = false;
+									m_toolbar.backToDeviceList();
 								}
 							}).show();
 
@@ -264,8 +218,8 @@ public class LocalNetworkView extends LinearLayout {
 		@Override
 		public void onBrowseComplete(final String objectID, final boolean haveNext, boolean havePrev,
 				final Map<String, List<? extends DIDLObject>> result) {
-			Log.i(TAG, "browse complete: object id = " + objectID + " haveNext = " + haveNext + "; havePrev =" + havePrev
-					+ "; result size = " + result.size());
+			Log.i(TAG, "browse complete: object id = " + objectID + " haveNext = " + haveNext + "; havePrev ="
+					+ havePrev + "; result size = " + result.size());
 			m_isRoot = objectID.equals("0");
 			MainActivity.INSTANCE.runOnUiThread(new Runnable() {
 
@@ -277,19 +231,23 @@ public class LocalNetworkView extends LinearLayout {
 						} else
 							m_adapter.clear();
 						for (DIDLObject container : result.get("Containers"))
-							m_adapter.add(new ListviewItem(container));
+							m_adapter.add(new AdapterItem(container));
 
 						for (DIDLObject item : result.get("Items"))
-							m_adapter.add(new ListviewItem(item));
+							m_adapter.add(new AdapterItem(item));
+
+						prepareImageCache(result);
 
 						if (haveNext) {
 							Item item = new Item();
 							item.setTitle("Load more result");
 							item.setId("-1");
-							m_adapter.add(new ListviewItem(item));
+							m_adapter.add(new AdapterItem(item));
 						}
 
 						m_progressDlg.dismiss();
+						if (!m_loadMore)
+							m_listView.smoothScrollToPosition(0);
 						m_adapter.notifyDataSetChanged();
 					}
 				}
@@ -297,6 +255,11 @@ public class LocalNetworkView extends LinearLayout {
 
 		}
 	};
+
+	private void prepareImageCache(final Map<String, List<? extends DIDLObject>> result) {
+		m_adapter.cancelPrepareImageCache();
+		m_adapter.prepareImageItemCache(result.get("Items"));
+	}
 
 	public boolean onKeyUp(int keyCode, android.view.KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
@@ -370,9 +333,9 @@ public class LocalNetworkView extends LinearLayout {
 					if (m_isBrowsing)
 						return;
 					if (device instanceof LocalDevice)
-						m_adapter.insert(new ListviewItem(device), 0);
+						m_adapter.insert(new AdapterItem(device), 0);
 					else
-						m_adapter.add(new ListviewItem(device));
+						m_adapter.add(new AdapterItem(device));
 				}
 			}
 		});
@@ -388,10 +351,38 @@ public class LocalNetworkView extends LinearLayout {
 				synchronized (m_adapter) {
 					if (m_isBrowsing)
 						return;
-					m_adapter.remove(new ListviewItem(device));
+					m_adapter.remove(new AdapterItem(device));
 				}
 			}
 		});
+	}
+
+	public boolean isRoot() {
+		return m_isRoot;
+	}
+
+	public boolean isBrowsing() {
+		return m_isBrowsing;
+	}
+
+	public HomeNetworkArrayAdapter getListAdapter() {
+		return m_adapter;
+	}
+
+	public void setBrowsing(boolean browsing) {
+		m_isBrowsing = browsing;
+	}
+
+	public ProgressDialog getProgressDlg() {
+		return m_progressDlg;
+	}
+
+	public void setLoadMore(boolean loadMore) {
+		m_loadMore = loadMore;
+	}
+
+	public DMSProcessorListner getBrowseListener() {
+		return m_browseListener;
 	}
 
 }

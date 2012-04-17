@@ -15,5 +15,14 @@
             <solid android:color="@color/tab_background_selected" />
         </shape>
     </item>
+    <item>
+        <shape android:shape="rectangle" >
+            <gradient
+                android:endColor="#00000000"
+                android:gradientRadius="100"
+                android:startColor="@color/blue_transparent_less"
+                android:type="radial" />
+        </shape>
+    </item>
 
 </layer-list>

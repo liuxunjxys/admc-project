@@ -3,39 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <LinearLayout
+    <com.app.dlna.dmc.gui.customview.localnetwork.HomeNetworkToolbar
         android:id="@+id/botToolbar"
         android:layout_width="fill_parent"
-        android:layout_height="32dp"
+        android:layout_height="48dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:weightSum="3" >
-
-        <ImageView
-            android:id="@+id/btn_back"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_btn_back" />
-
-        <ImageView
-            android:id="@+id/btn_selectAll"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_btn_selectall" />
-
-        <ImageView
-            android:id="@+id/btn_deselectAll"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_btn_deselectall" />
-    </LinearLayout>
+        />
 
     <ListView
         android:id="@+id/listView"
@@ -44,8 +18,8 @@
         android:layout_above="@id/botToolbar"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:divider="#000" 
-        android:dividerHeight="1dp">
+        android:divider="#000"
+        android:dividerHeight="1dp" >
     </ListView>
 
 </RelativeLayout>

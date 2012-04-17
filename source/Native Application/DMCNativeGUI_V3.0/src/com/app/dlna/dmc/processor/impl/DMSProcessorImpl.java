@@ -117,9 +117,6 @@ public class DMSProcessorImpl implements DMSProcessor {
 		m_traceID.add(objectID);
 		m_currentPageIndex = 0;
 		executeBrowse(objectID, pageIndex, listener);
-		for (String _id : m_traceID) {
-			Log.e(TAG, _id);
-		}
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
