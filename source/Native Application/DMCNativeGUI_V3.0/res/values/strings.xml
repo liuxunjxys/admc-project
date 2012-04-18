@@ -37,5 +37,8 @@
     <string name="media_source">Media Source</string>
     <string name="playlist">Playlist</string>
     <string name="now_playing">Now Playing</string>
+    <string name="play">play</string>
+    <string name="pause">pause</string>
+    <string name="deselectall">deselectAll</string>
 
 </resources>

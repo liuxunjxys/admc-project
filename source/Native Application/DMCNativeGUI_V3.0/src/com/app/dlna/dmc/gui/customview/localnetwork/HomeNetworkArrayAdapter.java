@@ -16,6 +16,7 @@ import org.teleal.cling.model.meta.RemoteDevice;
 import org.teleal.cling.support.model.DIDLObject;
 import org.teleal.cling.support.model.container.Container;
 import org.teleal.cling.support.model.item.ImageItem;
+import org.teleal.cling.support.model.item.Item;
 import org.teleal.cling.support.model.item.MusicTrack;
 import org.teleal.cling.support.model.item.VideoItem;
 
@@ -79,6 +80,7 @@ public class HomeNetworkArrayAdapter extends ArrayAdapter<AdapterItem> {
 
 	@SuppressWarnings("rawtypes")
 	private void initDeviceItem(final Device device, final ViewHolder holder) {
+		holder.checked.setVisibility(View.GONE);
 		if (device instanceof LocalDevice)
 			holder.name.setText("Local Device");
 		else
@@ -120,8 +122,7 @@ public class HomeNetworkArrayAdapter extends ArrayAdapter<AdapterItem> {
 					final RemoteDevice remoteDevice = (RemoteDevice) device;
 
 					String urlString = remoteDevice.getIdentity().getDescriptorURL().getProtocol() + "://"
-							+ remoteDevice.getIdentity().getDescriptorURL().getAuthority()
-							+ icons[0].getUri().toString();
+							+ remoteDevice.getIdentity().getDescriptorURL().getAuthority() + icons[0].getUri().toString();
 					URL url = new URL(urlString);
 					final Bitmap icon = BitmapFactory.decodeStream(url.openConnection().getInputStream());
 					m_cacheDMSIcon.put(udn, icon);
@@ -201,10 +202,8 @@ public class HomeNetworkArrayAdapter extends ArrayAdapter<AdapterItem> {
 		BitmapFactory.decodeByteArray(buffer, 0, buffer.length, o);
 		int scale = 1;
 		if (o.outHeight > IMAGE_MAX_SIZE || o.outWidth > IMAGE_MAX_SIZE) {
-			scale = (int) Math.pow(
-					2,
-					(int) Math.round(Math.log(IMAGE_MAX_SIZE / (double) Math.max(o.outHeight, o.outWidth))
-							/ Math.log(0.5)));
+			scale = (int) Math.pow(2,
+					(int) Math.round(Math.log(IMAGE_MAX_SIZE / (double) Math.max(o.outHeight, o.outWidth)) / Math.log(0.5)));
 		}
 
 		BitmapFactory.Options o2 = new BitmapFactory.Options();
@@ -218,11 +217,13 @@ public class HomeNetworkArrayAdapter extends ArrayAdapter<AdapterItem> {
 		if (object.getId().equals("-1")) {
 			holder.icon.setVisibility(View.GONE);
 			holder.desc.setText("");
+			holder.checked.setVisibility(View.GONE);
 			return;
 		}
 		holder.icon.setVisibility(View.VISIBLE);
 		if (object instanceof Container) {
 			holder.icon.setImageResource(R.drawable.ic_didlobject_container);
+			holder.checked.setVisibility(View.GONE);
 			int childCount = ((Container) object).getChildCount() != null ? ((Container) object).getChildCount() : 1;
 			String childCountStr = "";
 			if (childCount == 0)
@@ -247,6 +248,16 @@ public class HomeNetworkArrayAdapter extends ArrayAdapter<AdapterItem> {
 				if (object.getResources().get(0) != null && object.getResources().get(0).getSize() != null)
 					holder.desc.setText(Utility.convertSizeToString(object.getResources().get(0).getSize()));
 			}
+			if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor() != null)
+				if (object instanceof Item)
+					if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().containsUrl(object.getResources().get(0).getValue())) {
+						holder.checked.setVisibility(View.VISIBLE);
+					} else {
+						holder.checked.setVisibility(View.GONE);
+					}
+				else {
+					holder.checked.setVisibility(View.GONE);
+				}
 		}
 	}
 
@@ -255,6 +266,7 @@ public class HomeNetworkArrayAdapter extends ArrayAdapter<AdapterItem> {
 		viewHolder.name = (TextView) view.findViewById(R.id.name);
 		viewHolder.desc = (TextView) view.findViewById(R.id.desc);
 		viewHolder.icon = (ImageView) view.findViewById(R.id.icon);
+		viewHolder.checked = (ImageView) view.findViewById(R.id.checked);
 		view.setTag(viewHolder);
 	}
 
@@ -262,6 +274,7 @@ public class HomeNetworkArrayAdapter extends ArrayAdapter<AdapterItem> {
 		TextView desc;
 		TextView name;
 		ImageView icon;
+		ImageView checked;
 	}
 
 	@Override

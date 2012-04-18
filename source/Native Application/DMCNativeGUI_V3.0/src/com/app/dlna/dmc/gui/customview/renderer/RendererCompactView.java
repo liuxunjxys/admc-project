@@ -2,6 +2,8 @@ package com.app.dlna.dmc.gui.customview.renderer;
 
 import java.net.URL;
 
+import org.teleal.cling.model.message.UpnpResponse;
+import org.teleal.cling.model.meta.Action;
 import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.model.meta.Icon;
 import org.teleal.cling.model.meta.LocalDevice;
@@ -19,9 +21,11 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import app.dlna.controller.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
+import com.app.dlna.dmc.processor.interfaces.DMRProcessor.DMRProcessorListner;
 import com.app.dlna.dmc.processor.interfaces.UpnpProcessor.UpnpProcessorListener;
 
 public class RendererCompactView extends LinearLayout {
@@ -29,12 +33,12 @@ public class RendererCompactView extends LinearLayout {
 	protected static final String TAG = RendererCompactView.class.getName();
 	private LinearLayout m_ll_renderers;
 	private LayoutInflater m_inflater;
+	private ImageView m_btn_quickPlayPause;
 
 	@SuppressWarnings("rawtypes")
 	public RendererCompactView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
-				R.layout.cv_renderer_compact, this);
+		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.cv_renderer_compact, this);
 		m_ll_renderers = (LinearLayout) ((HorizontalScrollView) findViewById(R.id.gridView_renderer)).getChildAt(0);
 		m_inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		for (Device device : MainActivity.UPNP_PROCESSOR.getDMRList()) {
@@ -45,6 +49,11 @@ public class RendererCompactView extends LinearLayout {
 		}
 		updateListRenderer();
 		setDevicesListener();
+		m_btn_quickPlayPause = (ImageView) findViewById(R.id.btn_quickPlayPause);
+		m_btn_quickPlayPause.setOnClickListener(m_quickPlayPauseClick);
+		m_btn_quickPlayPause.setTag(R.string.play);
+		setDMRListener();
+
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -58,8 +67,7 @@ public class RendererCompactView extends LinearLayout {
 		ret.setTag(device.getIdentity().getUdn());
 		final ImageView icon = (ImageView) ret.findViewById(R.id.icon);
 		final Icon[] icons = device.getIcons();
-		if (device instanceof RemoteDevice && icons != null && icons.length > 0 && icons[0] != null
-				&& icons[0].getUri() != null) {
+		if (device instanceof RemoteDevice && icons != null && icons.length > 0 && icons[0] != null && icons[0].getUri() != null) {
 			loadRendererIcon(device, icon, icons);
 		} else {
 			icon.setImageResource(R.drawable.ic_device_unknow_player);
@@ -79,8 +87,7 @@ public class RendererCompactView extends LinearLayout {
 					final RemoteDevice remoteDevice = (RemoteDevice) device;
 
 					String urlString = remoteDevice.getIdentity().getDescriptorURL().getProtocol() + "://"
-							+ remoteDevice.getIdentity().getDescriptorURL().getAuthority()
-							+ icons[0].getUri().toString();
+							+ remoteDevice.getIdentity().getDescriptorURL().getAuthority() + icons[0].getUri().toString();
 					URL url = new URL(urlString);
 					final Bitmap bm = BitmapFactory.decodeStream(url.openConnection().getInputStream());
 					MainActivity.INSTANCE.runOnUiThread(new Runnable() {
@@ -115,6 +122,7 @@ public class RendererCompactView extends LinearLayout {
 			UDN udn = (UDN) v.getTag();
 			MainActivity.UPNP_PROCESSOR.setCurrentDMR(udn);
 			updateListRenderer();
+			setDMRListener();
 		}
 
 	};
@@ -122,7 +130,93 @@ public class RendererCompactView extends LinearLayout {
 
 		@Override
 		public boolean onLongClick(View v) {
+			Toast.makeText(getContext(), "Show device info", Toast.LENGTH_SHORT).show();
 			return true;
+		}
+	};
+
+	// Quick playpause
+
+	private OnClickListener m_quickPlayPauseClick = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			try {
+				if (MainActivity.UPNP_PROCESSOR.getDMRProcessor() != null) {
+					if (m_btn_quickPlayPause.getTag().equals(R.string.play)) {
+						MainActivity.UPNP_PROCESSOR.getDMRProcessor().play();
+					} else if (m_btn_quickPlayPause.getTag().equals(R.string.pause)) {
+						MainActivity.UPNP_PROCESSOR.getDMRProcessor().pause();
+					}
+				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+	};
+
+	private void setDMRListener() {
+		if (MainActivity.UPNP_PROCESSOR.getCurrentDMR() != null && MainActivity.UPNP_PROCESSOR.getDMRProcessor() != null) {
+			MainActivity.UPNP_PROCESSOR.getDMRProcessor().addListener(m_dmrListener);
+		}
+	}
+
+	private DMRProcessorListner m_dmrListener = new DMRProcessorListner() {
+
+		@Override
+		public void onUpdatePosition(long current, long max) {
+		}
+
+		@Override
+		public void onStoped() {
+			MainActivity.INSTANCE.runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					m_btn_quickPlayPause.setImageDrawable(getResources().getDrawable(R.drawable.ic_btn_media_quickplay));
+					m_btn_quickPlayPause.setTag(R.string.play);
+					m_btn_quickPlayPause.invalidate();
+				}
+			});
+		}
+
+		@Override
+		public void onPlaying() {
+			MainActivity.INSTANCE.runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					m_btn_quickPlayPause.setImageDrawable(getResources().getDrawable(R.drawable.ic_btn_media_quickpause));
+					m_btn_quickPlayPause.setTag(R.string.pause);
+					m_btn_quickPlayPause.invalidate();
+				}
+			});
+		}
+
+		@Override
+		public void onPaused() {
+			MainActivity.INSTANCE.runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					m_btn_quickPlayPause.setImageDrawable(getResources().getDrawable(R.drawable.ic_btn_media_quickplay));
+					m_btn_quickPlayPause.setTag(R.string.play);
+					m_btn_quickPlayPause.invalidate();
+				}
+			});
+		}
+
+		@Override
+		public void onErrorEvent(String error) {
+		}
+
+		@Override
+		public void onEndTrack() {
+		}
+
+		@SuppressWarnings("rawtypes")
+		@Override
+		public void onActionFail(Action actionCallback, UpnpResponse response, String cause) {
 		}
 	};
 
@@ -145,6 +239,7 @@ public class RendererCompactView extends LinearLayout {
 		MainActivity.UPNP_PROCESSOR.addListener(m_deviceListener);
 	}
 
+	// Devices listener
 	private UpnpProcessorListener m_deviceListener = new UpnpProcessorListener() {
 
 		@Override
