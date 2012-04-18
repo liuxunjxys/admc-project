@@ -16,6 +16,19 @@ public interface DMSProcessor {
 
 	void dispose();
 
+	DIDLObject getDIDLObject(String objectID);
+
+	void addCurrentItemsToPlaylist(PlaylistProcessor playlistProcessor, DMSAddRemoveContainerListener actionListener);
+
+	void addAllToPlaylist(PlaylistProcessor playlistProcessor, DMSAddRemoveContainerListener actionListener);
+
+	void removeCurrentItemsFromPlaylist(PlaylistProcessor playlistProcessor,
+			DMSAddRemoveContainerListener actionListener);
+
+	void removeAllFromPlaylist(PlaylistProcessor playlistProcessor, DMSAddRemoveContainerListener actionListener);
+
+	List<DIDLObject> getAllObjects();
+
 	public interface DMSProcessorListner {
 		void onBrowseComplete(String objectID, boolean haveNext, boolean havePrev,
 				Map<String, List<? extends DIDLObject>> result);
@@ -23,11 +36,11 @@ public interface DMSProcessor {
 		void onBrowseFail(String message);
 	}
 
-	DIDLObject getDIDLObject(String objectID);
+	public interface DMSAddRemoveContainerListener {
+		void onActionComplete();
 
-	void addAllToPlaylist(PlaylistProcessor playlistProcessor);
+		void onActionFail(Exception ex);
 
-	void removeAllFromPlaylist(PlaylistProcessor playlistProcessor);
-
-	List<DIDLObject> getAllObjects();
+		void onActionStart();
+	}
 }

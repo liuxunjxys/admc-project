@@ -1,14 +1,30 @@
 package com.app.dlna.dmc.utility;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.text.DecimalFormat;
+import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Log;
+import android.widget.ImageView;
+
+import com.app.dlna.dmc.gui.MainActivity;
+import com.app.dlna.dmc.gui.customview.localnetwork.HomeNetworkArrayAdapter;
 import com.app.dlna.dmc.processor.http.HTTPServerData;
 
 public class Utility {
+	public static final String TAG = Utility.class.getName();
+
 	public static String intToIp(int i) {
 		String result = "";
 		result = (i & 0xFF) + "." + ((i >> 8) & 0xFF) + "." + ((i >> 16) & 0xFF) + "." + ((i >> 24) & 0xFF);
@@ -64,4 +80,72 @@ public class Utility {
 		return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
 	}
 
+	public static void loadImageItemThumbnail(final ImageView image, final String imageUrl,
+			final Map<String, Bitmap> m_cacheImageItem) {
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					if (m_cacheImageItem.containsKey(imageUrl)) {
+						MainActivity.INSTANCE.runOnUiThread(new Runnable() {
+
+							@Override
+							public void run() {
+								try {
+									synchronized (m_cacheImageItem) {
+										image.setImageBitmap(m_cacheImageItem.get(imageUrl));
+										Log.i(TAG, "Cache hit");
+									}
+								} catch (Exception ex) {
+									ex.printStackTrace();
+								}
+							}
+						});
+					} else {
+						final Bitmap bm = getBitmapFromURL(imageUrl);
+						synchronized (m_cacheImageItem) {
+							m_cacheImageItem.put(imageUrl, bm);
+						}
+						MainActivity.INSTANCE.runOnUiThread(new Runnable() {
+
+							@Override
+							public void run() {
+								try {
+									image.setImageBitmap(bm);
+								} catch (Exception ex) {
+									ex.printStackTrace();
+								}
+							}
+						});
+					}
+
+				} catch (MalformedURLException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}).start();
+	}
+
+	public static Bitmap getBitmapFromURL(final String imageUrl) throws IOException, MalformedURLException {
+		BitmapFactory.Options o = new BitmapFactory.Options();
+		o.inJustDecodeBounds = true;
+		byte[] buffer = IOUtils.toByteArray((InputStream) new URL(imageUrl).getContent());
+		BitmapFactory.decodeByteArray(buffer, 0, buffer.length, o);
+		int scale = 1;
+		if (o.outHeight > HomeNetworkArrayAdapter.IMAGE_MAX_SIZE || o.outWidth > HomeNetworkArrayAdapter.IMAGE_MAX_SIZE) {
+			scale = (int) Math.pow(
+					2,
+					(int) Math.round(Math.log(HomeNetworkArrayAdapter.IMAGE_MAX_SIZE
+							/ (double) Math.max(o.outHeight, o.outWidth))
+							/ Math.log(0.5)));
+		}
+
+		BitmapFactory.Options o2 = new BitmapFactory.Options();
+		o2.inSampleSize = scale;
+
+		return BitmapFactory.decodeByteArray(buffer, 0, buffer.length, o2);
+	}
 }

@@ -1,14 +1,12 @@
 package com.app.dlna.dmc.gui.customview.localnetwork;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.model.meta.Icon;
 import org.teleal.cling.model.meta.LocalDevice;
@@ -38,7 +36,7 @@ import com.app.dlna.dmc.gui.customview.adapter.AdapterItem;
 import com.app.dlna.dmc.utility.Utility;
 
 public class HomeNetworkArrayAdapter extends ArrayAdapter<AdapterItem> {
-	protected static final int IMAGE_MAX_SIZE = 48;
+	public static final int IMAGE_MAX_SIZE = 48;
 	protected static final String TAG = HomeNetworkArrayAdapter.class.getName();
 	private LayoutInflater m_inflater = null;
 	private Map<String, Bitmap> m_cacheDMSIcon;
@@ -122,7 +120,8 @@ public class HomeNetworkArrayAdapter extends ArrayAdapter<AdapterItem> {
 					final RemoteDevice remoteDevice = (RemoteDevice) device;
 
 					String urlString = remoteDevice.getIdentity().getDescriptorURL().getProtocol() + "://"
-							+ remoteDevice.getIdentity().getDescriptorURL().getAuthority() + icons[0].getUri().toString();
+							+ remoteDevice.getIdentity().getDescriptorURL().getAuthority()
+							+ icons[0].getUri().toString();
 					URL url = new URL(urlString);
 					final Bitmap icon = BitmapFactory.decodeStream(url.openConnection().getInputStream());
 					m_cacheDMSIcon.put(udn, icon);
@@ -146,70 +145,6 @@ public class HomeNetworkArrayAdapter extends ArrayAdapter<AdapterItem> {
 				}
 			}
 		}).start();
-	}
-
-	private void loadImageItemThumbnail(final ImageView image, final String imageUrl) {
-		new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				try {
-					if (m_cacheImageItem.containsKey(imageUrl)) {
-						MainActivity.INSTANCE.runOnUiThread(new Runnable() {
-
-							@Override
-							public void run() {
-								try {
-									synchronized (m_cacheImageItem) {
-										image.setImageBitmap(m_cacheImageItem.get(imageUrl));
-									}
-								} catch (Exception ex) {
-									ex.printStackTrace();
-								}
-							}
-						});
-					} else {
-						final Bitmap bm = getBitmapFromURL(imageUrl);
-						synchronized (m_cacheImageItem) {
-							m_cacheImageItem.put(imageUrl, bm);
-						}
-						MainActivity.INSTANCE.runOnUiThread(new Runnable() {
-
-							@Override
-							public void run() {
-								try {
-									image.setImageBitmap(bm);
-								} catch (Exception ex) {
-									ex.printStackTrace();
-								}
-							}
-						});
-					}
-
-				} catch (MalformedURLException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}).start();
-	}
-
-	private Bitmap getBitmapFromURL(final String imageUrl) throws IOException, MalformedURLException {
-		BitmapFactory.Options o = new BitmapFactory.Options();
-		o.inJustDecodeBounds = true;
-		byte[] buffer = IOUtils.toByteArray((InputStream) new URL(imageUrl).getContent());
-		BitmapFactory.decodeByteArray(buffer, 0, buffer.length, o);
-		int scale = 1;
-		if (o.outHeight > IMAGE_MAX_SIZE || o.outWidth > IMAGE_MAX_SIZE) {
-			scale = (int) Math.pow(2,
-					(int) Math.round(Math.log(IMAGE_MAX_SIZE / (double) Math.max(o.outHeight, o.outWidth)) / Math.log(0.5)));
-		}
-
-		BitmapFactory.Options o2 = new BitmapFactory.Options();
-		o2.inSampleSize = scale;
-
-		return BitmapFactory.decodeByteArray(buffer, 0, buffer.length, o2);
 	}
 
 	private void initDIDLObject(DIDLObject object, ViewHolder holder) {
@@ -239,8 +174,7 @@ public class HomeNetworkArrayAdapter extends ArrayAdapter<AdapterItem> {
 			} else if (object instanceof VideoItem) {
 				holder.icon.setImageResource(R.drawable.ic_didlobject_video);
 			} else if (object instanceof ImageItem) {
-				holder.icon.setImageResource(R.drawable.ic_didlobject_image);
-				loadImageItemThumbnail(holder.icon, object.getResources().get(0).getValue());
+				Utility.loadImageItemThumbnail(holder.icon, object.getResources().get(0).getValue(), m_cacheImageItem);
 			} else {
 				holder.icon.setImageResource(R.drawable.ic_didlobject_unknow);
 			}
@@ -250,7 +184,8 @@ public class HomeNetworkArrayAdapter extends ArrayAdapter<AdapterItem> {
 			}
 			if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor() != null)
 				if (object instanceof Item)
-					if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().containsUrl(object.getResources().get(0).getValue())) {
+					if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().containsUrl(
+							object.getResources().get(0).getValue())) {
 						holder.checked.setVisibility(View.VISIBLE);
 					} else {
 						holder.checked.setVisibility(View.GONE);
@@ -302,7 +237,7 @@ public class HomeNetworkArrayAdapter extends ArrayAdapter<AdapterItem> {
 						synchronized (m_cacheImageItem) {
 							String imageUrl = didlObject.getResources().get(0).getValue();
 							try {
-								m_cacheImageItem.put(imageUrl, getBitmapFromURL(imageUrl));
+								m_cacheImageItem.put(imageUrl, Utility.getBitmapFromURL(imageUrl));
 							} catch (MalformedURLException e) {
 								e.printStackTrace();
 							} catch (IOException e) {
