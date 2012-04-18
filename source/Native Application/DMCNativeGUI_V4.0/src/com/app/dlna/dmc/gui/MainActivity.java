@@ -21,7 +21,7 @@ import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 import android.widget.Toast;
-import app.dlna.controller.R;
+import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerTabActivity;
 import com.app.dlna.dmc.gui.subactivity.MediaSourceActivity;
@@ -50,6 +50,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 		setContentView(R.layout.main_activity);
 		m_tabHost = getTabHost();
 		m_tabHost.setup();
+
 
 		UPNP_PROCESSOR = new UpnpProcessorImpl(MainActivity.this);
 		UPNP_PROCESSOR.bindUpnpService();
@@ -117,29 +118,21 @@ public class MainActivity extends UpnpListenerTabActivity {
 
 		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-		TabSpec mediaSource = m_tabHost.newTabSpec(getString(R.string.media_source));
+		TabSpec mediaSource = m_tabHost.newTabSpec(getString(R.string.library));
 		TextView tvMediaSource = (TextView) inflater.inflate(R.layout.cv_tabwidget, null);
-		tvMediaSource.setText(R.string.media_source);
+		tvMediaSource.setText(R.string.library);
 		mediaSource.setIndicator(tvMediaSource);
 		intent = new Intent(this, MediaSourceActivity.class);
 		mediaSource.setContent(intent);
 
-		TabSpec playlist = m_tabHost.newTabSpec(getString(R.string.playlist));
-		TextView tvPlaylist = (TextView) inflater.inflate(R.layout.cv_tabwidget, null);
-		tvPlaylist.setText(R.string.playlist);
-		playlist.setIndicator(tvPlaylist);
-		intent = new Intent(this, PlaylistActivity.class);
-		playlist.setContent(intent);
-
 		TabSpec nowPlayling = m_tabHost.newTabSpec(getString(R.string.now_playing));
-		TextView tvNowPlaying = (TextView) inflater.inflate(R.layout.cv_tabwidget, null);
-		tvNowPlaying.setText(R.string.now_playing);
-		nowPlayling.setIndicator(tvNowPlaying);
-		intent = new Intent(this, NowPlayingActivity.class);
+		TextView tvPlaylist = (TextView) inflater.inflate(R.layout.cv_tabwidget, null);
+		tvPlaylist.setText(R.string.now_playing);
+		nowPlayling.setIndicator(tvPlaylist);
+		intent = new Intent(this, PlaylistActivity.class);
 		nowPlayling.setContent(intent);
 
 		m_tabHost.addTab(mediaSource);
-		m_tabHost.addTab(playlist);
 		m_tabHost.addTab(nowPlayling);
 
 		m_tabHost.setCurrentTab(DEFAULT_TAB_INDEX);
@@ -181,7 +174,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 	@Override
 	public void finishFromChild(Activity child) {
 		Log.e(TAG, "Finish from child " + m_tabHost.getCurrentTabTag());
-		if (m_tabHost.getCurrentTabTag().equals(getString(R.string.media_source))) {
+		if (m_tabHost.getCurrentTabTag().equals(getString(R.string.library))) {
 			confirmExit();
 		} else {
 			m_tabHost.setCurrentTab(DEFAULT_TAB_INDEX);
@@ -218,8 +211,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 			public void run() {
 				if (m_routerProgressDialog != null)
 					m_routerProgressDialog.dismiss();
-				new AlertDialog.Builder(MainActivity.this).setTitle("Network error").setMessage(cause).setCancelable(false)
-						.setPositiveButton("OK", new OnClickListener() {
+				new AlertDialog.Builder(MainActivity.this).setTitle("Network error").setMessage(cause)
+						.setCancelable(false).setPositiveButton("OK", new OnClickListener() {
 
 							@Override
 							public void onClick(DialogInterface dialog, int which) {

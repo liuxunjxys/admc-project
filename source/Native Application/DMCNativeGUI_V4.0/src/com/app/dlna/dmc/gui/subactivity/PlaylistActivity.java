@@ -1,10 +1,10 @@
 package com.app.dlna.dmc.gui.subactivity;
 
-import com.app.dlna.dmc.gui.customview.playlist.PlaylistAllItemView;
-
 import android.app.Activity;
 import android.os.Bundle;
-import app.dlna.controller.R;
+import app.dlna.controller.v4.R;
+
+import com.app.dlna.dmc.gui.customview.playlist.PlaylistAllItemView;
 
 public class PlaylistActivity extends Activity {
 

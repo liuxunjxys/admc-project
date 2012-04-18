@@ -10,5 +10,6 @@
     <color name="tab_background_normal">#000000</color>
     <color name="tab_background_selected">#000000</color>
     <color name="pager_tiltle_stip">#000000</color>
+    <color name="tab_background_gray">#CCCCCCCC</color>
 
 </resources>

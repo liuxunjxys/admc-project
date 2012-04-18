@@ -11,7 +11,7 @@ import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
-import app.dlna.controller.R;
+import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.customview.localnetwork.HomeNetworkView;
 import com.app.dlna.dmc.gui.customview.renderer.RendererCompactView;

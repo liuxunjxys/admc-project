@@ -11,7 +11,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-import app.dlna.controller.R;
+import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.customview.adapter.AdapterItem;
@@ -41,8 +41,6 @@ public class PlaylistToolbar extends LinearLayout {
 		m_btn_back.setOnLongClickListener(onBackLongclick);
 		m_btn_back.setEnabled(false);
 
-		((ImageView) findViewById(R.id.btn_selectAll)).setOnClickListener(onSelectAll);
-		((ImageView) findViewById(R.id.btn_deselectAll)).setOnClickListener(onDeselectAll);
 		((ImageView) findViewById(R.id.btn_containerSelectAll)).setOnClickListener(onContainerSeselectAll);
 		((ImageView) findViewById(R.id.btn_containerDeselectAll)).setOnClickListener(onContainerDeselectAll);
 		((ImageView) findViewById(R.id.btn_showhide)).setOnClickListener(onShowHideClick);
@@ -169,22 +167,6 @@ public class PlaylistToolbar extends LinearLayout {
 				}
 			});
 
-		}
-	};
-
-	private OnClickListener onSelectAll = new OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-			modifyPlaylist(ACTION_SELECT_ALL);
-		}
-	};
-
-	private OnClickListener onDeselectAll = new OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-			modifyPlaylist(ACTION_DESELECT_ALL);
 		}
 	};
 

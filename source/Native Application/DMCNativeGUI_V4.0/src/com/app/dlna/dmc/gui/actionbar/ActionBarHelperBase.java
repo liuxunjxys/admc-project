@@ -39,7 +39,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import app.dlna.controller.R;
+import app.dlna.controller.v4.R;
 
 /**
  * A class that implements the action bar pattern for pre-Honeycomb devices.
@@ -86,19 +86,20 @@ public class ActionBarHelperBase extends ActionBarHelper {
 			return;
 		}
 
-		LinearLayout.LayoutParams springLayoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.FILL_PARENT);
+		LinearLayout.LayoutParams springLayoutParams = new LinearLayout.LayoutParams(0,
+				ViewGroup.LayoutParams.FILL_PARENT);
 		springLayoutParams.weight = 1;
 
 		// Add Home button
 		SimpleMenu tempMenu = new SimpleMenu(mActivity);
-		SimpleMenuItem homeItem = new SimpleMenuItem(tempMenu, android.R.id.title, 0, mActivity.getString(R.string.app_name));
+		SimpleMenuItem homeItem = new SimpleMenuItem(tempMenu, android.R.id.title, 0,
+				mActivity.getString(R.string.app_name));
 		homeItem.setIcon(R.drawable.ic_launcher_32x32);
 		addActionItemCompatFromMenuItem(homeItem);
 
 		// Add title text
 		TextView titleText = new TextView(mActivity, null, R.attr.actionbarCompatTitleStyle);
 		titleText.setLayoutParams(springLayoutParams);
-		titleText.setTextSize(17);
 		titleText.setText(mActivity.getTitle());
 		actionBarCompat.addView(titleText);
 	}
@@ -198,7 +199,8 @@ public class ActionBarHelperBase extends ActionBarHelper {
 			// so add those.
 			ProgressBar indicator = new ProgressBar(mActivity, null, R.attr.actionbarCompatProgressIndicatorStyle);
 
-			final int buttonWidth = mActivity.getResources().getDimensionPixelSize(R.dimen.actionbar_compat_button_width);
+			final int buttonWidth = mActivity.getResources().getDimensionPixelSize(
+					R.dimen.actionbar_compat_button_width);
 			final int buttonHeight = mActivity.getResources().getDimensionPixelSize(R.dimen.actionbar_compat_height);
 			final int progressIndicatorWidth = buttonWidth / 2;
 

@@ -7,46 +7,6 @@
     android:weightSum="6" 
     android:gravity="center">
 
-    <ImageView
-        android:id="@+id/btn_back"
-        android:layout_width="0dp"
-        android:layout_height="32dp"
-        android:layout_gravity="center"
-        android:layout_weight="1"
-        android:scaleType="centerInside"
-        android:src="@drawable/ic_btn_back" />
-
-    <ImageView
-        android:id="@+id/btn_selectAll"
-        android:layout_width="0dp"
-        android:layout_height="32dp"
-        android:layout_weight="1"
-        android:scaleType="centerInside"
-        android:src="@drawable/ic_btn_selectall" />
-
-    <ImageView
-        android:id="@+id/btn_deselectAll"
-        android:layout_width="0dp"
-        android:layout_height="32dp"
-        android:layout_weight="1"
-        android:scaleType="centerInside"
-        android:src="@drawable/ic_btn_deselectall" />
-
-    <ImageView
-        android:id="@+id/btn_containerSelectAll"
-        android:layout_width="0dp"
-        android:layout_height="32dp"
-        android:layout_weight="1"
-        android:scaleType="centerInside"
-        android:src="@drawable/ic_btn_container_selectall" />
-
-    <ImageView
-        android:id="@+id/btn_containerDeselectAll"
-        android:layout_width="0dp"
-        android:layout_height="32dp"
-        android:layout_weight="1"
-        android:scaleType="centerInside"
-        android:src="@drawable/ic_btn_container_deselectalll" />
 
     <ImageView
         android:id="@+id/btn_showhide"

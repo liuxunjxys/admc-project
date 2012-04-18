@@ -20,7 +20,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
-import app.dlna.controller.R;
+import app.dlna.controller.v4.R;
 
 /**
  * An abstract class that handles some common action bar-related functionality
