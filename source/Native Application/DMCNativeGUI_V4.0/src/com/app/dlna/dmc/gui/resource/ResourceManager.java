@@ -1,6 +1,6 @@
 package com.app.dlna.dmc.gui.resource;
 
-import app.dlna.controller.R;
+import app.dlna.controller.v4.R;
 
 public class ResourceManager {
 

@@ -14,7 +14,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
-import app.dlna.controller.R;
+import app.dlna.controller.v4.R;
 
 public class DownloadThread extends Thread {
 	protected File m_parent;
