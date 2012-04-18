@@ -1,6 +1,10 @@
 package com.app.dlna.dmc.gui.customview.playlist;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,20 +13,22 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 import app.dlna.controller.R;
 
+import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
+import com.app.dlna.dmc.utility.Utility;
 
 public class PlaylistItemArrayAdapter extends ArrayAdapter<PlaylistItem> {
 	private static final String TAG = PlaylistItemArrayAdapter.class.getName();
 	private LayoutInflater m_inflater = null;
+	private Map<String, Bitmap> m_cacheImageItem;
 
 	public PlaylistItemArrayAdapter(Context context, int textViewResourceId) {
 		super(context, textViewResourceId);
 		m_inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		m_cacheImageItem = new HashMap<String, Bitmap>();
 	}
 
 	@Override
@@ -45,9 +51,10 @@ public class PlaylistItemArrayAdapter extends ArrayAdapter<PlaylistItem> {
 			holder.icon.setImageResource(R.drawable.ic_didlobject_video);
 			break;
 		case IMAGE:
-			holder.icon.setImageResource(R.drawable.ic_didlobject_image);
+			Utility.loadImageItemThumbnail(holder.icon, object.getUri(), m_cacheImageItem);
 			break;
 		default:
+			holder.icon.setImageResource(R.drawable.ic_didlobject_unknow);
 			break;
 		}
 
@@ -86,7 +93,9 @@ public class PlaylistItemArrayAdapter extends ArrayAdapter<PlaylistItem> {
 
 		@Override
 		public void onClick(View v) {
-			Toast.makeText(getContext(), "Click delete on " + ((Integer) v.getTag()), Toast.LENGTH_SHORT).show();
+			int position = (Integer) v.getTag();
+			MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().removeItem(getItem(position));
+			remove(getItem(position));
 		}
 	};
 }

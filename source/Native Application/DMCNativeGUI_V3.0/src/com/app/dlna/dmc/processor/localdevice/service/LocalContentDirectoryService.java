@@ -51,8 +51,8 @@ public class LocalContentDirectoryService extends AbstractContentDirectoryServic
 	public static void scanMedia(final Context context) {
 		IS_SCANNING = true;
 		m_notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-		final Notification notification = new Notification(ResourceManager.getScanningIcon(), "Scanning content on sdcard",
-				System.currentTimeMillis());
+		final Notification notification = new Notification(ResourceManager.getScanningIcon(),
+				"Scanning content on sdcard", System.currentTimeMillis());
 
 		PendingIntent contentIntent = PendingIntent.getActivity(context, 0, new Intent(), 0);
 
@@ -148,44 +148,37 @@ public class LocalContentDirectoryService extends AbstractContentDirectoryServic
 			File file = new File(path);
 			for (File subFile : file.listFiles()) {
 				if (subFile.isDirectory()) {
-					// Log.i(TAG, "DIR = " + subFile.getAbsolutePath());
 					scanFile(subFile.getAbsolutePath());
 				} else if (subFile.length() >= 51200) {
-					// Log.i(TAG, "FILE = " + subFile.getAbsolutePath());
 					String fileName = subFile.getName();
-
 					int dotPos = subFile.getName().lastIndexOf(".");
 					String fileExtension = dotPos != -1 ? fileName.substring(dotPos) : null;
 					if (fileExtension != null) {
 						fileExtension = fileExtension.toLowerCase().replace(".", "");
 					}
-					// String mimeType =
-					// URLConnection.getFileNameMap().getContentTypeFor("a" +
-					// fileExtension);
-
 					String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
 					if (mimeType == null) {
 						mimeType = m_mineMap.get(fileExtension);
 					}
 
 					if (mimeType != null) {
-						Res res = new Res(new MimeType(mimeType.split("/")[0], mimeType.split("/")[1]), subFile.length(),
-								Utility.createLink(subFile));
+						Res res = new Res(new MimeType(mimeType.split("/")[0], mimeType.split("/")[1]),
+								subFile.length(), Utility.createLink(subFile));
 						if (fileExtension != null) {
 							if (m_musicMap.contains(fileExtension)) {
-								MusicTrack musicTrack = new MusicTrack("0/1/" + subFile.getName(), "0/1", subFile.getName(),
-										"local dms", "", "", res);
+								MusicTrack musicTrack = new MusicTrack("0/1/" + subFile.getName(), "0/1",
+										subFile.getName(), "local dms", "", "", res);
 								m_listMusic.add(musicTrack);
 							}
 
 							if (m_videoMap.contains(fileExtension)) {
-								VideoItem videoItem = new VideoItem("0/2/" + subFile.getName(), "0/2", subFile.getName(),
-										"local dms", res);
+								VideoItem videoItem = new VideoItem("0/2/" + subFile.getName(), "0/2",
+										subFile.getName(), "local dms", res);
 								m_listVideo.add(new VideoItem(videoItem));
 							}
 							if (m_photoMap.contains(fileExtension)) {
-								ImageItem imageItem = new ImageItem("0/3/" + subFile.getName(), "0/3", subFile.getName(),
-										"local dms", res);
+								ImageItem imageItem = new ImageItem("0/3/" + subFile.getName(), "0/3",
+										subFile.getName(), "local dms", res);
 								m_listPhoto.add(new ImageItem(imageItem));
 							}
 						}
@@ -198,8 +191,8 @@ public class LocalContentDirectoryService extends AbstractContentDirectoryServic
 	}
 
 	@Override
-	public BrowseResult browse(String objectID, BrowseFlag browseFlag, String filter, long firstResult, long maxResults,
-			SortCriterion[] orderby) throws ContentDirectoryException {
+	public BrowseResult browse(String objectID, BrowseFlag browseFlag, String filter, long firstResult,
+			long maxResults, SortCriterion[] orderby) throws ContentDirectoryException {
 		Log.d(TAG, "Browse " + objectID);
 		BrowseResult br = null;
 		int count = 0;
@@ -212,38 +205,11 @@ public class LocalContentDirectoryService extends AbstractContentDirectoryServic
 				count = 3;
 			}
 			if (objectID.equals("0/1"))
-				synchronized (m_listMusic) {
-					int toIndex = (firstResult + maxResults) < (m_listMusic.size() - 1) ? (int) (firstResult + maxResults)
-							: (m_listMusic.size() - 1);
-					for (DIDLObject didlObject : m_listMusic.subList((int) firstResult, toIndex)) {
-						if (didlObject != null) {
-							content.addItem((Item) didlObject);
-						}
-					}
-					count = m_listMusic.size();
-				}
+				count = getResultContent(firstResult, maxResults, content, m_listMusic);
 			if (objectID.equals("0/2"))
-				synchronized (m_listVideo) {
-					int toIndex = (firstResult + maxResults) < (m_listVideo.size() - 1) ? (int) (firstResult + maxResults)
-							: (m_listVideo.size() - 1);
-					for (DIDLObject didlObject : m_listVideo.subList((int) firstResult, toIndex)) {
-						if (didlObject != null) {
-							content.addItem((Item) didlObject);
-						}
-					}
-					count = m_listVideo.size();
-				}
+				count = getResultContent(firstResult, maxResults, content, m_listVideo);
 			if (objectID.equals("0/3"))
-				synchronized (m_listPhoto) {
-					int toIndex = (firstResult + maxResults) < (m_listPhoto.size() - 1) ? (int) (firstResult + maxResults)
-							: (m_listPhoto.size() - 1);
-					for (DIDLObject didlObject : m_listPhoto.subList((int) firstResult, toIndex)) {
-						if (didlObject != null) {
-							content.addItem((Item) didlObject);
-						}
-					}
-					count = m_listPhoto.size();
-				}
+				count = getResultContent(firstResult, maxResults, content, m_listPhoto);
 			DIDLParser parser = new DIDLParser();
 			br = new BrowseResult(parser.generate(content), count, count);
 		} catch (Exception e) {
@@ -253,4 +219,23 @@ public class LocalContentDirectoryService extends AbstractContentDirectoryServic
 		return br;
 	}
 
+	private int getResultContent(long firstResult, long maxResults, final DIDLContent content,
+			List<? extends DIDLObject> sourceList) {
+		int count;
+		synchronized (sourceList) {
+			int toIndex;
+			if (maxResults == 0)
+				toIndex = sourceList.size();
+			else
+				toIndex = (firstResult + maxResults) < (sourceList.size() - 1) ? (int) (firstResult + maxResults)
+						: (sourceList.size() - 1);
+			for (DIDLObject didlObject : sourceList.subList((int) firstResult, toIndex)) {
+				if (didlObject != null) {
+					content.addItem((Item) didlObject);
+				}
+			}
+			count = sourceList.size();
+		}
+		return count;
+	}
 }

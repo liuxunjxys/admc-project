@@ -54,7 +54,7 @@ public class HomeNetworkView extends LinearLayout {
 		m_isBrowsing = false;
 		m_inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		m_inflater.inflate(R.layout.cv_homenetwork, this);
-		m_listView = (ListView) findViewById(R.id.listView);
+		m_listView = (ListView) findViewById(R.id.lv_mediasource_browsing);
 		m_adapter = new HomeNetworkArrayAdapter(context, 0);
 		m_listView.setAdapter(m_adapter);
 		m_listView.setOnItemClickListener(m_itemClick);
@@ -363,6 +363,10 @@ public class HomeNetworkView extends LinearLayout {
 
 	public DMSProcessorListner getBrowseListener() {
 		return m_browseListener;
+	}
+
+	public void updateListView() {
+		m_adapter.notifyDataSetChanged();
 	}
 
 }

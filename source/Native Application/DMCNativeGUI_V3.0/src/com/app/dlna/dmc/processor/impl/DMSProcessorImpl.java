@@ -32,11 +32,14 @@ import com.app.dlna.dmc.processor.playlist.PlaylistItem.Type;
 public class DMSProcessorImpl implements DMSProcessor {
 
 	private static final String TAG = DMSProcessorImpl.class.getName();
+	private static final String ACTION_REMOVE = "Remove";
+	private static final String ACTION_ADD = "Add";
 	@SuppressWarnings("rawtypes")
 	private Device m_server;
 	private ControlPoint m_controlPoint;
 	private List<String> m_traceID;
 	private int m_currentPageIndex;
+	private String m_currentObjectId;
 	public static int ITEM_PER_PAGE = 25;
 	private List<DIDLObject> m_DIDLObjectList;
 
@@ -47,70 +50,12 @@ public class DMSProcessorImpl implements DMSProcessor {
 		m_traceID = new ArrayList<String>();
 		m_traceID.add("-1");
 		m_DIDLObjectList = new ArrayList<DIDLObject>();
+		m_currentObjectId = "-1";
 	}
-
-	// @SuppressWarnings({ "rawtypes", "unchecked" })
-	// public void browse(String objectID) {
-	// result = new HashMap<String, List<? extends DIDLObject>>();
-	// Service cds = m_server.findService(new ServiceType("schemas-upnp-org",
-	// "ContentDirectory"));
-	// if (cds != null) {
-	// Action action = cds.getAction("Browse");
-	// ActionInvocation actionInvocation = new ActionInvocation(action);
-	// actionInvocation.setInput("ObjectID", objectID);
-	// actionInvocation.setInput("BrowseFlag", "BrowseDirectChildren");
-	// actionInvocation.setInput("Filter", "*");
-	// actionInvocation.setInput("StartingIndex", new
-	// UnsignedIntegerFourBytes(0));
-	// actionInvocation.setInput("RequestedCount", new
-	// UnsignedIntegerFourBytes(999));
-	// actionInvocation.setInput("SortCriteria", null);
-	// ActionCallback actionCallback = new ActionCallback(actionInvocation) {
-	//
-	// @Override
-	// public void success(ActionInvocation invocation) {
-	// try {
-	// DIDLParser parser = new DIDLParser();
-	// DIDLContent content =
-	// parser.parse(invocation.getOutput("Result").toString());
-	// result.put("Containers", content.getContainers());
-	// result.put("Items", content.getItems());
-	// fireOnBrowseCompleteEvent();
-	// } catch (Exception e) {
-	// Log.e(TAG, e.getMessage());
-	// }
-	// }
-	//
-	// @Override
-	// public void failure(ActionInvocation invocation, UpnpResponse operation,
-	// String defaultMsg) {
-	// Log.e(TAG, defaultMsg);
-	// fireOnBrowseFailEvent(defaultMsg);
-	// }
-	// };
-	// m_controlPoint.execute(actionCallback);
-	// }
-	// }
 
 	public void dispose() {
 
 	}
-
-	// private void fireOnBrowseCompleteEvent() {
-	// synchronized (m_listeners) {
-	// for (DMSProcessorListner listener : m_listeners) {
-	// listener.onBrowseComplete(result);
-	// }
-	// }
-	// }
-	//
-	// private void fireOnBrowseFailEvent(String message) {
-	// synchronized (m_listeners) {
-	// for (DMSProcessorListner listener : m_listeners) {
-	// listener.onBrowseFail(message);
-	// }
-	// }
-	// }
 
 	@Override
 	public void browse(String objectID, int pageIndex, final DMSProcessorListner listener) {
@@ -121,6 +66,7 @@ public class DMSProcessorImpl implements DMSProcessor {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void executeBrowse(final String objectID, final int pageIndex, final DMSProcessorListner listener) {
+		m_currentObjectId = objectID;
 		Service cds = m_server.findService(new ServiceType("schemas-upnp-org", "ContentDirectory"));
 		if (cds != null) {
 			m_currentPageIndex = pageIndex;
@@ -211,58 +157,116 @@ public class DMSProcessorImpl implements DMSProcessor {
 	}
 
 	@Override
-	public void removeAllFromPlaylist(PlaylistProcessor playlistProcessor) {
-		if (playlistProcessor == null) {
-			Log.w(TAG, "Playlist processor = null");
-			return;
-		}
-		int count = m_DIDLObjectList.size();
-		for (int i = 0; i < count; ++i) {
-			DIDLObject object = m_DIDLObjectList.get(i);
-			if (object instanceof Item) {
-				PlaylistItem item = new PlaylistItem();
-				item.setTitle(object.getTitle());
-				item.setUrl(object.getResources().get(0).getValue());
-				if (object instanceof AudioItem) {
-					item.setType(Type.AUDIO);
-				} else if (object instanceof VideoItem) {
-					item.setType(Type.VIDEO);
-				} else {
-					item.setType(Type.IMAGE);
-				}
-				playlistProcessor.removeItem(item);
-			}
-		}
+	public void removeCurrentItemsFromPlaylist(PlaylistProcessor playlistProcessor,
+			DMSAddRemoveContainerListener actionListener) {
+		modifyCurrentItems(playlistProcessor, actionListener, ACTION_REMOVE);
 	}
 
 	@Override
-	public void addAllToPlaylist(PlaylistProcessor playlistProcessor) {
+	public void addCurrentItemsToPlaylist(PlaylistProcessor playlistProcessor,
+			DMSAddRemoveContainerListener actionListener) {
+		modifyCurrentItems(playlistProcessor, actionListener, ACTION_ADD);
+	}
+
+	private void modifyCurrentItems(PlaylistProcessor playlistProcessor, DMSAddRemoveContainerListener actionListener,
+			String actionType) {
+		actionListener.onActionStart();
 		if (playlistProcessor == null) {
 			Log.w(TAG, "Playlist processor = null");
+			actionListener.onActionFail(new RuntimeException("Playlist is null"));
 			return;
 		}
 		int count = m_DIDLObjectList.size();
 		for (int i = 0; i < count; ++i) {
-			DIDLObject object = m_DIDLObjectList.get(i);
-			if (object instanceof Item) {
-				PlaylistItem item = new PlaylistItem();
-				item.setTitle(object.getTitle());
-				item.setUrl(object.getResources().get(0).getValue());
-				if (object instanceof AudioItem) {
-					item.setType(Type.AUDIO);
-				} else if (object instanceof VideoItem) {
-					item.setType(Type.VIDEO);
-				} else {
-					item.setType(Type.IMAGE);
-				}
-				playlistProcessor.addItem(item);
-			}
+			addItemToPlaylist(playlistProcessor, actionType, m_DIDLObjectList.get(i));
 		}
+		actionListener.onActionComplete();
 	}
 
 	@Override
 	public List<DIDLObject> getAllObjects() {
 		return m_DIDLObjectList;
+	}
+
+	@Override
+	public void addAllToPlaylist(final PlaylistProcessor playlistProcessor,
+			final DMSAddRemoveContainerListener actionListener) {
+		modifyContainerItemsInPlaylist(playlistProcessor, actionListener, ACTION_ADD);
+	}
+
+	@Override
+	public void removeAllFromPlaylist(PlaylistProcessor playlistProcessor, DMSAddRemoveContainerListener actionListener) {
+		modifyContainerItemsInPlaylist(playlistProcessor, actionListener, ACTION_REMOVE);
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private void modifyContainerItemsInPlaylist(final PlaylistProcessor playlistProcessor,
+			final DMSAddRemoveContainerListener actionListener, final String actionType) {
+		actionListener.onActionStart();
+		Service cds = m_server.findService(new ServiceType("schemas-upnp-org", "ContentDirectory"));
+		if (cds != null) {
+			Action action = cds.getAction("Browse");
+			ActionInvocation actionInvocation = new ActionInvocation(action);
+			actionInvocation.setInput("ObjectID", m_currentObjectId);
+			actionInvocation.setInput("BrowseFlag", "BrowseDirectChildren");
+			actionInvocation.setInput("Filter", "*");
+			actionInvocation.setInput("StartingIndex", new UnsignedIntegerFourBytes(0));
+			actionInvocation.setInput("RequestedCount", new UnsignedIntegerFourBytes(0));
+			actionInvocation.setInput("SortCriteria", null);
+			ActionCallback actionCallback = new ActionCallback(actionInvocation) {
+
+				@Override
+				public void success(ActionInvocation invocation) {
+					try {
+						DIDLParser parser = new DIDLParser();
+						DIDLContent content = parser.parse(invocation.getOutput("Result").toString());
+						Log.i(TAG, "m_currentObjectId = " + m_currentObjectId + "Container = "
+								+ content.getContainers().size() + " Item = " + content.getItems().size());
+						List<Item> items = content.getItems();
+						if (playlistProcessor == null) {
+							actionListener.onActionFail(new RuntimeException("Playlist processor is null"));
+						} else {
+							int count = items.size();
+							for (int i = 0; i < count; ++i) {
+								DIDLObject object = items.get(i);
+								if (object instanceof Item) {
+									addItemToPlaylist(playlistProcessor, actionType, object);
+								}
+							}
+							actionListener.onActionComplete();
+						}
+
+					} catch (Exception e) {
+						e.printStackTrace();
+						actionListener.onActionFail(e);
+					}
+				}
+
+				@Override
+				public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
+					Log.e(TAG, defaultMsg);
+					actionListener.onActionFail(new RuntimeException(defaultMsg));
+				}
+			};
+			m_controlPoint.execute(actionCallback);
+		}
+	}
+
+	private void addItemToPlaylist(final PlaylistProcessor playlistProcessor, final String actionType, DIDLObject object) {
+		PlaylistItem item = new PlaylistItem();
+		item.setTitle(object.getTitle());
+		item.setUrl(object.getResources().get(0).getValue());
+		if (object instanceof AudioItem) {
+			item.setType(Type.AUDIO);
+		} else if (object instanceof VideoItem) {
+			item.setType(Type.VIDEO);
+		} else {
+			item.setType(Type.IMAGE);
+		}
+		if (actionType.equals(ACTION_ADD))
+			playlistProcessor.addItem(item);
+		else if (actionType.equals(ACTION_REMOVE))
+			playlistProcessor.removeItem(item);
 	}
 
 }

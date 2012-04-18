@@ -1,4 +1,4 @@
-package com.app.dlna.dmc.gui.customview.localnetwork;
+package com.app.dlna.dmc.gui.customview.playlist;
 
 import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.model.meta.LocalDevice;
@@ -15,12 +15,14 @@ import app.dlna.controller.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.customview.adapter.AdapterItem;
+import com.app.dlna.dmc.gui.customview.localnetwork.HomeNetworkArrayAdapter;
+import com.app.dlna.dmc.gui.customview.localnetwork.HomeNetworkView;
 import com.app.dlna.dmc.gui.subactivity.MediaSourceActivity;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor.DMSAddRemoveContainerListener;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 
-public class HomeNetworkToolbar extends LinearLayout {
+public class PlaylistToolbar extends LinearLayout {
 	private static final String ACTION_DESELECT_ALL = "Deselect All";
 	private static final String ACTION_SELECT_ALL = "Select All";
 	private static final String ACTION_SELECT_ALL_CONTAINER = "Select All Container";
@@ -30,7 +32,7 @@ public class HomeNetworkToolbar extends LinearLayout {
 	private ImageView m_btn_back;
 	private HomeNetworkArrayAdapter m_homeNetworkAdapter;
 
-	public HomeNetworkToolbar(Context context, AttributeSet attrs) {
+	public PlaylistToolbar(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
 				R.layout.cv_homenetwork_toolbar, this);
