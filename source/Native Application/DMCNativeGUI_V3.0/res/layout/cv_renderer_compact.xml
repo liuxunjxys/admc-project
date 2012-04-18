@@ -29,6 +29,9 @@
         android:layout_weight="2"
         android:clickable="true"
         android:src="@drawable/ic_btn_media_quickplay"
-        android:scaleType="centerInside" />
+        android:background="@drawable/bg_gridview_renderer_compact"
+        android:scaleType="centerInside" 
+        android:padding="1dp"
+        android:layout_margin="2dp"/>
 
 </LinearLayout>

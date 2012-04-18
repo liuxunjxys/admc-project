@@ -76,6 +76,7 @@ public class CoreUpnpService extends Service {
 	private ConnectivityManager m_connectivityManager;
 	private boolean m_isInitialized;
 	private NetworkStateReceiver m_networkReceiver;
+	private static final int MAX_ITEM = 1000;
 
 	@Override
 	public void onCreate() {
@@ -151,7 +152,7 @@ public class CoreUpnpService extends Service {
 			m_httpThread = new MainHttpProcessor();
 			m_httpThread.start();
 			// Create playlist with capacity = 100;
-			m_playlistProcessor = new PlaylistProcessorImpl(100);
+			m_playlistProcessor = new PlaylistProcessorImpl(MAX_ITEM);
 			LocalContentDirectoryService.scanMedia(CoreUpnpService.this);
 			showNotification();
 			startLocalDMS();

@@ -24,7 +24,6 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -88,8 +87,8 @@ public class HomeNetworkView extends LinearLayout {
 						&& !m_progressDlg.isShowing()
 						&& firstVisibleItem + visibleItemCount == totalItemCount
 						&& m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData() instanceof DIDLObject
-						&& ((DIDLObject) m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData()).getId()
-								.equals("-1")) {
+						&& ((DIDLObject) m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData()).getId().equals(
+								"-1")) {
 					doLoadMoreItems();
 				}
 			} catch (Exception ex) {
@@ -199,8 +198,8 @@ public class HomeNetworkView extends LinearLayout {
 		@Override
 		public void onBrowseComplete(final String objectID, final boolean haveNext, boolean havePrev,
 				final Map<String, List<? extends DIDLObject>> result) {
-			Log.i(TAG, "browse complete: object id = " + objectID + " haveNext = " + haveNext + "; havePrev ="
-					+ havePrev + "; result size = " + result.size());
+			Log.i(TAG, "browse complete: object id = " + objectID + " haveNext = " + haveNext + "; havePrev =" + havePrev
+					+ "; result size = " + result.size());
 			m_isRoot = objectID.equals("0");
 			MainActivity.INSTANCE.runOnUiThread(new Runnable() {
 
