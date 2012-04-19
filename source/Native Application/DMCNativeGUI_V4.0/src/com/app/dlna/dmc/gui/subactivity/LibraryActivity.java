@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import app.dlna.controller.v4.R;
 
@@ -28,67 +29,18 @@ public class LibraryActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		m_homeNetwork = new HomeNetworkView(this);
 		m_internet = new LinearLayout(this);
 		m_playlist = new PlaylistView(this);
-		setContentView(R.layout.library_activity);
+
+		setContentView(R.layout.activity_library);
 		m_pagerTitle = getResources().getStringArray(R.array.libray_pager_list);
 		m_rendererCompactView = (RendererCompactView) findViewById(R.id.cv_compact_dmr);
+
 		m_pager = (ViewPager) findViewById(R.id.viewPager);
-
-		m_pager.setOnPageChangeListener(new OnPageChangeListener() {
-
-			@Override
-			public void onPageSelected(int position) {
-			}
-
-			@Override
-			public void onPageScrolled(int arg0, float arg1, int arg2) {
-
-			}
-
-			@Override
-			public void onPageScrollStateChanged(int arg0) {
-
-			}
-		});
-		PagerAdapter adapter = new PagerAdapter() {
-			@Override
-			public void destroyItem(ViewGroup container, int position, Object view) {
-				((ViewPager) container).removeView((View) view);
-			}
-
-			@Override
-			public Object instantiateItem(ViewGroup container, int position) {
-				if (position == 0) {
-					((ViewPager) container).addView(m_homeNetwork);
-					return m_homeNetwork;
-				} else if (position == 1) {
-					((ViewPager) container).addView(m_playlist);
-					return m_playlist;
-				} else if (position == 2) {
-					((ViewPager) container).addView(m_internet);
-					return m_internet;
-				}
-				return null;
-			}
-
-			@Override
-			public boolean isViewFromObject(View view, Object key) {
-				return view == key;
-			}
-
-			@Override
-			public CharSequence getPageTitle(int position) {
-				return m_pagerTitle[position];
-			}
-
-			@Override
-			public int getCount() {
-				return m_pagerTitle.length;
-			}
-		};
-		m_pager.setAdapter(adapter);
+		m_pager.setOnPageChangeListener(m_onPageChangeListener);
+		m_pager.setAdapter(m_pagerAdapter);
 	}
 
 	@Override
@@ -108,7 +60,6 @@ public class LibraryActivity extends Activity {
 
 			@Override
 			public void onAnimationRepeat(Animation animation) {
-
 			}
 
 			@Override
@@ -130,7 +81,6 @@ public class LibraryActivity extends Activity {
 
 			@Override
 			public void onAnimationRepeat(Animation animation) {
-
 			}
 
 			@Override
@@ -146,6 +96,79 @@ public class LibraryActivity extends Activity {
 	}
 
 	public void onShowHideClick(View view) {
-
+		if (isCompactRendererShowing()) {
+			hideRendererCompactView();
+			((ImageView) view).setImageDrawable(getResources().getDrawable(R.drawable.ic_btn_navigate_up));
+		} else {
+			showRendererCompactView();
+			((ImageView) view).setImageDrawable(getResources().getDrawable(R.drawable.ic_btn_navigate_down));
+		}
 	}
+
+	private OnPageChangeListener m_onPageChangeListener = new OnPageChangeListener() {
+
+		@Override
+		public void onPageSelected(int position) {
+			switch (position) {
+			case 0:
+				m_homeNetwork.updateListView();
+				break;
+			case 1:
+				m_playlist.preparePlaylist();
+				break;
+			case 2:
+				break;
+
+			default:
+				break;
+			}
+		}
+
+		@Override
+		public void onPageScrolled(int arg0, float arg1, int arg2) {
+
+		}
+
+		@Override
+		public void onPageScrollStateChanged(int arg0) {
+
+		}
+	};
+
+	PagerAdapter m_pagerAdapter = new PagerAdapter() {
+		@Override
+		public void destroyItem(ViewGroup container, int position, Object view) {
+			((ViewPager) container).removeView((View) view);
+		}
+
+		@Override
+		public Object instantiateItem(ViewGroup container, int position) {
+			if (position == 0) {
+				((ViewPager) container).addView(m_homeNetwork);
+				return m_homeNetwork;
+			} else if (position == 1) {
+				((ViewPager) container).addView(m_playlist);
+				return m_playlist;
+			} else if (position == 2) {
+				((ViewPager) container).addView(m_internet);
+				return m_internet;
+			}
+			return null;
+		}
+
+		@Override
+		public boolean isViewFromObject(View view, Object key) {
+			return view == key;
+		}
+
+		@Override
+		public CharSequence getPageTitle(int position) {
+			return m_pagerTitle[position];
+		}
+
+		@Override
+		public int getCount() {
+			return m_pagerTitle.length;
+		}
+	};
 }

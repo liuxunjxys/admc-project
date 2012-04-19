@@ -43,6 +43,8 @@ public interface UpnpProcessor {
 	DMRProcessor getDMRProcessor();
 
 	DownloadProcessor getDownloadProcessor();
+	
+	void setPlaylistProcessor(PlaylistProcessor playlistProcessor);
 
 	public interface UpnpProcessorListener {
 
@@ -65,5 +67,7 @@ public interface UpnpProcessor {
 		void onRouterDisabledEvent();
 
 	}
+
+	
 
 }

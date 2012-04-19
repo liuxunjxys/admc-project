@@ -33,6 +33,8 @@ public interface DMRProcessor {
 
 	void setPlaylistProcessor(PlaylistProcessor playlistProcessor);
 
+	void setSeftAutoNext(boolean autoNext);
+
 	public interface DMRProcessorListner {
 		void onUpdatePosition(long current, long max);
 

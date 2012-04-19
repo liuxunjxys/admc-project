@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
+import android.widget.Toast;
 
+import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
@@ -47,7 +49,12 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 		mediaIntent.setDataAndType(Uri.parse(uri), mimeType);
 		mediaIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		m_context.startActivity(mediaIntent);
+		try {
+			m_context.startActivity(mediaIntent);
+		} catch (Exception ex) {
+			Toast.makeText(MainActivity.INSTANCE, "System cannot found program to handle this item", Toast.LENGTH_SHORT)
+					.show();
+		}
 	}
 
 	@Override
@@ -109,6 +116,12 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 	public void setURIandPlay(PlaylistItem item, boolean proxyMode) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void setSeftAutoNext(boolean autoNext) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

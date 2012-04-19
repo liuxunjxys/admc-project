@@ -8,9 +8,7 @@ import org.teleal.cling.model.meta.LocalDevice;
 import org.teleal.cling.model.types.UDN;
 import org.teleal.cling.support.model.DIDLObject;
 import org.teleal.cling.support.model.container.Container;
-import org.teleal.cling.support.model.item.AudioItem;
 import org.teleal.cling.support.model.item.Item;
-import org.teleal.cling.support.model.item.VideoItem;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -31,21 +29,22 @@ import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.customview.adapter.AdapterItem;
+import com.app.dlna.dmc.gui.customview.adapter.CustomArrayAdapter;
+import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
+import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor.DMSProcessorListner;
 import com.app.dlna.dmc.processor.interfaces.UpnpProcessor.UpnpProcessorListener;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
-import com.app.dlna.dmc.processor.playlist.PlaylistItem.Type;
 
 public class HomeNetworkView extends LinearLayout {
 	private static final String TAG = HomeNetworkView.class.getName();
 	private ListView m_listView;
 	private LayoutInflater m_inflater;
-	private HomeNetworkArrayAdapter m_adapter;
+	private CustomArrayAdapter m_adapter;
 	private ProgressDialog m_progressDlg;
 	private boolean m_loadMore;
 	private boolean m_isRoot;
 	private boolean m_isBrowsing;
-
 	private HomeNetworkToolbar m_toolbar;
 
 	@SuppressWarnings("rawtypes")
@@ -55,7 +54,7 @@ public class HomeNetworkView extends LinearLayout {
 		m_inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		m_inflater.inflate(R.layout.cv_homenetwork, this);
 		m_listView = (ListView) findViewById(R.id.lv_mediasource_browsing);
-		m_adapter = new HomeNetworkArrayAdapter(context, 0);
+		m_adapter = new CustomArrayAdapter(context, 0);
 		m_listView.setAdapter(m_adapter);
 		m_listView.setOnItemClickListener(m_itemClick);
 		m_listView.setOnScrollListener(m_scrollListener);
@@ -87,8 +86,8 @@ public class HomeNetworkView extends LinearLayout {
 						&& !m_progressDlg.isShowing()
 						&& firstVisibleItem + visibleItemCount == totalItemCount
 						&& m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData() instanceof DIDLObject
-						&& ((DIDLObject) m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData()).getId().equals(
-								"-1")) {
+						&& ((DIDLObject) m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData()).getId()
+								.equals("-1")) {
 					doLoadMoreItems();
 				}
 			} catch (Exception ex) {
@@ -122,7 +121,7 @@ public class HomeNetworkView extends LinearLayout {
 						// load more items
 						doLoadMoreItems();
 					} else {
-						addToPlaylist(object);
+						addToPlaylistAndPlay(object);
 					}
 				}
 			}
@@ -143,31 +142,32 @@ public class HomeNetworkView extends LinearLayout {
 		MainActivity.UPNP_PROCESSOR.getDMSProcessor().browse(id, pageIndex, m_browseListener);
 	}
 
-	private void addToPlaylist(DIDLObject object) {
-		if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor() == null) {
+	private void addToPlaylistAndPlay(DIDLObject object) {
+		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
+		if (playlistProcessor == null) {
 			Toast.makeText(MainActivity.INSTANCE, "Cannot get playlist processor", Toast.LENGTH_SHORT).show();
 			return;
 		}
-		PlaylistItem item = new PlaylistItem();
-		item.setTitle(object.getTitle());
-		item.setUrl(object.getResources().get(0).getValue());
-		if (object instanceof AudioItem) {
-			item.setType(Type.AUDIO);
-		} else if (object instanceof VideoItem) {
-			item.setType(Type.VIDEO);
-		} else {
-			item.setType(Type.IMAGE);
+		DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
+		if (dmrProcessor == null) {
+			Toast.makeText(getContext(), "Cannot connect to Renderer", Toast.LENGTH_SHORT).show();
+			return;
 		}
-		if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().addItem(item)) {
-			m_adapter.notifyDataSetChanged();
+		PlaylistItem added = playlistProcessor.addDIDLObject(object);
+		if (added != null) {
+			m_adapter.notifyVisibleItemChanged(m_listView);
+			Toast.makeText(getContext(), "Added item to playlist", Toast.LENGTH_SHORT).show();
+			playlistProcessor.setCurrentItem(added);
+			dmrProcessor.setURIandPlay(playlistProcessor.getCurrentItem().getUri());
 		} else {
-			if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().isFull()) {
-				Toast.makeText(MainActivity.INSTANCE, "Current playlist is full", Toast.LENGTH_SHORT).show();
+			if (playlistProcessor.isFull()) {
+				Toast.makeText(getContext(), "Current playlist is full", Toast.LENGTH_SHORT).show();
+				dmrProcessor.setURIandPlay(object.getResources().get(0).getValue());
 			} else {
-				MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().removeItem(item);
-				m_adapter.notifyDataSetChanged();
+				Toast.makeText(getContext(), "An error occurs, try again later", Toast.LENGTH_SHORT).show();
 			}
 		}
+
 	}
 
 	private DMSProcessorListner m_browseListener = new DMSProcessorListner() {
@@ -198,8 +198,8 @@ public class HomeNetworkView extends LinearLayout {
 		@Override
 		public void onBrowseComplete(final String objectID, final boolean haveNext, boolean havePrev,
 				final Map<String, List<? extends DIDLObject>> result) {
-			Log.i(TAG, "browse complete: object id = " + objectID + " haveNext = " + haveNext + "; havePrev =" + havePrev
-					+ "; result size = " + result.size());
+			Log.i(TAG, "browse complete: object id = " + objectID + " haveNext = " + haveNext + "; havePrev ="
+					+ havePrev + "; result size = " + result.size());
 			m_isRoot = objectID.equals("0");
 			MainActivity.INSTANCE.runOnUiThread(new Runnable() {
 
@@ -228,7 +228,7 @@ public class HomeNetworkView extends LinearLayout {
 						m_progressDlg.dismiss();
 						if (!m_loadMore)
 							m_listView.smoothScrollToPosition(0);
-						m_adapter.notifyDataSetChanged();
+						m_adapter.notifyVisibleItemChanged(m_listView);
 					}
 				}
 			});
@@ -345,7 +345,7 @@ public class HomeNetworkView extends LinearLayout {
 		return m_isBrowsing;
 	}
 
-	public HomeNetworkArrayAdapter getListAdapter() {
+	public CustomArrayAdapter getListAdapter() {
 		return m_adapter;
 	}
 
@@ -366,7 +366,11 @@ public class HomeNetworkView extends LinearLayout {
 	}
 
 	public void updateListView() {
-		m_adapter.notifyDataSetChanged();
+		m_adapter.notifyVisibleItemChanged(m_listView);
+	}
+
+	public ListView getListView() {
+		return m_listView;
 	}
 
 }

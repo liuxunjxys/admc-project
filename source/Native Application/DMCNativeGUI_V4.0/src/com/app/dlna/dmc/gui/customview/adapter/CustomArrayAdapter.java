@@ -1,4 +1,4 @@
-package com.app.dlna.dmc.gui.customview.localnetwork;
+package com.app.dlna.dmc.gui.customview.adapter;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -24,37 +24,39 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
-import com.app.dlna.dmc.gui.customview.adapter.AdapterItem;
+import com.app.dlna.dmc.processor.cache.Cache;
+import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
+import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 import com.app.dlna.dmc.utility.Utility;
 
-public class HomeNetworkArrayAdapter extends ArrayAdapter<AdapterItem> {
+public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 	public static final int IMAGE_MAX_SIZE = 48;
-	protected static final String TAG = HomeNetworkArrayAdapter.class.getName();
+	private static final String TAG = CustomArrayAdapter.class.getName();
 	private LayoutInflater m_inflater = null;
 	private Map<String, Bitmap> m_cacheDMSIcon;
-	private Map<String, Bitmap> m_cacheImageItem;
 	private boolean m_cancelPreparing;
 
-	public HomeNetworkArrayAdapter(Context context, int textViewResourceId) {
+	public CustomArrayAdapter(Context context, int textViewResourceId) {
 		super(context, textViewResourceId);
 		m_inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		m_cacheDMSIcon = new HashMap<String, Bitmap>();
-		m_cacheImageItem = new HashMap<String, Bitmap>();
 	}
 
 	@SuppressWarnings("rawtypes")
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		if (convertView == null || convertView instanceof ProgressBar) {
-			convertView = m_inflater.inflate(R.layout.lvitem_localnetwork, null, false);
+			convertView = m_inflater.inflate(R.layout.lvitem_generic_item, null, false);
 		}
 		if (convertView.getTag() == null) {
 			setViewHolder(convertView);
@@ -62,6 +64,7 @@ public class HomeNetworkArrayAdapter extends ArrayAdapter<AdapterItem> {
 		final AdapterItem object = getItem(position);
 
 		final ViewHolder holder = (ViewHolder) convertView.getTag();
+		holder.action.setTag(new Integer(position));
 		if (object.getData() instanceof Device)
 			initDeviceItem((Device) object.getData(), holder);
 		else if (object.getData() instanceof DIDLObject) {
@@ -71,14 +74,25 @@ public class HomeNetworkArrayAdapter extends ArrayAdapter<AdapterItem> {
 			} else {
 				initDIDLObject(didlObject, holder);
 			}
+		} else if (object.getData() instanceof PlaylistItem) {
+			initPlaylistItem((PlaylistItem) object.getData(), holder, position);
+		} else if (object.getData() instanceof PlaylistProcessor) {
+			initPlaylistProcessorItem((PlaylistProcessor) object.getData(), holder, position);
 		}
 
 		return convertView;
 	}
 
+	private void initPlaylistProcessorItem(PlaylistProcessor data, ViewHolder holder, int position) {
+		holder.action.setVisibility(View.GONE);
+		holder.name.setText(data.getPlaylistName());
+		holder.desc.setText("");
+		holder.icon.setImageResource(R.drawable.ic_playlist);
+	}
+
 	@SuppressWarnings("rawtypes")
 	private void initDeviceItem(final Device device, final ViewHolder holder) {
-		holder.checked.setVisibility(View.GONE);
+		holder.action.setVisibility(View.GONE);
 		if (device instanceof LocalDevice)
 			holder.name.setText("Local Device");
 		else
@@ -129,7 +143,7 @@ public class HomeNetworkArrayAdapter extends ArrayAdapter<AdapterItem> {
 
 						@Override
 						public void run() {
-							HomeNetworkArrayAdapter.this.notifyDataSetChanged();
+							CustomArrayAdapter.this.notifyDataSetChanged();
 						}
 					});
 
@@ -152,13 +166,13 @@ public class HomeNetworkArrayAdapter extends ArrayAdapter<AdapterItem> {
 		if (object.getId().equals("-1")) {
 			holder.icon.setVisibility(View.GONE);
 			holder.desc.setText("");
-			holder.checked.setVisibility(View.GONE);
+			holder.action.setVisibility(View.GONE);
 			return;
 		}
 		holder.icon.setVisibility(View.VISIBLE);
 		if (object instanceof Container) {
 			holder.icon.setImageResource(R.drawable.ic_didlobject_container);
-			holder.checked.setVisibility(View.GONE);
+			holder.action.setVisibility(View.GONE);
 			int childCount = ((Container) object).getChildCount() != null ? ((Container) object).getChildCount() : 1;
 			String childCountStr = "";
 			if (childCount == 0)
@@ -174,7 +188,8 @@ public class HomeNetworkArrayAdapter extends ArrayAdapter<AdapterItem> {
 			} else if (object instanceof VideoItem) {
 				holder.icon.setImageResource(R.drawable.ic_didlobject_video);
 			} else if (object instanceof ImageItem) {
-				Utility.loadImageItemThumbnail(holder.icon, object.getResources().get(0).getValue(), m_cacheImageItem);
+				Utility.loadImageItemThumbnail(holder.icon, object.getResources().get(0).getValue(),
+						Cache.getBitmapCache());
 			} else {
 				holder.icon.setImageResource(R.drawable.ic_didlobject_unknow);
 			}
@@ -183,17 +198,39 @@ public class HomeNetworkArrayAdapter extends ArrayAdapter<AdapterItem> {
 					holder.desc.setText(Utility.convertSizeToString(object.getResources().get(0).getSize()));
 			}
 			if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor() != null)
-				if (object instanceof Item)
+				if (object instanceof Item) {
+					holder.action.setVisibility(View.VISIBLE);
 					if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().containsUrl(
 							object.getResources().get(0).getValue())) {
-						holder.checked.setVisibility(View.VISIBLE);
+						holder.action.setImageDrawable(getContext().getResources()
+								.getDrawable(R.drawable.ic_btn_remove));
 					} else {
-						holder.checked.setVisibility(View.GONE);
+						holder.action.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_add));
 					}
-				else {
-					holder.checked.setVisibility(View.GONE);
+				} else {
+					holder.action.setVisibility(View.GONE);
 				}
 		}
+	}
+
+	private void initPlaylistItem(PlaylistItem object, ViewHolder holder, int position) {
+		holder.name.setText(object.getTitle());
+		switch (object.getType()) {
+		case AUDIO:
+			holder.icon.setImageResource(R.drawable.ic_didlobject_audio);
+			break;
+		case VIDEO:
+			holder.icon.setImageResource(R.drawable.ic_didlobject_video);
+			break;
+		case IMAGE:
+			Utility.loadImageItemThumbnail(holder.icon, object.getUri(), Cache.getBitmapCache());
+			break;
+		default:
+			holder.icon.setImageResource(R.drawable.ic_didlobject_unknow);
+			break;
+		}
+		holder.action.setVisibility(View.VISIBLE);
+		holder.action.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_remove));
 	}
 
 	public void setViewHolder(View view) {
@@ -201,7 +238,8 @@ public class HomeNetworkArrayAdapter extends ArrayAdapter<AdapterItem> {
 		viewHolder.name = (TextView) view.findViewById(R.id.name);
 		viewHolder.desc = (TextView) view.findViewById(R.id.desc);
 		viewHolder.icon = (ImageView) view.findViewById(R.id.icon);
-		viewHolder.checked = (ImageView) view.findViewById(R.id.checked);
+		viewHolder.action = (ImageView) view.findViewById(R.id.action);
+		viewHolder.action.setOnClickListener(m_actionClick);
 		view.setTag(viewHolder);
 	}
 
@@ -209,15 +247,12 @@ public class HomeNetworkArrayAdapter extends ArrayAdapter<AdapterItem> {
 		TextView desc;
 		TextView name;
 		ImageView icon;
-		ImageView checked;
+		ImageView action;
 	}
 
 	@Override
 	public void clear() {
 		super.clear();
-		synchronized (m_cacheImageItem) {
-			m_cacheImageItem.clear();
-		}
 	}
 
 	public void prepareImageItemCache(final List<? extends DIDLObject> objects) {
@@ -234,10 +269,10 @@ public class HomeNetworkArrayAdapter extends ArrayAdapter<AdapterItem> {
 					}
 
 					if (didlObject instanceof ImageItem) {
-						synchronized (m_cacheImageItem) {
+						synchronized (Cache.getBitmapCache()) {
 							String imageUrl = didlObject.getResources().get(0).getValue();
 							try {
-								m_cacheImageItem.put(imageUrl, Utility.getBitmapFromURL(imageUrl));
+								Cache.getBitmapCache().put(imageUrl, Utility.getBitmapFromURL(imageUrl));
 							} catch (MalformedURLException e) {
 								e.printStackTrace();
 							} catch (IOException e) {
@@ -252,5 +287,72 @@ public class HomeNetworkArrayAdapter extends ArrayAdapter<AdapterItem> {
 
 	public void cancelPrepareImageCache() {
 		m_cancelPreparing = true;
+	}
+
+	private OnClickListener m_actionClick = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			if (v.getTag() == null)
+				return;
+			int position = (Integer) v.getTag();
+			Object item = getItem(position).getData();
+			if (item instanceof PlaylistItem) {
+				MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().removeItem((PlaylistItem) item);
+				remove(getItem(position));
+			} else if (item instanceof DIDLObject) {
+				final DIDLObject object = (DIDLObject) item;
+				if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor() != null)
+					if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().containsUrl(
+							object.getResources().get(0).getValue())) {
+						if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().removeDIDLObject(object) != null)
+							updateSingleView(v, position);
+					} else {
+						if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().addDIDLObject(object) != null)
+							updateSingleView(v, position);
+					}
+			}
+
+		}
+	};
+
+	public void updateSingleView(View v, int position) {
+		if (v.getParent().getParent().getParent() instanceof ListView) {
+			ListView list = (ListView) v.getParent().getParent().getParent();
+			int start = list.getFirstVisiblePosition();
+			int end = list.getLastVisiblePosition();
+			for (int i = start, j = end; i <= j; i++)
+				if (position == i) {
+					View view = list.getChildAt(i - start);
+					list.getAdapter().getView(i, view, list);
+					break;
+				}
+		}
+	}
+
+	public void updateSingleView(ListView list, int position) {
+		int start = list.getFirstVisiblePosition();
+		int end = list.getLastVisiblePosition();
+		for (int i = start, j = end; i <= j; i++)
+			if (position == i) {
+				View view = list.getChildAt(i - start);
+				list.getAdapter().getView(i, view, list);
+				break;
+			}
+	}
+
+	@Override
+	public void notifyDataSetChanged() {
+		super.notifyDataSetChanged();
+	}
+
+	public void notifyVisibleItemChanged(ListView list) {
+		int start = list.getFirstVisiblePosition() < getCount() ? list.getFirstVisiblePosition() : getCount() - 1;
+		int end = list.getLastVisiblePosition() < getCount() ? list.getLastVisiblePosition() : getCount() - 1;
+		for (int i = start, j = end; i <= j; i++) {
+			View view = list.getChildAt(i - start);
+			if (0 <= i && i < getCount())
+				list.getAdapter().getView(i, view, list);
+		}
 	}
 }

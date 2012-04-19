@@ -18,16 +18,12 @@ import org.teleal.cling.support.contentdirectory.DIDLParser;
 import org.teleal.cling.support.model.DIDLContent;
 import org.teleal.cling.support.model.DIDLObject;
 import org.teleal.cling.support.model.container.Container;
-import org.teleal.cling.support.model.item.AudioItem;
 import org.teleal.cling.support.model.item.Item;
-import org.teleal.cling.support.model.item.VideoItem;
 
 import android.util.Log;
 
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
-import com.app.dlna.dmc.processor.playlist.PlaylistItem;
-import com.app.dlna.dmc.processor.playlist.PlaylistItem.Type;
 
 public class DMSProcessorImpl implements DMSProcessor {
 
@@ -253,20 +249,10 @@ public class DMSProcessorImpl implements DMSProcessor {
 	}
 
 	private void addItemToPlaylist(final PlaylistProcessor playlistProcessor, final String actionType, DIDLObject object) {
-		PlaylistItem item = new PlaylistItem();
-		item.setTitle(object.getTitle());
-		item.setUrl(object.getResources().get(0).getValue());
-		if (object instanceof AudioItem) {
-			item.setType(Type.AUDIO);
-		} else if (object instanceof VideoItem) {
-			item.setType(Type.VIDEO);
-		} else {
-			item.setType(Type.IMAGE);
-		}
 		if (actionType.equals(ACTION_ADD))
-			playlistProcessor.addItem(item);
+			playlistProcessor.addDIDLObject(object);
 		else if (actionType.equals(ACTION_REMOVE))
-			playlistProcessor.removeItem(item);
+			playlistProcessor.removeDIDLObject(object);
 	}
 
 }
