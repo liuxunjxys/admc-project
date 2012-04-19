@@ -9,15 +9,26 @@
         android:layout_width="fill_parent"
         android:layout_height="72dp"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true" 
-        android:visibility="gone">
+        android:layout_alignParentLeft="true" >
     </com.app.dlna.dmc.gui.customview.renderer.RendererCompactView>
+
+    <ImageView
+        android:id="@+id/btn_toggleShowHide"
+        android:layout_width="fill_parent"
+        android:layout_height="32dp"
+        android:layout_above="@+id/cv_compact_dmr"
+        android:layout_alignParentLeft="true"
+        android:onClick="onShowHideClick"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_btn_navigate_up" 
+        android:layout_alignParentBottom="true"/>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewPager"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_above="@id/cv_compact_dmr"
+        android:layout_above="@+id/btn_toggleShowHide"
+        android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true" >
 
         <android.support.v4.view.PagerTitleStrip

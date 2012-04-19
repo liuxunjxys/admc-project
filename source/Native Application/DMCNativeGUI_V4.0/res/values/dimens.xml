@@ -18,4 +18,5 @@
     <dimen name="actionbar_compat_height">48dp</dimen>
     <dimen name="actionbar_compat_button_width">36dp</dimen>
     <dimen name="actionbar_compat_button_home_width">40dp</dimen>
+    <dimen name="tabwidget_height">36dp</dimen>
 </resources>

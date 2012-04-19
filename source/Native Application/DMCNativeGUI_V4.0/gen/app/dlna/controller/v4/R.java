@@ -5,12 +5,15 @@
  * should not be modified by hand.
  */
 
-package app.dlna.controller;
+package app.dlna.controller.v4;
 
 public final class R {
     public static final class anim {
         public static final int compactrenderer_slidein=0x7f040000;
         public static final int compactrenderer_slideout=0x7f040001;
+    }
+    public static final class array {
+        public static final int libray_pager_list=0x7f090000;
     }
     public static final class attr {
         /** <p>Must be a reference to another resource, in the form "<code>@[+][<i>package</i>:]<i>type</i>:<i>name</i></code>"
@@ -39,20 +42,23 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int maskDrawable=0x7f010004;
     }
     public static final class color {
+        public static final int actionbar_bacground_color=0x7f050001;
         public static final int actionbar_title_color=0x7f050000;
-        public static final int blue=0x7f050001;
-        public static final int blue_transparent=0x7f050003;
-        public static final int blue_transparent_less=0x7f050002;
-        public static final int blue_transparent_more=0x7f050004;
-        public static final int orange=0x7f050005;
-        public static final int pager_tiltle_stip=0x7f050008;
-        public static final int tab_background_normal=0x7f050006;
-        public static final int tab_background_selected=0x7f050007;
+        public static final int blue=0x7f050002;
+        public static final int blue_transparent=0x7f050004;
+        public static final int blue_transparent_less=0x7f050003;
+        public static final int blue_transparent_more=0x7f050005;
+        public static final int orange=0x7f050006;
+        public static final int pager_tiltle_stip=0x7f050009;
+        public static final int tab_background_gray=0x7f05000a;
+        public static final int tab_background_normal=0x7f050007;
+        public static final int tab_background_selected=0x7f050008;
     }
     public static final class dimen {
         public static final int actionbar_compat_button_home_width=0x7f060002;
         public static final int actionbar_compat_button_width=0x7f060001;
         public static final int actionbar_compat_height=0x7f060000;
+        public static final int tabwidget_height=0x7f060003;
     }
     public static final class drawable {
         public static final int actionbar_compat_item=0x7f020000;
@@ -125,36 +131,34 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int ic_tab_playlist=0x7f020043;
     }
     public static final class id {
-        public static final int action=0x7f070018;
+        public static final int action=0x7f07001a;
         public static final int actionbar_compat=0x7f070000;
         public static final int actionbar_compat_item_refresh=0x7f070003;
         public static final int actionbar_compat_item_refresh_progress=0x7f070002;
         public static final int actionbar_compat_title=0x7f070001;
         public static final int botToolbar=0x7f070005;
         public static final int btn_back=0x7f070007;
-        public static final int btn_containerDeselectAll=0x7f07000b;
-        public static final int btn_containerSelectAll=0x7f07000a;
-        public static final int btn_deselectAll=0x7f070009;
-        public static final int btn_quickPlayPause=0x7f07000f;
-        public static final int btn_selectAll=0x7f070008;
-        public static final int btn_showhide=0x7f07000c;
-        public static final int checked=0x7f070017;
-        public static final int contentName=0x7f070012;
-        public static final int cv_compact_dmr=0x7f070019;
-        public static final int desc=0x7f070016;
-        public static final int downloadProgress=0x7f070011;
-        public static final int download_icon=0x7f070010;
-        public static final int downloaded=0x7f070013;
-        public static final int gridView_renderer=0x7f07000e;
-        public static final int icon=0x7f070014;
-        public static final int listView=0x7f07000d;
+        public static final int btn_containerDeselectAll=0x7f070009;
+        public static final int btn_containerSelectAll=0x7f070008;
+        public static final int btn_quickPlayPause=0x7f07000d;
+        public static final int btn_showhide=0x7f07000a;
+        public static final int btn_toggleShowHide=0x7f070015;
+        public static final int checked=0x7f070019;
+        public static final int contentName=0x7f070010;
+        public static final int cv_compact_dmr=0x7f070014;
+        public static final int desc=0x7f070018;
+        public static final int downloadProgress=0x7f07000f;
+        public static final int download_icon=0x7f07000e;
+        public static final int downloaded=0x7f070011;
+        public static final int gridView_renderer=0x7f07000c;
+        public static final int icon=0x7f070012;
         public static final int lv_mediasource_browsing=0x7f070006;
+        public static final int lv_playlist=0x7f07000b;
         public static final int menu_refresh=0x7f070004;
-        public static final int menu_settings=0x7f07001d;
-        public static final int name=0x7f070015;
-        public static final int playlist_AllItem=0x7f07001c;
-        public static final int viewPager=0x7f07001a;
-        public static final int viewPagerStrip=0x7f07001b;
+        public static final int menu_settings=0x7f07001b;
+        public static final int name=0x7f070013;
+        public static final int viewPager=0x7f070016;
+        public static final int viewPagerStrip=0x7f070017;
     }
     public static final class layout {
         public static final int actionbar_compat=0x7f030000;
@@ -166,15 +170,14 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int cv_tabwidget=0x7f030006;
         public static final int download_notification=0x7f030007;
         public static final int gvitem_renderer_compact=0x7f030008;
-        public static final int lvitem_loadmoreitem=0x7f030009;
-        public static final int lvitem_localnetwork=0x7f03000a;
-        public static final int lvitem_playlist_item=0x7f03000b;
-        public static final int main_activity=0x7f03000c;
-        public static final int mediasource_activity=0x7f03000d;
-        public static final int playlist_activity=0x7f03000e;
+        public static final int library_activity=0x7f030009;
+        public static final int lvitem_loadmoreitem=0x7f03000a;
+        public static final int lvitem_localnetwork=0x7f03000b;
+        public static final int lvitem_playlist_item=0x7f03000c;
+        public static final int main_activity=0x7f03000d;
     }
     public static final class menu {
-        public static final int main=0x7f0a0000;
+        public static final int main=0x7f0b0000;
     }
     public static final class string {
         public static final int app_name=0x7f080000;
@@ -184,23 +187,22 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int change_dmr=0x7f080015;
         public static final int contentName=0x7f08001d;
         public static final int deselect_all=0x7f08001a;
-        public static final int deselectall=0x7f080026;
+        public static final int deselectall=0x7f080025;
         public static final int dmr_list=0x7f080018;
         public static final int dms_list=0x7f080017;
         public static final int enter_keyword_here=0x7f08001b;
         public static final int enter_video_link_=0x7f08000e;
+        public static final int library=0x7f080021;
         public static final int media_renderer=0x7f080014;
         public static final int media_server=0x7f080013;
-        public static final int media_source=0x7f080021;
         public static final int menu_refresh=0x7f08001e;
         public static final int menu_settings=0x7f08001f;
         public static final int music=0x7f080007;
-        public static final int now_playing=0x7f080023;
-        public static final int pause=0x7f080025;
+        public static final int now_playing=0x7f080022;
+        public static final int pause=0x7f080024;
         public static final int photo=0x7f080009;
-        public static final int play=0x7f080024;
+        public static final int play=0x7f080023;
         public static final int play_to_httpserver_port=0x7f08000c;
-        public static final int playlist=0x7f080022;
         public static final int proxy_enable_text=0x7f080010;
         public static final int refresh=0x7f080002;
         public static final int select_all=0x7f080019;
@@ -218,17 +220,17 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int youtube_proxy_port=0x7f08000b;
     }
     public static final class style {
-        public static final int  ContentTypeButtonStyle=0x7f090002;
-        public static final int ActionBarCompat=0x7f090004;
-        public static final int ActionBarCompatHomeItem=0x7f09000a;
-        public static final int ActionBarCompatItem=0x7f090009;
-        public static final int ActionBarCompatItemBase=0x7f090005;
-        public static final int ActionBarCompatProgressIndicator=0x7f090006;
-        public static final int ActionBarCompatTitle=0x7f090008;
-        public static final int ActionBarCompatTitleBase=0x7f090007;
-        public static final int AppTheme=0x7f090003;
-        public static final int MediaControlButton=0x7f090001;
-        public static final int styleName=0x7f090000;
+        public static final int  ContentTypeButtonStyle=0x7f0a0002;
+        public static final int ActionBarCompat=0x7f0a0004;
+        public static final int ActionBarCompatHomeItem=0x7f0a000a;
+        public static final int ActionBarCompatItem=0x7f0a0009;
+        public static final int ActionBarCompatItemBase=0x7f0a0005;
+        public static final int ActionBarCompatProgressIndicator=0x7f0a0006;
+        public static final int ActionBarCompatTitle=0x7f0a0008;
+        public static final int ActionBarCompatTitleBase=0x7f0a0007;
+        public static final int AppTheme=0x7f0a0003;
+        public static final int MediaControlButton=0x7f0a0001;
+        public static final int styleName=0x7f0a0000;
     }
     public static final class styleable {
         /** Attributes that can be used with a AppTheme.
@@ -237,10 +239,10 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
            <colgroup align="left" />
            <colgroup align="left" />
            <tr><th>Attribute</th><th>Description</th></tr>
-           <tr><td><code>{@link #AppTheme_actionbarCompatItemHomeStyle app.dlna.controller:actionbarCompatItemHomeStyle}</code></td><td></td></tr>
-           <tr><td><code>{@link #AppTheme_actionbarCompatItemStyle app.dlna.controller:actionbarCompatItemStyle}</code></td><td></td></tr>
-           <tr><td><code>{@link #AppTheme_actionbarCompatProgressIndicatorStyle app.dlna.controller:actionbarCompatProgressIndicatorStyle}</code></td><td></td></tr>
-           <tr><td><code>{@link #AppTheme_actionbarCompatTitleStyle app.dlna.controller:actionbarCompatTitleStyle}</code></td><td></td></tr>
+           <tr><td><code>{@link #AppTheme_actionbarCompatItemHomeStyle app.dlna.controller.v4:actionbarCompatItemHomeStyle}</code></td><td></td></tr>
+           <tr><td><code>{@link #AppTheme_actionbarCompatItemStyle app.dlna.controller.v4:actionbarCompatItemStyle}</code></td><td></td></tr>
+           <tr><td><code>{@link #AppTheme_actionbarCompatProgressIndicatorStyle app.dlna.controller.v4:actionbarCompatProgressIndicatorStyle}</code></td><td></td></tr>
+           <tr><td><code>{@link #AppTheme_actionbarCompatTitleStyle app.dlna.controller.v4:actionbarCompatTitleStyle}</code></td><td></td></tr>
            </table>
            @see #AppTheme_actionbarCompatItemHomeStyle
            @see #AppTheme_actionbarCompatItemStyle
@@ -251,7 +253,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
             0x7f010000, 0x7f010001, 0x7f010002, 0x7f010003
         };
         /**
-          <p>This symbol is the offset where the {@link app.dlna.controller.R.attr#actionbarCompatItemHomeStyle}
+          <p>This symbol is the offset where the {@link app.dlna.controller.v4.R.attr#actionbarCompatItemHomeStyle}
           attribute's value can be found in the {@link #AppTheme} array.
 
 
@@ -261,7 +263,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         */
         public static final int AppTheme_actionbarCompatItemHomeStyle = 2;
         /**
-          <p>This symbol is the offset where the {@link app.dlna.controller.R.attr#actionbarCompatItemStyle}
+          <p>This symbol is the offset where the {@link app.dlna.controller.v4.R.attr#actionbarCompatItemStyle}
           attribute's value can be found in the {@link #AppTheme} array.
 
 
@@ -271,7 +273,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         */
         public static final int AppTheme_actionbarCompatItemStyle = 1;
         /**
-          <p>This symbol is the offset where the {@link app.dlna.controller.R.attr#actionbarCompatProgressIndicatorStyle}
+          <p>This symbol is the offset where the {@link app.dlna.controller.v4.R.attr#actionbarCompatProgressIndicatorStyle}
           attribute's value can be found in the {@link #AppTheme} array.
 
 
@@ -281,7 +283,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         */
         public static final int AppTheme_actionbarCompatProgressIndicatorStyle = 3;
         /**
-          <p>This symbol is the offset where the {@link app.dlna.controller.R.attr#actionbarCompatTitleStyle}
+          <p>This symbol is the offset where the {@link app.dlna.controller.v4.R.attr#actionbarCompatTitleStyle}
           attribute's value can be found in the {@link #AppTheme} array.
 
 
@@ -296,8 +298,8 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
            <colgroup align="left" />
            <colgroup align="left" />
            <tr><th>Attribute</th><th>Description</th></tr>
-           <tr><td><code>{@link #BezelImageView_borderDrawable app.dlna.controller:borderDrawable}</code></td><td></td></tr>
-           <tr><td><code>{@link #BezelImageView_maskDrawable app.dlna.controller:maskDrawable}</code></td><td></td></tr>
+           <tr><td><code>{@link #BezelImageView_borderDrawable app.dlna.controller.v4:borderDrawable}</code></td><td></td></tr>
+           <tr><td><code>{@link #BezelImageView_maskDrawable app.dlna.controller.v4:maskDrawable}</code></td><td></td></tr>
            </table>
            @see #BezelImageView_borderDrawable
            @see #BezelImageView_maskDrawable
@@ -306,7 +308,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
             0x7f010004, 0x7f010005
         };
         /**
-          <p>This symbol is the offset where the {@link app.dlna.controller.R.attr#borderDrawable}
+          <p>This symbol is the offset where the {@link app.dlna.controller.v4.R.attr#borderDrawable}
           attribute's value can be found in the {@link #BezelImageView} array.
 
 
@@ -316,7 +318,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         */
         public static final int BezelImageView_borderDrawable = 1;
         /**
-          <p>This symbol is the offset where the {@link app.dlna.controller.R.attr#maskDrawable}
+          <p>This symbol is the offset where the {@link app.dlna.controller.v4.R.attr#maskDrawable}
           attribute's value can be found in the {@link #BezelImageView} array.
 
 

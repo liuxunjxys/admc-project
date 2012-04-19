@@ -9,9 +9,9 @@
     </item>
     <item android:bottom="2dp">
         <shape android:shape="rectangle" >
-            <stroke android:color="@color/tab_background_normal" />
+            <stroke android:color="@color/actionbar_bacground_color" />
 
-            <solid android:color="@color/tab_background_normal" />
+            <solid android:color="@color/actionbar_bacground_color" />
         </shape>
     </item>
 

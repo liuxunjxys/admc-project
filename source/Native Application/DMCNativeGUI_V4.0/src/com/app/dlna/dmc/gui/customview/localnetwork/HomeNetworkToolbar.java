@@ -15,7 +15,7 @@ import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.customview.adapter.AdapterItem;
-import com.app.dlna.dmc.gui.subactivity.MediaSourceActivity;
+import com.app.dlna.dmc.gui.subactivity.LibraryActivity;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor.DMSAddRemoveContainerListener;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
@@ -23,8 +23,6 @@ import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 public class HomeNetworkToolbar extends LinearLayout {
 	private static final String ACTION_DESELECT_ALL = "Deselect All";
 	private static final String ACTION_SELECT_ALL = "Select All";
-	private static final String ACTION_SELECT_ALL_CONTAINER = "Select All Container";
-	private static final String ACTION_DESELECT_ALL_CONTAINER = "Deselect All Container";
 
 	private HomeNetworkView m_localNetworkView;
 	private ImageView m_btn_back;
@@ -32,15 +30,15 @@ public class HomeNetworkToolbar extends LinearLayout {
 
 	public HomeNetworkToolbar(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
-				R.layout.cv_homenetwork_toolbar, this);
+		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.cv_homenetwork_toolbar,
+				this);
 		m_btn_back = ((ImageView) findViewById(R.id.btn_back));
 		m_btn_back.setOnClickListener(onBackClick);
 		m_btn_back.setOnLongClickListener(onBackLongclick);
 		m_btn_back.setEnabled(false);
 
-		((ImageView) findViewById(R.id.btn_containerSelectAll)).setOnClickListener(onContainerSeselectAll);
-		((ImageView) findViewById(R.id.btn_containerDeselectAll)).setOnClickListener(onContainerDeselectAll);
+		((ImageView) findViewById(R.id.btn_containerSelectAll)).setOnClickListener(onSelectAll);
+		((ImageView) findViewById(R.id.btn_containerDeselectAll)).setOnClickListener(onDeselectAll);
 		((ImageView) findViewById(R.id.btn_showhide)).setOnClickListener(onShowHideClick);
 	}
 
@@ -104,19 +102,17 @@ public class HomeNetworkToolbar extends LinearLayout {
 		final PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
 		if (playlistProcessor == null) {
 			Toast.makeText(MainActivity.INSTANCE, "Cannot process playlist", Toast.LENGTH_SHORT).show();
+			return;
 		}
 		final DMSProcessor dmsProcessor = MainActivity.UPNP_PROCESSOR.getDMSProcessor();
 		if (dmsProcessor == null) {
 			Toast.makeText(MainActivity.INSTANCE, "Cannot contact to dms server", Toast.LENGTH_SHORT).show();
+			return;
 		}
 
 		if (type.equals(ACTION_SELECT_ALL)) {
-			dmsProcessor.addCurrentItemsToPlaylist(playlistProcessor, m_playlistModifyListener);
-		} else if (type.equals(ACTION_DESELECT_ALL)) {
-			dmsProcessor.removeCurrentItemsFromPlaylist(playlistProcessor, m_playlistModifyListener);
-		} else if (type.equals(ACTION_SELECT_ALL_CONTAINER)) {
 			dmsProcessor.addAllToPlaylist(playlistProcessor, m_playlistModifyListener);
-		} else if (type.equals(ACTION_DESELECT_ALL_CONTAINER)) {
+		} else if (type.equals(ACTION_DESELECT_ALL)) {
 			dmsProcessor.removeAllFromPlaylist(playlistProcessor, m_playlistModifyListener);
 		}
 
@@ -131,8 +127,7 @@ public class HomeNetworkToolbar extends LinearLayout {
 
 				@Override
 				public void run() {
-					m_progreProgressDialog = ProgressDialog
-							.show(getContext(), "Processing", "Waiting to add all items");
+					m_progreProgressDialog = ProgressDialog.show(getContext(), "Processing", "Waiting to add all items");
 					m_progreProgressDialog.setCancelable(false);
 				}
 			});
@@ -168,34 +163,33 @@ public class HomeNetworkToolbar extends LinearLayout {
 		}
 	};
 
-	private OnClickListener onContainerSeselectAll = new OnClickListener() {
+	private OnClickListener onSelectAll = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
-			modifyPlaylist(ACTION_SELECT_ALL_CONTAINER);
+			modifyPlaylist(ACTION_SELECT_ALL);
 		}
 	};
-	private OnClickListener onContainerDeselectAll = new OnClickListener() {
+	private OnClickListener onDeselectAll = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
-			modifyPlaylist(ACTION_DESELECT_ALL_CONTAINER);
+			modifyPlaylist(ACTION_DESELECT_ALL);
 		}
 	};
+
 	private OnClickListener onShowHideClick = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
-			if (v.getContext() instanceof MediaSourceActivity) {
-				MediaSourceActivity activity = (MediaSourceActivity) v.getContext();
+			if (v.getContext() instanceof LibraryActivity) {
+				LibraryActivity activity = (LibraryActivity) v.getContext();
 				if (activity.isCompactRendererShowing()) {
 					activity.hideRendererCompactView();
-					((ImageView) v).setImageDrawable(getContext().getResources().getDrawable(
-							R.drawable.ic_btn_navigate_up));
+					((ImageView) v).setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_navigate_up));
 				} else {
 					activity.showRendererCompactView();
-					((ImageView) v).setImageDrawable(getContext().getResources().getDrawable(
-							R.drawable.ic_btn_navigate_down));
+					((ImageView) v).setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_navigate_down));
 				}
 			}
 		}
