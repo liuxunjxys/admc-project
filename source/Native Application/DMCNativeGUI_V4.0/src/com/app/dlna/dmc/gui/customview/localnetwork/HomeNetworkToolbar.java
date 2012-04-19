@@ -15,7 +15,7 @@ import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.customview.adapter.AdapterItem;
-import com.app.dlna.dmc.gui.subactivity.LibraryActivity;
+import com.app.dlna.dmc.gui.customview.adapter.CustomArrayAdapter;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor.DMSAddRemoveContainerListener;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
@@ -24,14 +24,14 @@ public class HomeNetworkToolbar extends LinearLayout {
 	private static final String ACTION_DESELECT_ALL = "Deselect All";
 	private static final String ACTION_SELECT_ALL = "Select All";
 
-	private HomeNetworkView m_localNetworkView;
+	private HomeNetworkView m_homeNetworkView;
 	private ImageView m_btn_back;
-	private HomeNetworkArrayAdapter m_homeNetworkAdapter;
+	private CustomArrayAdapter m_homeNetworkAdapter;
 
 	public HomeNetworkToolbar(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.cv_homenetwork_toolbar,
-				this);
+		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
+				R.layout.cv_toolbar_homenetwork, this);
 		m_btn_back = ((ImageView) findViewById(R.id.btn_back));
 		m_btn_back.setOnClickListener(onBackClick);
 		m_btn_back.setOnLongClickListener(onBackLongclick);
@@ -39,19 +39,18 @@ public class HomeNetworkToolbar extends LinearLayout {
 
 		((ImageView) findViewById(R.id.btn_containerSelectAll)).setOnClickListener(onSelectAll);
 		((ImageView) findViewById(R.id.btn_containerDeselectAll)).setOnClickListener(onDeselectAll);
-		((ImageView) findViewById(R.id.btn_showhide)).setOnClickListener(onShowHideClick);
 	}
 
 	public void setLocalNetworkView(HomeNetworkView localNetworkView) {
-		m_localNetworkView = localNetworkView;
+		m_homeNetworkView = localNetworkView;
 		m_homeNetworkAdapter = localNetworkView.getListAdapter();
 	}
 
 	private OnClickListener onBackClick = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			if (m_localNetworkView.isBrowsing()) {
-				if (m_localNetworkView.isRoot()) {
+			if (m_homeNetworkView.isBrowsing()) {
+				if (m_homeNetworkView.isRoot()) {
 					// return to device list
 					backToDeviceList();
 				} else {
@@ -79,18 +78,18 @@ public class HomeNetworkToolbar extends LinearLayout {
 			else
 				m_homeNetworkAdapter.add(new AdapterItem(dms));
 		}
-		m_localNetworkView.setBrowsing(false);
+		m_homeNetworkView.setBrowsing(false);
 		m_homeNetworkAdapter.cancelPrepareImageCache();
 		m_btn_back.setEnabled(false);
 	}
 
 	private void upOneLevel() {
-		if (m_localNetworkView.isRoot())
+		if (m_homeNetworkView.isRoot())
 			Toast.makeText(getContext(), "You are in root of this data source", Toast.LENGTH_SHORT).show();
 		else if (MainActivity.UPNP_PROCESSOR.getDMSProcessor() != null) {
-			m_localNetworkView.getProgressDlg().show();
-			m_localNetworkView.setLoadMore(false);
-			MainActivity.UPNP_PROCESSOR.getDMSProcessor().back(m_localNetworkView.getBrowseListener());
+			m_homeNetworkView.getProgressDlg().show();
+			m_homeNetworkView.setLoadMore(false);
+			MainActivity.UPNP_PROCESSOR.getDMSProcessor().back(m_homeNetworkView.getBrowseListener());
 		}
 	}
 
@@ -127,7 +126,8 @@ public class HomeNetworkToolbar extends LinearLayout {
 
 				@Override
 				public void run() {
-					m_progreProgressDialog = ProgressDialog.show(getContext(), "Processing", "Waiting to add all items");
+					m_progreProgressDialog = ProgressDialog
+							.show(getContext(), "Processing", "Waiting to add all items");
 					m_progreProgressDialog.setCancelable(false);
 				}
 			});
@@ -142,7 +142,7 @@ public class HomeNetworkToolbar extends LinearLayout {
 				public void run() {
 					m_progreProgressDialog.dismiss();
 					Toast.makeText(getContext(), "Error occur: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
-					m_homeNetworkAdapter.notifyDataSetChanged();
+					m_homeNetworkAdapter.notifyVisibleItemChanged(m_homeNetworkView.getListView());
 				}
 			});
 
@@ -156,7 +156,7 @@ public class HomeNetworkToolbar extends LinearLayout {
 				public void run() {
 					m_progreProgressDialog.dismiss();
 					Toast.makeText(getContext(), "Add all items complete", Toast.LENGTH_SHORT).show();
-					m_homeNetworkAdapter.notifyDataSetChanged();
+					m_homeNetworkAdapter.notifyVisibleItemChanged(m_homeNetworkView.getListView());
 				}
 			});
 
@@ -175,23 +175,6 @@ public class HomeNetworkToolbar extends LinearLayout {
 		@Override
 		public void onClick(View v) {
 			modifyPlaylist(ACTION_DESELECT_ALL);
-		}
-	};
-
-	private OnClickListener onShowHideClick = new OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-			if (v.getContext() instanceof LibraryActivity) {
-				LibraryActivity activity = (LibraryActivity) v.getContext();
-				if (activity.isCompactRendererShowing()) {
-					activity.hideRendererCompactView();
-					((ImageView) v).setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_navigate_up));
-				} else {
-					activity.showRendererCompactView();
-					((ImageView) v).setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_navigate_down));
-				}
-			}
 		}
 	};
 }

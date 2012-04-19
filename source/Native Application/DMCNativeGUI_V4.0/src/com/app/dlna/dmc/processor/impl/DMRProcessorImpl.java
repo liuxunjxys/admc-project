@@ -57,6 +57,8 @@ public class DMRProcessorImpl implements DMRProcessor {
 	private boolean m_checkGetTransportInfo = false;
 	private boolean m_checkGetVolumeInfo = false;
 	private boolean m_user_stop = false;
+	private boolean m_seftAutoNext = true;
+	private int m_autoNextPending = 0;
 
 	private Thread m_updateThread = new Thread(new Runnable() {
 
@@ -82,7 +84,8 @@ public class DMRProcessorImpl implements DMRProcessor {
 						public void received(ActionInvocation invocation, PositionInfo positionInfo) {
 							Log.v(TAG, positionInfo.toString());
 							Log.v(TAG, "Track uri = " + positionInfo.getTrackURI());
-							fireUpdatePositionEvent(positionInfo.getTrackElapsedSeconds(), positionInfo.getTrackDurationSeconds());
+							fireUpdatePositionEvent(positionInfo.getTrackElapsedSeconds(),
+									positionInfo.getTrackDurationSeconds());
 
 							// if ((positionInfo.getTrack().getValue() == 0 ||
 							// positionInfo.getElapsedPercent() == 100)
@@ -326,7 +329,8 @@ public class DMRProcessorImpl implements DMRProcessor {
 									m_controlPoint.execute(new Play(m_avtransportService) {
 
 										@Override
-										public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
+										public void failure(ActionInvocation invocation, UpnpResponse operation,
+												String defaultMsg) {
 											Log.e(TAG, "Call fail");
 											fireOnFailEvent(invocation.getAction(), operation, defaultMsg);
 											m_isBusy = false;
@@ -340,7 +344,8 @@ public class DMRProcessorImpl implements DMRProcessor {
 								}
 
 								@Override
-								public void failure(ActionInvocation invocation, UpnpResponse response, String defaultMsg) {
+								public void failure(ActionInvocation invocation, UpnpResponse response,
+										String defaultMsg) {
 									fireOnFailEvent(invocation.getAction(), response, defaultMsg);
 									m_isBusy = false;
 								}
@@ -507,20 +512,29 @@ public class DMRProcessorImpl implements DMRProcessor {
 	}
 
 	private void fireOnEndTrackEvent() {
+		Log.i(TAG, "fireOnEndTrackEvent");
 		if (m_isBusy)
 			return;
 		synchronized (m_listeners) {
-			if (m_listeners.size() > 0)
+			if (m_listeners.size() > 0) {
+				Log.i(TAG, "fire auto next with ");
 				for (DMRProcessorListner listener : m_listeners) {
 					listener.onEndTrack();
 				}
-			else {
-				if (m_playlistProcessor != null) {
-					m_playlistProcessor.next();
-					final PlaylistItem item = m_playlistProcessor.getCurrentItem();
-					if (item != null) {
-						setURIandPlay(item.getUri());
+			}
+			if (m_seftAutoNext) {
+				Log.i(TAG, "seft next");
+				if (m_autoNextPending == 0) {
+					if (m_playlistProcessor != null) {
+						m_playlistProcessor.next();
+						final PlaylistItem item = m_playlistProcessor.getCurrentItem();
+						if (item != null) {
+							setURIandPlay(item.getUri());
+						}
 					}
+					m_autoNextPending = 7;
+				} else {
+					--m_autoNextPending;
 				}
 			}
 		}
@@ -606,8 +620,12 @@ public class DMRProcessorImpl implements DMRProcessor {
 
 	@Override
 	public void setURIandPlay(PlaylistItem item, boolean proxyMode) {
-		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void setSeftAutoNext(boolean autoNext) {
+		m_seftAutoNext = autoNext;
 	}
 
 }

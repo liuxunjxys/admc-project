@@ -333,4 +333,9 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener, CoreU
 		return m_downloadProcessor;
 	}
 
+	@Override
+	public void setPlaylistProcessor(PlaylistProcessor playlistProcessor) {
+		m_upnpService.setPlaylistProcessor(playlistProcessor);
+	}
+
 }

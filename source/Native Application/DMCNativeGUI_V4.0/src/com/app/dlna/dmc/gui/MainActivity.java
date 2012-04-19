@@ -46,7 +46,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		Log.i(TAG, "MainActivity onCreate");
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main_activity);
+		setContentView(R.layout.activity_main);
 		m_tabHost = getTabHost();
 		m_tabHost.setup();
 

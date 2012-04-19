@@ -9,7 +9,6 @@ import android.widget.LinearLayout;
 import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.customview.localnetwork.HomeNetworkView;
-import com.app.dlna.dmc.gui.subactivity.LibraryActivity;
 
 public class PlaylistToolbar extends LinearLayout {
 
@@ -18,11 +17,10 @@ public class PlaylistToolbar extends LinearLayout {
 
 	public PlaylistToolbar(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.cv_playlist_toolbar, this);
+		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
+				R.layout.cv_toolbar_playlist, this);
 		m_btn_back = ((ImageView) findViewById(R.id.btn_back));
-		m_btn_back.setEnabled(false);
-
-		((ImageView) findViewById(R.id.btn_showhide)).setOnClickListener(onShowHideClick);
+		m_btn_back.setOnClickListener(m_backClick);
 	}
 
 	public void setLocalNetworkView(HomeNetworkView localNetworkView) {
@@ -32,25 +30,24 @@ public class PlaylistToolbar extends LinearLayout {
 		m_btn_back.setEnabled(enabled);
 	}
 
-	private OnClickListener onShowHideClick = new OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-			if (v.getContext() instanceof LibraryActivity) {
-				LibraryActivity activity = (LibraryActivity) v.getContext();
-				if (activity.isCompactRendererShowing()) {
-					activity.hideRendererCompactView();
-					((ImageView) v).setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_navigate_up));
-				} else {
-					activity.showRendererCompactView();
-					((ImageView) v).setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_navigate_down));
-				}
-			}
-		}
-	};
-
 	public void setPlaylistView(PlaylistView playlistView) {
 		m_playlistView = playlistView;
 	}
-	
+
+	public void enableBack() {
+		m_btn_back.setEnabled(true);
+	}
+
+	public void disableBack() {
+		m_btn_back.setEnabled(false);
+	}
+
+	private OnClickListener m_backClick = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			m_playlistView.backToListPlaylist();
+		}
+	};
+
 }

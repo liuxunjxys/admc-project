@@ -15,11 +15,11 @@ import org.apache.commons.io.IOUtils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 import android.widget.ImageView;
+import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
-import com.app.dlna.dmc.gui.customview.localnetwork.HomeNetworkArrayAdapter;
+import com.app.dlna.dmc.gui.customview.adapter.CustomArrayAdapter;
 import com.app.dlna.dmc.processor.http.HTTPServerData;
 
 public class Utility {
@@ -95,7 +95,6 @@ public class Utility {
 								try {
 									synchronized (m_cacheImageItem) {
 										image.setImageBitmap(m_cacheImageItem.get(imageUrl));
-										Log.i(TAG, "Cache hit");
 									}
 								} catch (Exception ex) {
 									ex.printStackTrace();
@@ -121,8 +120,10 @@ public class Utility {
 					}
 
 				} catch (MalformedURLException e) {
+					image.setImageResource(R.drawable.ic_didlobject_image);
 					e.printStackTrace();
 				} catch (IOException e) {
+					image.setImageResource(R.drawable.ic_didlobject_image);
 					e.printStackTrace();
 				}
 			}
@@ -135,10 +136,10 @@ public class Utility {
 		byte[] buffer = IOUtils.toByteArray((InputStream) new URL(imageUrl).getContent());
 		BitmapFactory.decodeByteArray(buffer, 0, buffer.length, o);
 		int scale = 1;
-		if (o.outHeight > HomeNetworkArrayAdapter.IMAGE_MAX_SIZE || o.outWidth > HomeNetworkArrayAdapter.IMAGE_MAX_SIZE) {
+		if (o.outHeight > CustomArrayAdapter.IMAGE_MAX_SIZE || o.outWidth > CustomArrayAdapter.IMAGE_MAX_SIZE) {
 			scale = (int) Math.pow(
 					2,
-					(int) Math.round(Math.log(HomeNetworkArrayAdapter.IMAGE_MAX_SIZE
+					(int) Math.round(Math.log(CustomArrayAdapter.IMAGE_MAX_SIZE
 							/ (double) Math.max(o.outHeight, o.outWidth))
 							/ Math.log(0.5)));
 		}

@@ -2,6 +2,8 @@ package com.app.dlna.dmc.processor.interfaces;
 
 import java.util.List;
 
+import org.teleal.cling.support.model.DIDLObject;
+
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 
 public interface PlaylistProcessor {
@@ -11,12 +13,16 @@ public interface PlaylistProcessor {
 
 	PlaylistItem getCurrentItem();
 
-	boolean addItem(PlaylistItem item);
+	PlaylistItem addItem(PlaylistItem item);
 
-	boolean removeItem(PlaylistItem item);
+	PlaylistItem addDIDLObject(DIDLObject object);
+
+	PlaylistItem removeItem(PlaylistItem item);
+
+	PlaylistItem removeDIDLObject(DIDLObject object);
 
 	boolean containsUrl(String url);
-	
+
 	int getMaxSize();
 
 	boolean isFull();
@@ -26,4 +32,6 @@ public interface PlaylistProcessor {
 	int setCurrentItem(int idx);
 
 	int setCurrentItem(PlaylistItem item);
+	
+	String getPlaylistName();
 }

@@ -3,23 +3,32 @@ package com.app.dlna.dmc.processor.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.util.Log;
+import org.teleal.cling.support.model.DIDLObject;
+import org.teleal.cling.support.model.item.AudioItem;
+import org.teleal.cling.support.model.item.VideoItem;
 
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
+import com.app.dlna.dmc.processor.playlist.PlaylistItem.Type;
 
 public class PlaylistProcessorImpl implements PlaylistProcessor {
-	private static final String TAG = PlaylistProcessorImpl.class.getName();
 	private List<PlaylistItem> m_playlistItems;
 	private int m_currentItemIdx;
-	private int m_maxSize = 100;
+	private int m_maxSize;
 	private List<String> m_listURI;
+	private String m_playlistName;
 
-	public PlaylistProcessorImpl(int maxSize) {
+	public PlaylistProcessorImpl(String name, int maxSize) {
 		m_playlistItems = new ArrayList<PlaylistItem>();
 		m_currentItemIdx = -1;
 		m_maxSize = maxSize;
 		m_listURI = new ArrayList<String>();
+		m_playlistName = name;
+	}
+
+	@Override
+	public String getPlaylistName() {
+		return m_playlistName;
 	}
 
 	@Override
@@ -81,30 +90,28 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 	}
 
 	@Override
-	public boolean addItem(PlaylistItem item) {
+	public PlaylistItem addItem(PlaylistItem item) {
 		synchronized (m_playlistItems) {
 			if (m_playlistItems.contains(item) || m_playlistItems.size() >= m_maxSize)
-				return false;
+				return null;
 			m_playlistItems.add(item);
 			m_listURI.add(item.getUri());
-			Log.i(TAG, "Added Item, playlist size: " + m_playlistItems.size());
 			if (m_playlistItems.size() == 1) {
 				m_currentItemIdx = 0;
 			}
-			return true;
+			return item;
 		}
 	}
 
 	@Override
-	public boolean removeItem(PlaylistItem item) {
+	public PlaylistItem removeItem(PlaylistItem item) {
 		synchronized (m_playlistItems) {
 			if (m_playlistItems.contains(item)) {
 				m_playlistItems.remove(item);
 				m_listURI.remove(item.getUri());
-				Log.i(TAG, "Removed Item, playlist size: " + m_playlistItems.size());
-				return true;
+				return item;
 			}
-			return false;
+			return null;
 		}
 	}
 
@@ -118,4 +125,27 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 		return m_listURI.contains(url);
 	}
 
+	@Override
+	public PlaylistItem addDIDLObject(DIDLObject object) {
+		return addItem(createPlaylistItem(object));
+	}
+
+	@Override
+	public PlaylistItem removeDIDLObject(DIDLObject object) {
+		return removeItem(createPlaylistItem(object));
+	}
+
+	private PlaylistItem createPlaylistItem(DIDLObject object) {
+		PlaylistItem item = new PlaylistItem();
+		item.setTitle(object.getTitle());
+		item.setUrl(object.getResources().get(0).getValue());
+		if (object instanceof AudioItem) {
+			item.setType(Type.AUDIO);
+		} else if (object instanceof VideoItem) {
+			item.setType(Type.VIDEO);
+		} else {
+			item.setType(Type.IMAGE);
+		}
+		return item;
+	}
 }
