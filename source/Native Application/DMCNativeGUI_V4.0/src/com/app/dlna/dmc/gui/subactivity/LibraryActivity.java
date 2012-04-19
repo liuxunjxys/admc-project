@@ -14,20 +14,25 @@ import android.widget.LinearLayout;
 import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.customview.localnetwork.HomeNetworkView;
+import com.app.dlna.dmc.gui.customview.playlist.PlaylistView;
 import com.app.dlna.dmc.gui.customview.renderer.RendererCompactView;
 
-public class MediaSourceActivity extends Activity {
+public class LibraryActivity extends Activity {
 	private ViewPager m_pager;
 	private HomeNetworkView m_homeNetwork;
 	private View m_internet;
+	private PlaylistView m_playlist;
 	private RendererCompactView m_rendererCompactView;
+	private String[] m_pagerTitle;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		m_homeNetwork = new HomeNetworkView(this);
 		m_internet = new LinearLayout(this);
-		setContentView(R.layout.mediasource_activity);
+		m_playlist = new PlaylistView(this);
+		setContentView(R.layout.library_activity);
+		m_pagerTitle = getResources().getStringArray(R.array.libray_pager_list);
 		m_rendererCompactView = (RendererCompactView) findViewById(R.id.cv_compact_dmr);
 		m_pager = (ViewPager) findViewById(R.id.viewPager);
 
@@ -59,6 +64,9 @@ public class MediaSourceActivity extends Activity {
 					((ViewPager) container).addView(m_homeNetwork);
 					return m_homeNetwork;
 				} else if (position == 1) {
+					((ViewPager) container).addView(m_playlist);
+					return m_playlist;
+				} else if (position == 2) {
 					((ViewPager) container).addView(m_internet);
 					return m_internet;
 				}
@@ -72,12 +80,12 @@ public class MediaSourceActivity extends Activity {
 
 			@Override
 			public CharSequence getPageTitle(int position) {
-				return new String[] { "Home Network", "Internet" }[position];
+				return m_pagerTitle[position];
 			}
 
 			@Override
 			public int getCount() {
-				return 2;
+				return m_pagerTitle.length;
 			}
 		};
 		m_pager.setAdapter(adapter);
@@ -90,7 +98,7 @@ public class MediaSourceActivity extends Activity {
 	}
 
 	public void showRendererCompactView() {
-		Animation animation = AnimationUtils.loadAnimation(MediaSourceActivity.this, R.anim.compactrenderer_slidein);
+		Animation animation = AnimationUtils.loadAnimation(LibraryActivity.this, R.anim.compactrenderer_slidein);
 		animation.setAnimationListener(new AnimationListener() {
 
 			@Override
@@ -112,7 +120,7 @@ public class MediaSourceActivity extends Activity {
 	}
 
 	public void hideRendererCompactView() {
-		Animation animation = AnimationUtils.loadAnimation(MediaSourceActivity.this, R.anim.compactrenderer_slideout);
+		Animation animation = AnimationUtils.loadAnimation(LibraryActivity.this, R.anim.compactrenderer_slideout);
 		animation.setAnimationListener(new AnimationListener() {
 
 			@Override
@@ -135,5 +143,9 @@ public class MediaSourceActivity extends Activity {
 
 	public boolean isCompactRendererShowing() {
 		return m_rendererCompactView.getVisibility() == View.VISIBLE;
+	}
+
+	public void onShowHideClick(View view) {
+
 	}
 }

@@ -1,27 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <item android:top="32dp">
+    <item android:top="28dp">
         <shape android:shape="rectangle" >
             <stroke android:color="@color/blue" />
 
             <solid android:color="@color/blue" />
         </shape>
     </item>
-    <item android:bottom="6dp">
+    <item android:bottom="4dp">
         <shape android:shape="rectangle" >
             <stroke android:color="@color/tab_background_selected" />
 
             <solid android:color="@color/tab_background_selected" />
-        </shape>
-    </item>
-    <item>
-        <shape android:shape="rectangle" >
-            <gradient
-                android:endColor="#00000000"
-                android:gradientRadius="70"
-                android:startColor="@color/blue_transparent_less"
-                android:type="radial" />
         </shape>
     </item>
 

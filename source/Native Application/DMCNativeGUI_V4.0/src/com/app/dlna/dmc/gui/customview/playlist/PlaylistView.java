@@ -13,25 +13,29 @@ import app.dlna.controller.v4.R;
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 
-public class PlaylistAllItemView extends LinearLayout {
+public class PlaylistView extends LinearLayout {
 
 	private ListView m_listView;
-	private PlaylistItemArrayAdapter m_adapter;
+	private PlaylistItemArrayAdapter m_playlistItemAdapter;
+	private PlaylistToolbar m_playlistToolbar;
 
-	public PlaylistAllItemView(Context context, AttributeSet attrs) {
-		super(context, attrs);
+	public PlaylistView(Context context) {
+		super(context);
 		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.cv_playlist_allitem, this);
-		m_listView = (ListView) findViewById(R.id.listView);
-		m_adapter = new PlaylistItemArrayAdapter(getContext(), 0);
-		m_listView.setAdapter(m_adapter);
+		m_listView = (ListView) findViewById(R.id.lv_playlist);
+		m_playlistItemAdapter = new PlaylistItemArrayAdapter(getContext(), 0);
+		m_listView.setAdapter(m_playlistItemAdapter);
 		preparePlaylist();
 		m_listView.setOnItemClickListener(m_playlistItemClick);
+		
+		m_playlistToolbar = (PlaylistToolbar) findViewById(R.id.botToolbar);
+		m_playlistToolbar.setPlaylistView(this);
 	}
 
 	public void preparePlaylist() {
-		m_adapter.clear();
+		m_playlistItemAdapter.clear();
 		for (PlaylistItem item : MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getAllItems()) {
-			m_adapter.add(item);
+			m_playlistItemAdapter.add(item);
 		}
 	}
 

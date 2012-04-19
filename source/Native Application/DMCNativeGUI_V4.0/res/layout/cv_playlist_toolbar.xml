@@ -4,9 +4,17 @@
     android:layout_height="match_parent"
     android:layout_margin="2dp"
     android:background="@drawable/bg_homenetwork_toolbar"
-    android:weightSum="6" 
-    android:gravity="center">
+    android:gravity="center"
+    android:weightSum="2" >
 
+    <ImageView
+        android:id="@+id/btn_back"
+        android:layout_width="0dp"
+        android:layout_height="32dp"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_btn_back" />
 
     <ImageView
         android:id="@+id/btn_showhide"

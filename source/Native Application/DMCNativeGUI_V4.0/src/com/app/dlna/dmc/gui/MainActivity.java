@@ -24,9 +24,8 @@ import android.widget.Toast;
 import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerTabActivity;
-import com.app.dlna.dmc.gui.subactivity.MediaSourceActivity;
+import com.app.dlna.dmc.gui.subactivity.LibraryActivity;
 import com.app.dlna.dmc.gui.subactivity.NowPlayingActivity;
-import com.app.dlna.dmc.gui.subactivity.PlaylistActivity;
 import com.app.dlna.dmc.processor.impl.UpnpProcessorImpl;
 import com.app.dlna.dmc.processor.interfaces.UpnpProcessor;
 import com.app.dlna.dmc.processor.localdevice.service.LocalContentDirectoryService;
@@ -50,7 +49,6 @@ public class MainActivity extends UpnpListenerTabActivity {
 		setContentView(R.layout.main_activity);
 		m_tabHost = getTabHost();
 		m_tabHost.setup();
-
 
 		UPNP_PROCESSOR = new UpnpProcessorImpl(MainActivity.this);
 		UPNP_PROCESSOR.bindUpnpService();
@@ -98,41 +96,23 @@ public class MainActivity extends UpnpListenerTabActivity {
 	private void createTabs() {
 		Intent intent = null;
 
-		// TabSpec mediaSource = m_tabHost.newTabSpec("Devices");
-		// mediaSource.setIndicator("",
-		// getResources().getDrawable(R.drawable.ic_tab_mediasource));
-		// intent = new Intent(this, MediaSourceActivity.class);
-		// mediaSource.setContent(intent);
-		//
-		// TabSpec playlist = m_tabHost.newTabSpec("Library");
-		// playlist.setIndicator("",
-		// getResources().getDrawable(R.drawable.ic_tab_playlist));
-		// intent = new Intent(this, PlaylistActivity.class);
-		// playlist.setContent(intent);
-		//
-		// TabSpec nowPlayling = m_tabHost.newTabSpec("Youtube");
-		// nowPlayling.setIndicator("",
-		// getResources().getDrawable(R.drawable.ic_tab_nowplaying));
-		// intent = new Intent(this, NowPlayingActivity.class);
-		// nowPlayling.setContent(intent);
-
 		LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-		TabSpec mediaSource = m_tabHost.newTabSpec(getString(R.string.library));
+		TabSpec library = m_tabHost.newTabSpec(getString(R.string.library));
 		TextView tvMediaSource = (TextView) inflater.inflate(R.layout.cv_tabwidget, null);
 		tvMediaSource.setText(R.string.library);
-		mediaSource.setIndicator(tvMediaSource);
-		intent = new Intent(this, MediaSourceActivity.class);
-		mediaSource.setContent(intent);
+		library.setIndicator(tvMediaSource);
+		intent = new Intent(this, LibraryActivity.class);
+		library.setContent(intent);
 
 		TabSpec nowPlayling = m_tabHost.newTabSpec(getString(R.string.now_playing));
 		TextView tvPlaylist = (TextView) inflater.inflate(R.layout.cv_tabwidget, null);
 		tvPlaylist.setText(R.string.now_playing);
 		nowPlayling.setIndicator(tvPlaylist);
-		intent = new Intent(this, PlaylistActivity.class);
+		intent = new Intent(this, NowPlayingActivity.class);
 		nowPlayling.setContent(intent);
 
-		m_tabHost.addTab(mediaSource);
+		m_tabHost.addTab(library);
 		m_tabHost.addTab(nowPlayling);
 
 		m_tabHost.setCurrentTab(DEFAULT_TAB_INDEX);
@@ -146,14 +126,16 @@ public class MainActivity extends UpnpListenerTabActivity {
 	private void setTabTextColor() {
 		for (int i = 0; i < m_tabHost.getTabWidget().getChildCount(); ++i) {
 			View view = m_tabHost.getTabWidget().getChildAt(i);
-			int color = -1;
-			if (i == m_tabHost.getCurrentTab()) {
-				color = getResources().getColor(R.color.blue);
-			} else {
-				color = getResources().getColor(R.color.blue_transparent);
-			}
+			// int color = -1;
+			// if (i == m_tabHost.getCurrentTab()) {
+			// color = getResources().getColor(R.color.blue);
+			// } else {
+			// color = getResources().getColor(R.color.blue_transparent);
+			// }
+			// if (view instanceof TextView)
+			// ((TextView) view).setTextColor(color);
 			if (view instanceof TextView)
-				((TextView) view).setTextColor(color);
+				((TextView) view).setTextColor(getResources().getColor(R.color.blue));
 		}
 	}
 
@@ -211,8 +193,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 			public void run() {
 				if (m_routerProgressDialog != null)
 					m_routerProgressDialog.dismiss();
-				new AlertDialog.Builder(MainActivity.this).setTitle("Network error").setMessage(cause)
-						.setCancelable(false).setPositiveButton("OK", new OnClickListener() {
+				new AlertDialog.Builder(MainActivity.this).setTitle("Network error").setMessage(cause).setCancelable(false)
+						.setPositiveButton("OK", new OnClickListener() {
 
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
