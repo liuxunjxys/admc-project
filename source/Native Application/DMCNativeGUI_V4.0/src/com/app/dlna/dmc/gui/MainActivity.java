@@ -41,8 +41,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 	private ProgressDialog m_routerProgressDialog;
 	public static MainActivity INSTANCE;
 	private LinearLayout m_ll_menu;
-
-	BroadcastReceiver m_mountedReceiver = new SDCardReceiver();
+	private BroadcastReceiver m_mountedReceiver = new SDCardReceiver();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -118,11 +117,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 
 		m_tabHost.addTab(library);
 		m_tabHost.addTab(nowPlayling);
-
 		m_tabHost.setCurrentTab(DEFAULT_TAB_INDEX);
-
 		m_tabHost.setOnTabChangedListener(changeListener);
-
 		m_tabHost.refreshDrawableState();
 		setTabTextColor();
 	}
@@ -189,8 +185,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 			public void run() {
 				if (m_routerProgressDialog != null)
 					m_routerProgressDialog.dismiss();
-				new AlertDialog.Builder(MainActivity.this).setTitle("Network error").setMessage(cause).setCancelable(false)
-						.setPositiveButton("OK", new OnClickListener() {
+				new AlertDialog.Builder(MainActivity.this).setTitle("Network error").setMessage(cause)
+						.setCancelable(false).setPositiveButton("OK", new OnClickListener() {
 
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
@@ -252,7 +248,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 			m_ll_menu.setVisibility(View.GONE);
 			switch (((Integer) v.getTag()).intValue()) {
 			case 0:
-				Toast.makeText(MainActivity.this, "Refresh", Toast.LENGTH_SHORT).show();
+				refreshDevicesList();
 				break;
 			case 1:
 				String[] items = new String[1];
@@ -278,6 +274,13 @@ public class MainActivity extends UpnpListenerTabActivity {
 			}
 		}
 	};
+
+	private void refreshDevicesList() {
+		if (UPNP_PROCESSOR != null) {
+			UPNP_PROCESSOR.getRegistry().removeAllRemoteDevices();
+			UPNP_PROCESSOR.getControlPoint().search();
+		}
+	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -312,7 +315,11 @@ public class MainActivity extends UpnpListenerTabActivity {
 
 	@Override
 	public void onBackPressed() {
-		confirmExit();
+		if (m_ll_menu.getVisibility() == View.VISIBLE) {
+			m_ll_menu.setVisibility(View.GONE);
+		} else {
+			confirmExit();
+		}
 
 	}
 
@@ -346,7 +353,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 					tv.setTag(i);
 					tv.setOnClickListener(customMenuItemClick);
 					tv.setTextSize(20);
-					tv.setBackgroundDrawable(MainActivity.this.getResources().getDrawable(R.drawable.bg_actionbar_normal));
+					tv.setBackgroundDrawable(MainActivity.this.getResources().getDrawable(
+							R.drawable.bg_actionbar_normal));
 					m_ll_menu.addView(tv);
 				}
 			}

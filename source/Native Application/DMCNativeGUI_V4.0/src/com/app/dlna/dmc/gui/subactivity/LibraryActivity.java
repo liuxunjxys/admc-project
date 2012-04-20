@@ -56,6 +56,7 @@ public class LibraryActivity extends Activity {
 			@Override
 			public void onAnimationStart(Animation animation) {
 				m_rendererCompactView.setVisibility(View.VISIBLE);
+				m_rendererCompactView.updateListRenderer();
 			}
 
 			@Override

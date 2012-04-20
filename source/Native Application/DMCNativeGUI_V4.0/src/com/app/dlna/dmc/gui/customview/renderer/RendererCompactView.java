@@ -221,7 +221,7 @@ public class RendererCompactView extends LinearLayout {
 	};
 
 	@SuppressWarnings("rawtypes")
-	private void updateListRenderer() {
+	public void updateListRenderer() {
 		Device currentDMR = MainActivity.UPNP_PROCESSOR.getCurrentDMR();
 		for (int i = 0; i < m_ll_renderers.getChildCount(); ++i) {
 			if (currentDMR.getIdentity().getUdn().equals(m_ll_renderers.getChildAt(i).getTag())) {
