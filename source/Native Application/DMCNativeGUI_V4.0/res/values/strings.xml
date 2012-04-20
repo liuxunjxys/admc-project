@@ -45,5 +45,13 @@
         <item>Playlist</item>
         <item>Internet</item>
     </string-array>
+    
+    <string-array name="menu_items">
+        <item>Refresh</item>
+        <item>Settings</item>
+        <item>About</item>
+    </string-array>
+        <string name="minimize">Minimize</string>
+        <string name="close">Close</string>
 
 </resources>

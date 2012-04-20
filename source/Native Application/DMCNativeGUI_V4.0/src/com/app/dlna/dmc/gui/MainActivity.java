@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabSpec;
@@ -39,6 +40,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 	private static final int DEFAULT_TAB_INDEX = 0;
 	private ProgressDialog m_routerProgressDialog;
 	public static MainActivity INSTANCE;
+	private LinearLayout m_ll_menu;
 
 	BroadcastReceiver m_mountedReceiver = new SDCardReceiver();
 
@@ -59,6 +61,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 
 		registerReceiver(m_mountedReceiver, filter);
 		INSTANCE = this;
+
+		m_ll_menu = (LinearLayout) findViewById(R.id.ll_floatMenu);
 	}
 
 	private OnTabChangeListener changeListener = new OnTabChangeListener() {
@@ -126,14 +130,6 @@ public class MainActivity extends UpnpListenerTabActivity {
 	private void setTabTextColor() {
 		for (int i = 0; i < m_tabHost.getTabWidget().getChildCount(); ++i) {
 			View view = m_tabHost.getTabWidget().getChildAt(i);
-			// int color = -1;
-			// if (i == m_tabHost.getCurrentTab()) {
-			// color = getResources().getColor(R.color.blue);
-			// } else {
-			// color = getResources().getColor(R.color.blue_transparent);
-			// }
-			// if (view instanceof TextView)
-			// ((TextView) view).setTextColor(color);
 			if (view instanceof TextView)
 				((TextView) view).setTextColor(getResources().getColor(R.color.blue));
 		}
@@ -249,12 +245,39 @@ public class MainActivity extends UpnpListenerTabActivity {
 
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater menuInflater = getMenuInflater();
-		menuInflater.inflate(R.menu.main, menu);
-		return super.onCreateOptionsMenu(menu);
-	}
+	private android.view.View.OnClickListener customMenuItemClick = new android.view.View.OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			m_ll_menu.setVisibility(View.GONE);
+			switch (((Integer) v.getTag()).intValue()) {
+			case 0:
+				Toast.makeText(MainActivity.this, "Refresh", Toast.LENGTH_SHORT).show();
+				break;
+			case 1:
+				String[] items = new String[1];
+				items[0] = "Rescan external storage";
+				new AlertDialog.Builder(MainActivity.this).setTitle("Settings").setItems(items, new OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						switch (which) {
+						case 0:
+							if (!LocalContentDirectoryService.isScanning())
+								LocalContentDirectoryService.scanMedia(MainActivity.this);
+							break;
+						default:
+							break;
+						}
+					}
+				}).create().show();
+				break;
+			case 2:
+				Toast.makeText(MainActivity.this, "Show about dialog", Toast.LENGTH_SHORT).show();
+				break;
+			}
+		}
+	};
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -295,12 +318,38 @@ public class MainActivity extends UpnpListenerTabActivity {
 
 	private void confirmExit() {
 		new AlertDialog.Builder(MainActivity.this).setTitle("Confirm exit").setMessage("Are you sure want to exit?")
-				.setPositiveButton("OK", new OnClickListener() {
+				.setPositiveButton(R.string.minimize, new OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						moveTaskToBack(true);
+					}
+				}).setNegativeButton(R.string.close, new OnClickListener() {
 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						finish();
 					}
-				}).setNegativeButton("Cancel", null).create().show();
+				}).create().show();
+	}
+
+	public void onMenuClick(View view) {
+		if (m_ll_menu.getVisibility() == View.VISIBLE) {
+			m_ll_menu.setVisibility(View.GONE);
+		} else {
+			m_ll_menu.setVisibility(View.VISIBLE);
+			if (m_ll_menu.getChildCount() == 0) {
+				String[] menuItems = getResources().getStringArray(R.array.menu_items);
+				for (int i = 0; i < menuItems.length; ++i) {
+					TextView tv = new TextView(this);
+					tv.setText(menuItems[i]);
+					tv.setTag(i);
+					tv.setOnClickListener(customMenuItemClick);
+					tv.setTextSize(20);
+					tv.setBackgroundDrawable(MainActivity.this.getResources().getDrawable(R.drawable.bg_actionbar_normal));
+					m_ll_menu.addView(tv);
+				}
+			}
+		}
 	}
 }
