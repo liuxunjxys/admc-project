@@ -7,11 +7,11 @@
             <solid android:color="@color/blue" />
         </shape>
     </item>
-    <item android:bottom="2dp">
+    <item android:bottom="1dp">
         <shape android:shape="rectangle" >
-            <stroke android:color="@color/actionbar_bacground_color" />
+            <stroke android:color="@color/custom_menu_background" />
 
-            <solid android:color="@color/actionbar_bacground_color" />
+            <solid android:color="@color/custom_menu_background" />
         </shape>
     </item>
 

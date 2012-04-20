@@ -2,10 +2,11 @@ package com.app.dlna.dmc.gui.abstractactivity;
 
 import org.teleal.cling.model.meta.Device;
 
-import com.app.dlna.dmc.gui.actionbar.ActionBarActivity;
+import android.app.TabActivity;
+
 import com.app.dlna.dmc.processor.interfaces.UpnpProcessor.UpnpProcessorListener;
 
-public class UpnpListenerTabActivity extends ActionBarActivity implements UpnpProcessorListener {
+public class UpnpListenerTabActivity extends TabActivity implements UpnpProcessorListener {
 
 	@Override
 	public void onStartComplete() {

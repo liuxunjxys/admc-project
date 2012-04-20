@@ -87,27 +87,6 @@ public class DMRProcessorImpl implements DMRProcessor {
 							fireUpdatePositionEvent(positionInfo.getTrackElapsedSeconds(),
 									positionInfo.getTrackDurationSeconds());
 
-							// if ((positionInfo.getTrack().getValue() == 0 ||
-							// positionInfo.getElapsedPercent() == 100)
-							// && m_state == PLAYING) {
-							// Log.v(TAG, "auto next");
-							// m_state = STOP;
-							// new Thread(new Runnable() {
-							//
-							// @Override
-							// public void run() {
-							// try {
-							// Thread.sleep(4000);
-							// if (m_state == STOP) {
-							// fireOnEndTrackEvent();
-							// }
-							// } catch (InterruptedException e) {
-							// e.printStackTrace();
-							// }
-							// }
-							// }).start();
-							// }
-
 							if (positionInfo.getTrackDurationSeconds() == 0) {
 								Log.v(TAG, "auto next");
 								m_state = STOP;
@@ -273,6 +252,7 @@ public class DMRProcessorImpl implements DMRProcessor {
 	@SuppressWarnings({ "rawtypes" })
 	@Override
 	public void setURIandPlay(final String uri) {
+		m_autoNextPending = 5;
 		if (m_controlPoint == null || m_avtransportService == null)
 			return;
 		m_isBusy = true;

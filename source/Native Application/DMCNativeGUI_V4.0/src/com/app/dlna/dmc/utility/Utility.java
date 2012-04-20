@@ -66,8 +66,7 @@ public class Utility {
 		long hour = seconds / 3600;
 		long minute = (seconds - hour * 3600) / 60;
 		long second = seconds - hour * 3600 - minute * 60;
-		sb.append(String.format("%02d", hour) + ":" + String.format("%02d", minute) + ":"
-				+ String.format("%02d", second));
+		sb.append(String.format("%02d", hour) + ":" + String.format("%02d", minute) + ":" + String.format("%02d", second));
 
 		return sb.toString();
 	}
@@ -120,10 +119,24 @@ public class Utility {
 					}
 
 				} catch (MalformedURLException e) {
-					image.setImageResource(R.drawable.ic_didlobject_image);
+					MainActivity.INSTANCE.runOnUiThread(new Runnable() {
+
+						@Override
+						public void run() {
+							image.setImageResource(R.drawable.ic_didlobject_image);
+						}
+
+					});
 					e.printStackTrace();
 				} catch (IOException e) {
-					image.setImageResource(R.drawable.ic_didlobject_image);
+					MainActivity.INSTANCE.runOnUiThread(new Runnable() {
+
+						@Override
+						public void run() {
+							image.setImageResource(R.drawable.ic_didlobject_image);
+						}
+
+					});
 					e.printStackTrace();
 				}
 			}
@@ -139,8 +152,7 @@ public class Utility {
 		if (o.outHeight > CustomArrayAdapter.IMAGE_MAX_SIZE || o.outWidth > CustomArrayAdapter.IMAGE_MAX_SIZE) {
 			scale = (int) Math.pow(
 					2,
-					(int) Math.round(Math.log(CustomArrayAdapter.IMAGE_MAX_SIZE
-							/ (double) Math.max(o.outHeight, o.outWidth))
+					(int) Math.round(Math.log(CustomArrayAdapter.IMAGE_MAX_SIZE / (double) Math.max(o.outHeight, o.outWidth))
 							/ Math.log(0.5)));
 		}
 
