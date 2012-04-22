@@ -34,6 +34,8 @@ public interface DMRProcessor {
 	void setPlaylistProcessor(PlaylistProcessor playlistProcessor);
 
 	void setSeftAutoNext(boolean autoNext);
+	
+	String getCurrentTrackURI();
 
 	public interface DMRProcessorListner {
 		void onUpdatePosition(long current, long max);

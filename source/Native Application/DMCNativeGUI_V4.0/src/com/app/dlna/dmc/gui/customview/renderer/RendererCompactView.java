@@ -34,6 +34,7 @@ public class RendererCompactView extends LinearLayout {
 	private LinearLayout m_ll_renderers;
 	private LayoutInflater m_inflater;
 	private ImageView m_btn_quickPlayPause;
+	private onDMRChangeListener m_onDMRChangeListener;
 
 	@SuppressWarnings("rawtypes")
 	public RendererCompactView(Context context, AttributeSet attrs) {
@@ -123,6 +124,9 @@ public class RendererCompactView extends LinearLayout {
 			MainActivity.UPNP_PROCESSOR.setCurrentDMR(udn);
 			updateListRenderer();
 			setDMRListener();
+			if (m_onDMRChangeListener != null){
+				m_onDMRChangeListener.onDMRChange();
+			}
 		}
 
 	};
@@ -321,6 +325,14 @@ public class RendererCompactView extends LinearLayout {
 				m_ll_renderers.invalidate();
 			}
 		});
+	}
+
+	public interface onDMRChangeListener {
+		void onDMRChange();
+	}
+
+	public void setOnDMRChangeListener(onDMRChangeListener listener) {
+		m_onDMRChangeListener = listener;
 	}
 
 }

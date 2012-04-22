@@ -3,11 +3,6 @@ package com.app.dlna.dmc.gui.customview.nowplaying;
 import org.teleal.cling.model.message.UpnpResponse;
 import org.teleal.cling.model.meta.Action;
 
-import com.app.dlna.dmc.gui.MainActivity;
-import com.app.dlna.dmc.processor.interfaces.DMRProcessor.DMRProcessorListner;
-import com.app.dlna.dmc.processor.playlist.PlaylistItem;
-import com.app.dlna.dmc.utility.Utility;
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -15,10 +10,15 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
-import android.widget.Toast;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
+import android.widget.Toast;
 import app.dlna.controller.v4.R;
+
+import com.app.dlna.dmc.gui.MainActivity;
+import com.app.dlna.dmc.processor.interfaces.DMRProcessor.DMRProcessorListner;
+import com.app.dlna.dmc.processor.playlist.PlaylistItem;
+import com.app.dlna.dmc.utility.Utility;
 
 public class RendererControlView extends LinearLayout {
 
@@ -30,6 +30,7 @@ public class RendererControlView extends LinearLayout {
 	private TextView m_tv_max;
 	private ImageView m_btn_playPause, m_btn_stop, m_btn_next, m_btn_prev;
 	private SeekBar m_sb_duration;
+	private boolean m_isSeeking = false;
 
 	public RendererControlView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -99,8 +100,7 @@ public class RendererControlView extends LinearLayout {
 	};
 
 	private void doNext() {
-		if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor() != null
-				&& MainActivity.UPNP_PROCESSOR.getDMRProcessor() != null) {
+		if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor() != null && MainActivity.UPNP_PROCESSOR.getDMRProcessor() != null) {
 			MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().next();
 			updateCurrentPlaylistItem();
 		}
@@ -119,8 +119,7 @@ public class RendererControlView extends LinearLayout {
 	}
 
 	private void doPrevious() {
-		if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor() != null
-				&& MainActivity.UPNP_PROCESSOR.getDMRProcessor() != null) {
+		if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor() != null && MainActivity.UPNP_PROCESSOR.getDMRProcessor() != null) {
 			MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().previous();
 			updateCurrentPlaylistItem();
 		}
@@ -130,19 +129,19 @@ public class RendererControlView extends LinearLayout {
 
 		@Override
 		public void onStopTrackingTouch(SeekBar seekBar) {
-			// TODO Auto-generated method stub
+			m_isSeeking = false;
+			MainActivity.UPNP_PROCESSOR.getDMRProcessor().seek(Utility.getTimeString(seekBar.getProgress()));
 		}
 
 		@Override
 		public void onStartTrackingTouch(SeekBar seekBar) {
-			// TODO Auto-generated method stub
+			m_isSeeking = true;
 
 		}
 
 		@Override
 		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-			// TODO Auto-generated method stub
-
+			m_tv_current.setText(Utility.getTimeString(m_sb_duration.getProgress()));
 		}
 	};
 
@@ -150,6 +149,8 @@ public class RendererControlView extends LinearLayout {
 
 		@Override
 		public void onUpdatePosition(final long current, final long max) {
+			if (m_isSeeking)
+				return;
 			final String currentText = Utility.getTimeString(current);
 			final String maxText = Utility.getTimeString(max);
 			MainActivity.INSTANCE.runOnUiThread(new Runnable() {
@@ -172,8 +173,7 @@ public class RendererControlView extends LinearLayout {
 
 				@Override
 				public void run() {
-					m_btn_playPause.setImageDrawable(getContext().getResources().getDrawable(
-							R.drawable.ic_btn_media_play));
+					m_btn_playPause.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_media_play));
 				}
 			});
 		}
@@ -185,8 +185,7 @@ public class RendererControlView extends LinearLayout {
 
 				@Override
 				public void run() {
-					m_btn_playPause.setImageDrawable(getContext().getResources().getDrawable(
-							R.drawable.ic_btn_media_pause));
+					m_btn_playPause.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_media_pause));
 				}
 			});
 
@@ -199,8 +198,7 @@ public class RendererControlView extends LinearLayout {
 
 				@Override
 				public void run() {
-					m_btn_playPause.setImageDrawable(getContext().getResources().getDrawable(
-							R.drawable.ic_btn_media_play));
+					m_btn_playPause.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_media_play));
 				}
 			});
 
@@ -219,14 +217,12 @@ public class RendererControlView extends LinearLayout {
 
 		@Override
 		public void onEndTrack() {
-			// TODO Auto-generated method stub
 
 		}
 
 		@SuppressWarnings("rawtypes")
 		@Override
 		public void onActionFail(Action actionCallback, UpnpResponse response, final String cause) {
-			// TODO Auto-generated method stub
 			MainActivity.INSTANCE.runOnUiThread(new Runnable() {
 
 				@Override

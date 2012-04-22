@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 import app.dlna.controller.v4.R;
@@ -13,15 +12,14 @@ import app.dlna.controller.v4.R;
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.customview.adapter.AdapterItem;
 import com.app.dlna.dmc.gui.customview.adapter.CustomArrayAdapter;
+import com.app.dlna.dmc.gui.customview.listener.DMRListenerView;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 import com.app.dlna.dmc.processor.playlist.PlaylistManager;
 
-public class PlaylistView extends LinearLayout {
+public class PlaylistView extends DMRListenerView {
 
-	private ListView m_listView;
-	private CustomArrayAdapter m_adapter;
 	private PlaylistToolbar m_playlistToolbar;
 	private static final int VM_LIST = 0;
 	private static final int VM_DETAILS = 1;
@@ -29,8 +27,7 @@ public class PlaylistView extends LinearLayout {
 
 	public PlaylistView(Context context) {
 		super(context);
-		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
-				R.layout.cv_playlist_allitem, this);
+		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.cv_playlist_allitem, this);
 		m_listView = (ListView) findViewById(R.id.lv_playlist);
 		m_adapter = new CustomArrayAdapter(getContext(), 0);
 		m_listView.setAdapter(m_adapter);
@@ -41,6 +38,7 @@ public class PlaylistView extends LinearLayout {
 		m_viewMode = VM_LIST;
 		m_playlistToolbar.enableBack();
 		preparePlaylist();
+		updateDMRListener();
 	}
 
 	public void preparePlaylist() {
@@ -103,5 +101,4 @@ public class PlaylistView extends LinearLayout {
 		m_viewMode = VM_LIST;
 		preparePlaylist();
 	}
-
 }

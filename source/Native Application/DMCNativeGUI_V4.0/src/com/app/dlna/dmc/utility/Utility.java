@@ -15,11 +15,11 @@ import org.apache.commons.io.IOUtils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.widget.ImageView;
 import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
-import com.app.dlna.dmc.gui.customview.adapter.CustomArrayAdapter;
 import com.app.dlna.dmc.processor.http.HTTPServerData;
 
 public class Utility {
@@ -80,31 +80,14 @@ public class Utility {
 	}
 
 	public static void loadImageItemThumbnail(final ImageView image, final String imageUrl,
-			final Map<String, Bitmap> m_cacheImageItem) {
+			final Map<String, Bitmap> m_cacheImageItem, final int size) {
 		new Thread(new Runnable() {
 
 			@Override
 			public void run() {
 				try {
-					if (m_cacheImageItem.containsKey(imageUrl)) {
-						MainActivity.INSTANCE.runOnUiThread(new Runnable() {
-
-							@Override
-							public void run() {
-								try {
-									synchronized (m_cacheImageItem) {
-										image.setImageBitmap(m_cacheImageItem.get(imageUrl));
-									}
-								} catch (Exception ex) {
-									ex.printStackTrace();
-								}
-							}
-						});
-					} else {
-						final Bitmap bm = getBitmapFromURL(imageUrl);
-						synchronized (m_cacheImageItem) {
-							m_cacheImageItem.put(imageUrl, bm);
-						}
+					if (m_cacheImageItem == null) {
+						final Bitmap bm = getBitmapFromURL(imageUrl, size);
 						MainActivity.INSTANCE.runOnUiThread(new Runnable() {
 
 							@Override
@@ -116,6 +99,38 @@ public class Utility {
 								}
 							}
 						});
+					} else {
+						if (m_cacheImageItem.containsKey(imageUrl)) {
+							MainActivity.INSTANCE.runOnUiThread(new Runnable() {
+
+								@Override
+								public void run() {
+									try {
+										synchronized (m_cacheImageItem) {
+											image.setImageBitmap(m_cacheImageItem.get(imageUrl));
+										}
+									} catch (Exception ex) {
+										ex.printStackTrace();
+									}
+								}
+							});
+						} else {
+							final Bitmap bm = getBitmapFromURL(imageUrl, size);
+							synchronized (m_cacheImageItem) {
+								m_cacheImageItem.put(imageUrl, bm);
+							}
+							MainActivity.INSTANCE.runOnUiThread(new Runnable() {
+
+								@Override
+								public void run() {
+									try {
+										image.setImageBitmap(bm);
+									} catch (Exception ex) {
+										ex.printStackTrace();
+									}
+								}
+							});
+						}
 					}
 
 				} catch (MalformedURLException e) {
@@ -143,21 +158,22 @@ public class Utility {
 		}).start();
 	}
 
-	public static Bitmap getBitmapFromURL(final String imageUrl) throws IOException, MalformedURLException {
+	public static Bitmap getBitmapFromURL(final String imageUrl, int size) throws IOException, MalformedURLException {
 		BitmapFactory.Options o = new BitmapFactory.Options();
 		o.inJustDecodeBounds = true;
 		byte[] buffer = IOUtils.toByteArray((InputStream) new URL(imageUrl).getContent());
 		BitmapFactory.decodeByteArray(buffer, 0, buffer.length, o);
+
 		int scale = 1;
-		if (o.outHeight > CustomArrayAdapter.IMAGE_MAX_SIZE || o.outWidth > CustomArrayAdapter.IMAGE_MAX_SIZE) {
-			scale = (int) Math.pow(
-					2,
-					(int) Math.round(Math.log(CustomArrayAdapter.IMAGE_MAX_SIZE / (double) Math.max(o.outHeight, o.outWidth))
-							/ Math.log(0.5)));
+		if (o.outHeight > size || o.outWidth > size) {
+			scale = (int) Math.pow(2,
+					(int) Math.round(Math.log(size / (double) Math.max(o.outHeight, o.outWidth)) / Math.log(0.5)));
 		}
 
 		BitmapFactory.Options o2 = new BitmapFactory.Options();
 		o2.inSampleSize = scale;
+
+		Log.i(TAG, "oWidth = " + o.outWidth + "; oHeight = " + o.outHeight + "; scale = " + scale);
 
 		return BitmapFactory.decodeByteArray(buffer, 0, buffer.length, o2);
 	}

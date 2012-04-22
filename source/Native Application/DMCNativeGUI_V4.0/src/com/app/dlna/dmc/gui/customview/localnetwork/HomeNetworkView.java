@@ -22,7 +22,6 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 import app.dlna.controller.v4.R;
@@ -30,17 +29,15 @@ import app.dlna.controller.v4.R;
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.customview.adapter.AdapterItem;
 import com.app.dlna.dmc.gui.customview.adapter.CustomArrayAdapter;
+import com.app.dlna.dmc.gui.customview.listener.DMRListenerView;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
-import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor.DMSProcessorListner;
+import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.interfaces.UpnpProcessor.UpnpProcessorListener;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 
-public class HomeNetworkView extends LinearLayout {
+public class HomeNetworkView extends DMRListenerView {
 	private static final String TAG = HomeNetworkView.class.getName();
-	private ListView m_listView;
-	private LayoutInflater m_inflater;
-	private CustomArrayAdapter m_adapter;
 	private ProgressDialog m_progressDlg;
 	private boolean m_loadMore;
 	private boolean m_isRoot;
@@ -51,8 +48,7 @@ public class HomeNetworkView extends LinearLayout {
 	public HomeNetworkView(Context context) {
 		super(context);
 		m_isBrowsing = false;
-		m_inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		m_inflater.inflate(R.layout.cv_homenetwork, this);
+		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.cv_homenetwork, this);
 		m_listView = (ListView) findViewById(R.id.lv_mediasource_browsing);
 		m_adapter = new CustomArrayAdapter(context, 0);
 		m_listView.setAdapter(m_adapter);
@@ -70,6 +66,8 @@ public class HomeNetworkView extends LinearLayout {
 		for (Device device : MainActivity.UPNP_PROCESSOR.getDMSList()) {
 			m_adapter.add(new AdapterItem(device));
 		}
+
+		updateDMRListener();
 	}
 
 	private OnScrollListener m_scrollListener = new OnScrollListener() {
@@ -86,8 +84,8 @@ public class HomeNetworkView extends LinearLayout {
 						&& !m_progressDlg.isShowing()
 						&& firstVisibleItem + visibleItemCount == totalItemCount
 						&& m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData() instanceof DIDLObject
-						&& ((DIDLObject) m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData()).getId()
-								.equals("-1")) {
+						&& ((DIDLObject) m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData()).getId().equals(
+								"-1")) {
 					doLoadMoreItems();
 				}
 			} catch (Exception ex) {
@@ -118,7 +116,6 @@ public class HomeNetworkView extends LinearLayout {
 						browse(object.getId(), 0);
 				} else if (object instanceof Item) {
 					if (object.getId().equals("-1")) {
-						// load more items
 						doLoadMoreItems();
 					} else {
 						addToPlaylistAndPlay(object);
@@ -144,15 +141,7 @@ public class HomeNetworkView extends LinearLayout {
 
 	private void addToPlaylistAndPlay(DIDLObject object) {
 		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
-		if (playlistProcessor == null) {
-			Toast.makeText(MainActivity.INSTANCE, "Cannot get playlist processor", Toast.LENGTH_SHORT).show();
-			return;
-		}
 		DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
-		if (dmrProcessor == null) {
-			Toast.makeText(getContext(), "Cannot connect to Renderer", Toast.LENGTH_SHORT).show();
-			return;
-		}
 		PlaylistItem added = playlistProcessor.addDIDLObject(object);
 		if (added != null) {
 			m_adapter.notifyVisibleItemChanged(m_listView);
@@ -198,8 +187,8 @@ public class HomeNetworkView extends LinearLayout {
 		@Override
 		public void onBrowseComplete(final String objectID, final boolean haveNext, boolean havePrev,
 				final Map<String, List<? extends DIDLObject>> result) {
-			Log.i(TAG, "browse complete: object id = " + objectID + " haveNext = " + haveNext + "; havePrev ="
-					+ havePrev + "; result size = " + result.size());
+			Log.i(TAG, "browse complete: object id = " + objectID + " haveNext = " + haveNext + "; havePrev =" + havePrev
+					+ "; result size = " + result.size());
 			m_isRoot = objectID.equals("0");
 			MainActivity.INSTANCE.runOnUiThread(new Runnable() {
 
