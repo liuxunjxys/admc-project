@@ -92,8 +92,10 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 	@Override
 	public PlaylistItem addItem(PlaylistItem item) {
 		synchronized (m_playlistItems) {
-			if (m_playlistItems.contains(item) || m_playlistItems.size() >= m_maxSize)
+			if (m_playlistItems.size() >= m_maxSize)
 				return null;
+			if (m_playlistItems.contains(item))
+				return item;
 			m_playlistItems.add(item);
 			m_listURI.add(item.getUri());
 			if (m_playlistItems.size() == 1) {
@@ -147,5 +149,10 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 			item.setType(Type.IMAGE);
 		}
 		return item;
+	}
+
+	@Override
+	public PlaylistItem getItemAt(int idx) {
+		return m_playlistItems.get(idx);
 	}
 }

@@ -22,6 +22,7 @@
     </com.app.dlna.dmc.gui.customview.nowplaying.RendererControlView>
 
     <Gallery
+        android:id="@+id/galery"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_above="@id/rendererControlView"

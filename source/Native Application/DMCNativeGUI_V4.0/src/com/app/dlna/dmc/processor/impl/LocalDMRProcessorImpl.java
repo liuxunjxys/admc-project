@@ -124,4 +124,10 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 		
 	}
 
+	@Override
+	public String getCurrentTrackURI() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

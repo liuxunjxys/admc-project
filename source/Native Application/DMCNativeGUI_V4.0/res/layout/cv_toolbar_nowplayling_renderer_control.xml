@@ -53,14 +53,14 @@
 
         <TextView
             android:id="@+id/tv_current"
-            android:layout_width="48dp"
+            android:layout_width="56dp"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true" />
 
         <TextView
             android:id="@+id/tv_max"
-            android:layout_width="48dp"
+            android:layout_width="56dp"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true" />

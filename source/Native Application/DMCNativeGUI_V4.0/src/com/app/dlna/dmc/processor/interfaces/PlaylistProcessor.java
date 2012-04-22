@@ -21,6 +21,8 @@ public interface PlaylistProcessor {
 
 	PlaylistItem removeDIDLObject(DIDLObject object);
 
+	PlaylistItem getItemAt(int idx);
+
 	boolean containsUrl(String url);
 
 	int getMaxSize();

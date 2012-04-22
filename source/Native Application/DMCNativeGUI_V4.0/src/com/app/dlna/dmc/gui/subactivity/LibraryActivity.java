@@ -17,12 +17,13 @@ import app.dlna.controller.v4.R;
 import com.app.dlna.dmc.gui.customview.localnetwork.HomeNetworkView;
 import com.app.dlna.dmc.gui.customview.playlist.PlaylistView;
 import com.app.dlna.dmc.gui.customview.renderer.RendererCompactView;
+import com.app.dlna.dmc.gui.customview.renderer.RendererCompactView.onDMRChangeListener;
 
 public class LibraryActivity extends Activity {
 	private ViewPager m_pager;
-	private HomeNetworkView m_homeNetwork;
+	private HomeNetworkView m_homeNetworkView;
 	private View m_internet;
-	private PlaylistView m_playlist;
+	private PlaylistView m_playlistView;
 	private RendererCompactView m_rendererCompactView;
 	private String[] m_pagerTitle;
 
@@ -30,9 +31,9 @@ public class LibraryActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		m_homeNetwork = new HomeNetworkView(this);
+		m_homeNetworkView = new HomeNetworkView(this);
 		m_internet = new LinearLayout(this);
-		m_playlist = new PlaylistView(this);
+		m_playlistView = new PlaylistView(this);
 
 		setContentView(R.layout.activity_library);
 		m_pagerTitle = getResources().getStringArray(R.array.libray_pager_list);
@@ -41,12 +42,14 @@ public class LibraryActivity extends Activity {
 		m_pager = (ViewPager) findViewById(R.id.viewPager);
 		m_pager.setOnPageChangeListener(m_onPageChangeListener);
 		m_pager.setAdapter(m_pagerAdapter);
+
+		m_rendererCompactView.setOnDMRChangeListener(m_DMRChangeListener);
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		m_homeNetwork.updateListView();
+		m_homeNetworkView.updateListView();
 	}
 
 	public void showRendererCompactView() {
@@ -112,10 +115,10 @@ public class LibraryActivity extends Activity {
 		public void onPageSelected(int position) {
 			switch (position) {
 			case 0:
-				m_homeNetwork.updateListView();
+				m_homeNetworkView.updateListView();
 				break;
 			case 1:
-				m_playlist.preparePlaylist();
+				m_playlistView.preparePlaylist();
 				break;
 			case 2:
 				break;
@@ -145,11 +148,11 @@ public class LibraryActivity extends Activity {
 		@Override
 		public Object instantiateItem(ViewGroup container, int position) {
 			if (position == 0) {
-				((ViewPager) container).addView(m_homeNetwork);
-				return m_homeNetwork;
+				((ViewPager) container).addView(m_homeNetworkView);
+				return m_homeNetworkView;
 			} else if (position == 1) {
-				((ViewPager) container).addView(m_playlist);
-				return m_playlist;
+				((ViewPager) container).addView(m_playlistView);
+				return m_playlistView;
 			} else if (position == 2) {
 				((ViewPager) container).addView(m_internet);
 				return m_internet;
@@ -172,4 +175,13 @@ public class LibraryActivity extends Activity {
 			return m_pagerTitle.length;
 		}
 	};
+	private onDMRChangeListener m_DMRChangeListener = new onDMRChangeListener() {
+
+		@Override
+		public void onDMRChange() {
+			m_homeNetworkView.updateDMRListener();
+			m_playlistView.updateDMRListener();
+		}
+	};
+
 }
