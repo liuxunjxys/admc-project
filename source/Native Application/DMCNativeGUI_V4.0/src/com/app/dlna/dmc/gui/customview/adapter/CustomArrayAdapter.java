@@ -269,33 +269,33 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 	}
 
 	public void prepareImageItemCache(final List<? extends DIDLObject> objects) {
-		new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				m_cancelPreparing = false;
-				for (DIDLObject didlObject : objects) {
-
-					if (m_cancelPreparing) {
-						Log.e(TAG, "Cancel preparing");
-						break;
-					}
-
-					if (didlObject instanceof ImageItem) {
-						synchronized (Cache.getBitmapCache()) {
-							String imageUrl = didlObject.getResources().get(0).getValue();
-							try {
-								Cache.getBitmapCache().put(imageUrl, Utility.getBitmapFromURL(imageUrl, MAX_SIZE));
-							} catch (MalformedURLException e) {
-								e.printStackTrace();
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-						}
-					}
-				}
-			}
-		}).start();
+//		new Thread(new Runnable() {
+//
+//			@Override
+//			public void run() {
+//				m_cancelPreparing = false;
+//				for (DIDLObject didlObject : objects) {
+//
+//					if (m_cancelPreparing) {
+//						Log.e(TAG, "Cancel preparing");
+//						break;
+//					}
+//
+//					if (didlObject instanceof ImageItem) {
+//						synchronized (Cache.getBitmapCache()) {
+//							String imageUrl = didlObject.getResources().get(0).getValue();
+//							try {
+//								Cache.getBitmapCache().put(imageUrl, Utility.getBitmapFromURL(imageUrl, MAX_SIZE));
+//							} catch (MalformedURLException e) {
+//								e.printStackTrace();
+//							} catch (IOException e) {
+//								e.printStackTrace();
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}).start();
 	}
 
 	public void cancelPrepareImageCache() {

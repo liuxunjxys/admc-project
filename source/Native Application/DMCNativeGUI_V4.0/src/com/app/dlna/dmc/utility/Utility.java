@@ -173,7 +173,6 @@ public class Utility {
 		BitmapFactory.Options o2 = new BitmapFactory.Options();
 		o2.inSampleSize = scale;
 
-		Log.i(TAG, "oWidth = " + o.outWidth + "; oHeight = " + o.outHeight + "; scale = " + scale);
 
 		return BitmapFactory.decodeByteArray(buffer, 0, buffer.length, o2);
 	}
