@@ -1,18 +1,12 @@
 package com.app.dlna.dmc.gui.customview.nowplaying;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import android.content.Context;
-import android.graphics.Bitmap;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
@@ -47,25 +41,40 @@ public class GaleryViewAdapter extends BaseAdapter {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		PlaylistItem item = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getItemAt(position);
-		if (convertView == null || !(convertView instanceof ImageView)) {
-			convertView = new ImageView(m_context);
+		if (convertView == null) {
+			convertView = ((LayoutInflater) m_context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
+					R.layout.cv_galery_image, null);
 		}
+		if (convertView.getTag() == null) {
+			setViewHolder(convertView);
+		}
+		ViewHolder holder = (ViewHolder) convertView.getTag();
 		switch (item.getType()) {
 		case AUDIO:
-			((ImageView) convertView).setImageResource(R.drawable.ic_didlobject_audio);
+			holder.image.setImageResource(R.drawable.ic_didlobject_audio);
 			break;
 		case VIDEO:
-			((ImageView) convertView).setImageResource(R.drawable.ic_didlobject_video);
+			holder.image.setImageResource(R.drawable.ic_didlobject_video);
 			break;
 		case IMAGE:
-			((ImageView) convertView).setScaleType(ScaleType.FIT_START);
-			Utility.loadImageItemThumbnail((ImageView) convertView, item.getUri(), Cache.getBitmapCache(), MAX_SIZE);
+			holder.image.setScaleType(ScaleType.FIT_START);
+			Utility.loadImageItemThumbnail(holder.image, item.getUri(), Cache.getBitmapCache(), MAX_SIZE);
 			break;
 		default:
-			((ImageView) convertView).setImageResource(R.drawable.ic_didlobject_unknow);
+			holder.image.setImageResource(R.drawable.ic_didlobject_unknow);
 			break;
 		}
 		return convertView;
+	}
+
+	private void setViewHolder(View convertView) {
+		ViewHolder holder = new ViewHolder();
+		holder.image = (ImageView) convertView.findViewById(R.id.image);
+		convertView.setTag(holder);
+	}
+
+	private class ViewHolder {
+		ImageView image;
 	}
 
 }
