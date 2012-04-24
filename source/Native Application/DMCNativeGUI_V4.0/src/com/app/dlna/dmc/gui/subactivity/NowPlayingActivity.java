@@ -25,7 +25,6 @@ import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.customview.nowplaying.RendererControlView;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
-import com.app.dlna.dmc.processor.playlist.PlaylistItem.Type;
 import com.app.dlna.dmc.utility.Utility;
 
 public class NowPlayingActivity extends Activity {

@@ -1,7 +1,12 @@
 package com.app.dlna.dmc.gui;
 
+import java.io.UnsupportedEncodingException;
+
+import org.teleal.cling.model.types.UDN;
+
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -9,7 +14,12 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.IntentFilter.MalformedMimeTypeException;
+import android.nfc.NdefMessage;
+import android.nfc.NfcAdapter;
+import android.nfc.tech.MifareClassic;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -40,6 +50,10 @@ public class MainActivity extends UpnpListenerTabActivity {
 	public static MainActivity INSTANCE;
 	private LinearLayout m_ll_menu;
 	private BroadcastReceiver m_mountedReceiver = new SDCardReceiver();
+	private NfcAdapter m_nfcAdapter;
+	private PendingIntent m_pendingIntent;
+	private IntentFilter[] m_filters;
+	private String[][] m_techLists;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -60,6 +74,18 @@ public class MainActivity extends UpnpListenerTabActivity {
 		INSTANCE = this;
 
 		m_ll_menu = (LinearLayout) findViewById(R.id.ll_floatMenu);
+
+		m_nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+		m_pendingIntent = PendingIntent.getActivity(this, 0,
+				new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+		IntentFilter ndef = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
+		try {
+			ndef.addDataType("text/plain");
+		} catch (MalformedMimeTypeException e) {
+			throw new RuntimeException("fail", e);
+		}
+		m_filters = new IntentFilter[] { ndef, };
+		m_techLists = new String[][] { new String[] { MifareClassic.class.getName() } };
 	}
 
 	private OnTabChangeListener changeListener = new OnTabChangeListener() {
@@ -72,18 +98,17 @@ public class MainActivity extends UpnpListenerTabActivity {
 
 	protected void onResume() {
 		super.onResume();
-		Log.i(TAG, "MainActivity onResume");
+		m_nfcAdapter.enableForegroundDispatch(this, m_pendingIntent, m_filters, m_techLists);
 	};
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		Log.i(TAG, "MainActivity onPause");
+		m_nfcAdapter.disableForegroundDispatch(MainActivity.this);
 	}
 
 	protected void onDestroy() {
 		super.onDestroy();
-		Log.i(TAG, "MainActivity onDestroy");
 		UPNP_PROCESSOR.unbindUpnpService();
 		unregisterReceiver(m_mountedReceiver);
 	};
@@ -183,8 +208,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 			public void run() {
 				if (m_routerProgressDialog != null)
 					m_routerProgressDialog.dismiss();
-				new AlertDialog.Builder(MainActivity.this).setTitle("Network error").setMessage(cause)
-						.setCancelable(false).setPositiveButton("OK", new OnClickListener() {
+				new AlertDialog.Builder(MainActivity.this).setTitle("Network error").setMessage(cause).setCancelable(false)
+						.setPositiveButton("OK", new OnClickListener() {
 
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
@@ -351,12 +376,46 @@ public class MainActivity extends UpnpListenerTabActivity {
 					tv.setTag(i);
 					tv.setOnClickListener(customMenuItemClick);
 					tv.setTextSize(20);
-					tv.setBackgroundDrawable(MainActivity.this.getResources().getDrawable(
-							R.drawable.bg_actionbar_normal));
+					tv.setBackgroundDrawable(MainActivity.this.getResources().getDrawable(R.drawable.bg_actionbar_normal));
 					m_ll_menu.addView(tv);
 				}
 			}
 		}
 	}
-	
+
+	protected void onNewIntent(Intent intent) {
+		if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
+			Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+			if (rawMsgs != null) {
+				NdefMessage[] msgs = new NdefMessage[rawMsgs.length];
+				for (int i = 0; i < rawMsgs.length; i++) {
+					msgs[i] = (NdefMessage) rawMsgs[i];
+					Log.e(TAG, "NFC Tag receive");
+					byte[] buffer = msgs[i].getRecords()[0].getPayload();
+					String textEncoding = (buffer[0] & 0200) == 0 ? "UTF-8" : "UTF-16";
+					int languageCodeLength = buffer[0] & 0077;
+					try {
+						String text = new String(buffer, languageCodeLength + 1, buffer.length - languageCodeLength - 1,
+								textEncoding);
+						if (UPNP_PROCESSOR != null) {
+							UPNP_PROCESSOR.setCurrentDMR(new UDN(text));
+							if (UPNP_PROCESSOR.getDMRProcessor() != null) {
+								Toast.makeText(MainActivity.this,
+										"Current DMR: " + UPNP_PROCESSOR.getCurrentDMR().getDetails().getFriendlyName(),
+										Toast.LENGTH_SHORT).show();
+							} else {
+								Toast.makeText(MainActivity.this, "Cannot find DMR from NFC Tag, udn = " + text,
+										Toast.LENGTH_SHORT).show();
+							}
+						}
+					} catch (UnsupportedEncodingException e) {
+						e.printStackTrace();
+						Log.e(TAG, "NFC TAG parse text error");
+					}
+
+				}
+			}
+		}
+	};
+
 }
