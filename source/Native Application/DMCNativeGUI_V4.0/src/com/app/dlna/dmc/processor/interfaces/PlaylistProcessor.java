@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.teleal.cling.support.model.DIDLObject;
 
+import com.app.dlna.dmc.processor.playlist.Playlist;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 
 public interface PlaylistProcessor {
@@ -35,5 +36,14 @@ public interface PlaylistProcessor {
 
 	int setCurrentItem(PlaylistItem item);
 	
-	String getPlaylistName();
+	Playlist getData();
+	
+	void setData(Playlist data);
+	
+	void insertNew(String name);
+	
+	void updateCurrent();
+	
+	void deleteCurrent();
+	
 }

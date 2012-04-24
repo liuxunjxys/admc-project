@@ -5,9 +5,18 @@ public class PlaylistItem {
 		AUDIO, VIDEO, IMAGE
 	};
 
+	private long m_id;
 	private String m_url;
 	private String m_title;
 	private Type m_type;
+
+	public void setId(long id) {
+		m_id = id;
+	}
+
+	public long getId() {
+		return m_id;
+	}
 
 	public String getUri() {
 		return m_url;
@@ -38,7 +47,8 @@ public class PlaylistItem {
 		if (!(o instanceof PlaylistItem))
 			return false;
 		PlaylistItem other = (PlaylistItem) o;
-		if (other.getUri().equals(this.m_url) && other.getType().equals(this.m_type) && other.getTitle().equals(this.m_title))
+		if (other.getUri().equals(this.m_url) && other.getType().equals(this.m_type)
+				&& other.getTitle().equals(this.m_title))
 			return true;
 		return false;
 	}
