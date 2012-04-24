@@ -8,27 +8,34 @@ import org.teleal.cling.support.model.item.AudioItem;
 import org.teleal.cling.support.model.item.VideoItem;
 
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
+import com.app.dlna.dmc.processor.playlist.Playlist;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem.Type;
+import com.app.dlna.dmc.processor.playlist.PlaylistManager;
 
 public class PlaylistProcessorImpl implements PlaylistProcessor {
 	private List<PlaylistItem> m_playlistItems;
 	private int m_currentItemIdx;
 	private int m_maxSize;
 	private List<String> m_listURI;
-	private String m_playlistName;
+	private Playlist m_data;
 
-	public PlaylistProcessorImpl(String name, int maxSize) {
+	public PlaylistProcessorImpl(Playlist LIST_DATA, int maxItem) {
 		m_playlistItems = new ArrayList<PlaylistItem>();
 		m_currentItemIdx = -1;
-		m_maxSize = maxSize;
+		m_maxSize = maxItem;
 		m_listURI = new ArrayList<String>();
-		m_playlistName = name;
+		m_data = LIST_DATA;
 	}
 
 	@Override
-	public String getPlaylistName() {
-		return m_playlistName;
+	public Playlist getData() {
+		return m_data;
+	}
+
+	@Override
+	public void setData(Playlist data) {
+		m_data = data;
 	}
 
 	@Override
@@ -111,6 +118,8 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 			if (m_playlistItems.contains(item)) {
 				m_playlistItems.remove(item);
 				m_listURI.remove(item.getUri());
+				long id = item.getId();
+				PlaylistManager.deletePlaylistItem(id);
 				return item;
 			}
 			return null;
@@ -154,5 +163,22 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 	@Override
 	public PlaylistItem getItemAt(int idx) {
 		return m_playlistItems.get(idx);
+	}
+
+	@Override
+	public void insertNew(String name) {
+		m_data.setName(name);
+		// TODO: fix here
+		// PlaylistManager.createPlaylist(this);
+	}
+
+	@Override
+	public void updateCurrent() {
+		PlaylistManager.updatePlaylist(this);
+	}
+
+	@Override
+	public void deleteCurrent() {
+		PlaylistManager.deletePlaylist(this);
 	}
 }

@@ -15,6 +15,7 @@ import com.app.dlna.dmc.gui.customview.adapter.CustomArrayAdapter;
 import com.app.dlna.dmc.gui.customview.listener.DMRListenerView;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
+import com.app.dlna.dmc.processor.playlist.Playlist;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 import com.app.dlna.dmc.processor.playlist.PlaylistManager;
 
@@ -27,7 +28,8 @@ public class PlaylistView extends DMRListenerView {
 
 	public PlaylistView(Context context) {
 		super(context);
-		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.cv_playlist_allitem, this);
+		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
+				R.layout.cv_playlist_allitem, this);
 		m_listView = (ListView) findViewById(R.id.lv_playlist);
 		m_adapter = new CustomArrayAdapter(getContext(), 0);
 		m_listView.setAdapter(m_adapter);
@@ -48,14 +50,15 @@ public class PlaylistView extends DMRListenerView {
 			for (PlaylistItem item : MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getAllItems()) {
 				m_adapter.add(new AdapterItem(item));
 			}
+			m_playlistToolbar.setVisibility(View.VISIBLE);
 			m_playlistToolbar.enableBack();
 			break;
 		case VM_LIST:
-			m_adapter.add(new AdapterItem(PlaylistManager.UNSAVED_LIST));
-			for (PlaylistProcessor playlist : PlaylistManager.getAllPlaylist()) {
+			for (Playlist playlist : PlaylistManager.getAllPlaylist()) {
 				m_adapter.add(new AdapterItem(playlist));
 			}
 			m_playlistToolbar.disableBack();
+			m_playlistToolbar.setVisibility(View.GONE);
 		default:
 			break;
 		}
@@ -67,10 +70,10 @@ public class PlaylistView extends DMRListenerView {
 		@Override
 		public void onItemClick(AdapterView<?> adapter, View v, int position, long arg3) {
 			Object object = m_adapter.getItem(position).getData();
-			if (object instanceof PlaylistProcessor) {
-				MainActivity.UPNP_PROCESSOR.setPlaylistProcessor((PlaylistProcessor) object);
-				MainActivity.UPNP_PROCESSOR.getDMRProcessor().setPlaylistProcessor(
-						MainActivity.UPNP_PROCESSOR.getPlaylistProcessor());
+			if (object instanceof Playlist) {
+				PlaylistProcessor playlistProcessor = PlaylistManager.getPlaylistProcessor((Playlist) object);
+				MainActivity.UPNP_PROCESSOR.setPlaylistProcessor(playlistProcessor);
+				MainActivity.UPNP_PROCESSOR.getDMRProcessor().setPlaylistProcessor(playlistProcessor);
 				MainActivity.UPNP_PROCESSOR.getDMRProcessor().setSeftAutoNext(true);
 				m_viewMode = VM_DETAILS;
 				preparePlaylist();

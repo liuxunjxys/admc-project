@@ -51,6 +51,7 @@ import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.localdevice.service.LocalContentDirectoryService;
+import com.app.dlna.dmc.processor.playlist.Playlist;
 import com.app.dlna.dmc.processor.playlist.PlaylistManager;
 import com.app.dlna.dmc.processor.receiver.NetworkStateReceiver;
 import com.app.dlna.dmc.processor.receiver.NetworkStateReceiver.RouterStateListener;
@@ -152,7 +153,9 @@ public class CoreUpnpService extends Service {
 
 			m_httpThread = new MainHttpProcessor();
 			m_httpThread.start();
-			m_playlistProcessor = PlaylistManager.UNSAVED_LIST;
+			Playlist playlist = new Playlist();
+			playlist.setId(1);
+			m_playlistProcessor = PlaylistManager.getPlaylistProcessor(playlist);
 			LocalContentDirectoryService.scanMedia(CoreUpnpService.this);
 			showNotification();
 			startLocalDMS();

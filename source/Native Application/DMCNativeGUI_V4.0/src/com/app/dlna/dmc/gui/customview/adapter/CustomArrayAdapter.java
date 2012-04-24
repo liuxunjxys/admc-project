@@ -1,7 +1,5 @@
 package com.app.dlna.dmc.gui.customview.adapter;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +19,6 @@ import org.teleal.cling.support.model.item.VideoItem;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -35,15 +32,13 @@ import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.processor.cache.Cache;
-import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
+import com.app.dlna.dmc.processor.playlist.Playlist;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 import com.app.dlna.dmc.utility.Utility;
 
 public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
-	private static final String TAG = CustomArrayAdapter.class.getName();
 	private LayoutInflater m_inflater = null;
 	private Map<String, Bitmap> m_cacheDMSIcon;
-	private boolean m_cancelPreparing;
 	public static final int MAX_SIZE = 48;
 
 	public CustomArrayAdapter(Context context, int textViewResourceId) {
@@ -76,16 +71,16 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 			}
 		} else if (object.getData() instanceof PlaylistItem) {
 			initPlaylistItem((PlaylistItem) object.getData(), holder, position);
-		} else if (object.getData() instanceof PlaylistProcessor) {
-			initPlaylistProcessorItem((PlaylistProcessor) object.getData(), holder, position);
+		} else if (object.getData() instanceof Playlist) {
+			initPlaylist((Playlist) object.getData(), holder, position);
 		}
 
 		return convertView;
 	}
 
-	private void initPlaylistProcessorItem(PlaylistProcessor data, ViewHolder holder, int position) {
+	private void initPlaylist(Playlist data, ViewHolder holder, int position) {
 		holder.action.setVisibility(View.GONE);
-		holder.name.setText(data.getPlaylistName());
+		holder.name.setText(data.getName());
 		holder.desc.setText("");
 		holder.icon.setImageResource(R.drawable.ic_playlist);
 		holder.playing.setVisibility(View.GONE);
@@ -136,7 +131,8 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 					final RemoteDevice remoteDevice = (RemoteDevice) device;
 
 					String urlString = remoteDevice.getIdentity().getDescriptorURL().getProtocol() + "://"
-							+ remoteDevice.getIdentity().getDescriptorURL().getAuthority() + icons[0].getUri().toString();
+							+ remoteDevice.getIdentity().getDescriptorURL().getAuthority()
+							+ icons[0].getUri().toString();
 					URL url = new URL(urlString);
 					final Bitmap icon = BitmapFactory.decodeStream(url.openConnection().getInputStream());
 					m_cacheDMSIcon.put(udn, icon);
@@ -191,8 +187,8 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 			} else if (object instanceof VideoItem) {
 				holder.icon.setImageResource(R.drawable.ic_didlobject_video);
 			} else if (object instanceof ImageItem) {
-				Utility.loadImageItemThumbnail(holder.icon, object.getResources().get(0).getValue(), Cache.getBitmapCache(),
-						MAX_SIZE);
+				Utility.loadImageItemThumbnail(holder.icon, object.getResources().get(0).getValue(),
+						Cache.getBitmapCache(), MAX_SIZE);
 			} else {
 				holder.icon.setImageResource(R.drawable.ic_didlobject_unknow);
 			}
@@ -202,7 +198,8 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 			}
 			if (object instanceof Item) {
 				holder.action.setVisibility(View.VISIBLE);
-				if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().containsUrl(object.getResources().get(0).getValue())) {
+				if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().containsUrl(
+						object.getResources().get(0).getValue())) {
 					holder.action.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_remove));
 				} else {
 					holder.action.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_add));
@@ -269,37 +266,37 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 	}
 
 	public void prepareImageItemCache(final List<? extends DIDLObject> objects) {
-//		new Thread(new Runnable() {
-//
-//			@Override
-//			public void run() {
-//				m_cancelPreparing = false;
-//				for (DIDLObject didlObject : objects) {
-//
-//					if (m_cancelPreparing) {
-//						Log.e(TAG, "Cancel preparing");
-//						break;
-//					}
-//
-//					if (didlObject instanceof ImageItem) {
-//						synchronized (Cache.getBitmapCache()) {
-//							String imageUrl = didlObject.getResources().get(0).getValue();
-//							try {
-//								Cache.getBitmapCache().put(imageUrl, Utility.getBitmapFromURL(imageUrl, MAX_SIZE));
-//							} catch (MalformedURLException e) {
-//								e.printStackTrace();
-//							} catch (IOException e) {
-//								e.printStackTrace();
-//							}
-//						}
-//					}
-//				}
-//			}
-//		}).start();
+		// new Thread(new Runnable() {
+		//
+		// @Override
+		// public void run() {
+		// m_cancelPreparing = false;
+		// for (DIDLObject didlObject : objects) {
+		//
+		// if (m_cancelPreparing) {
+		// Log.e(TAG, "Cancel preparing");
+		// break;
+		// }
+		//
+		// if (didlObject instanceof ImageItem) {
+		// synchronized (Cache.getBitmapCache()) {
+		// String imageUrl = didlObject.getResources().get(0).getValue();
+		// try {
+		// Cache.getBitmapCache().put(imageUrl,
+		// Utility.getBitmapFromURL(imageUrl, MAX_SIZE));
+		// } catch (MalformedURLException e) {
+		// e.printStackTrace();
+		// } catch (IOException e) {
+		// e.printStackTrace();
+		// }
+		// }
+		// }
+		// }
+		// }
+		// }).start();
 	}
 
 	public void cancelPrepareImageCache() {
-		m_cancelPreparing = true;
 	}
 
 	private OnClickListener m_actionClick = new OnClickListener() {
@@ -316,7 +313,8 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 			} else if (item instanceof DIDLObject) {
 				final DIDLObject object = (DIDLObject) item;
 				if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor() != null)
-					if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().containsUrl(object.getResources().get(0).getValue())) {
+					if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().containsUrl(
+							object.getResources().get(0).getValue())) {
 						if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().removeDIDLObject(object) != null)
 							updateSingleView(v, position);
 					} else {
