@@ -17,14 +17,12 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 	private List<PlaylistItem> m_playlistItems;
 	private int m_currentItemIdx;
 	private int m_maxSize;
-	private List<String> m_listURI;
 	private Playlist m_data;
 
 	public PlaylistProcessorImpl(Playlist LIST_DATA, int maxItem) {
 		m_playlistItems = new ArrayList<PlaylistItem>();
 		m_currentItemIdx = -1;
 		m_maxSize = maxItem;
-		m_listURI = new ArrayList<String>();
 		m_data = LIST_DATA;
 	}
 
@@ -104,7 +102,7 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 			if (m_playlistItems.contains(item))
 				return item;
 			m_playlistItems.add(item);
-			m_listURI.add(item.getUri());
+			PlaylistManager.createPlaylistItem(item, m_data.getId());
 			if (m_playlistItems.size() == 1) {
 				m_currentItemIdx = 0;
 			}
@@ -117,7 +115,6 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 		synchronized (m_playlistItems) {
 			if (m_playlistItems.contains(item)) {
 				m_playlistItems.remove(item);
-				m_listURI.remove(item.getUri());
 				long id = item.getId();
 				PlaylistManager.deletePlaylistItem(id);
 				return item;
@@ -133,7 +130,11 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 
 	@Override
 	public boolean containsUrl(String url) {
-		return m_listURI.contains(url);
+		List<String> listUrl = new ArrayList<String>();
+		for (PlaylistItem item : m_playlistItems) {
+			listUrl.add(item.getUrl());
+		}
+		return listUrl.contains(url);
 	}
 
 	@Override
@@ -163,22 +164,5 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 	@Override
 	public PlaylistItem getItemAt(int idx) {
 		return m_playlistItems.get(idx);
-	}
-
-	@Override
-	public void insertNew(String name) {
-		m_data.setName(name);
-		// TODO: fix here
-		// PlaylistManager.createPlaylist(this);
-	}
-
-	@Override
-	public void updateCurrent() {
-		PlaylistManager.updatePlaylist(this);
-	}
-
-	@Override
-	public void deleteCurrent() {
-		PlaylistManager.deletePlaylist(this);
 	}
 }

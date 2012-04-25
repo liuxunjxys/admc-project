@@ -110,7 +110,7 @@ public class RendererControlView extends LinearLayout {
 		final PlaylistItem item = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getCurrentItem();
 		if (item != null) {
 			if (MainActivity.UPNP_PROCESSOR.getDMRProcessor() != null)
-				MainActivity.UPNP_PROCESSOR.getDMRProcessor().setURIandPlay(item.getUri());
+				MainActivity.UPNP_PROCESSOR.getDMRProcessor().setURIandPlay(item.getUrl());
 		}
 	}
 

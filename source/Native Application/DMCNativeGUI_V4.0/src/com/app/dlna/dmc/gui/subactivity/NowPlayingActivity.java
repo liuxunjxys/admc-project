@@ -113,7 +113,7 @@ public class NowPlayingActivity extends Activity {
 			Log.i(TAG, "Pageselected");
 			PlaylistProcessor playlist = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
 			PlaylistItem item = playlist.getItemAt(position);
-			(new LoadImageAsync()).execute(item.getUri(), "256", "256", String.valueOf(position));
+			(new LoadImageAsync()).execute(item.getUrl(), "256", "256", String.valueOf(position));
 		}
 
 		@Override

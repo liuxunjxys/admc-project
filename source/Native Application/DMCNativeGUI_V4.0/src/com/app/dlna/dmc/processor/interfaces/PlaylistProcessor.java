@@ -40,10 +40,4 @@ public interface PlaylistProcessor {
 	
 	void setData(Playlist data);
 	
-	void insertNew(String name);
-	
-	void updateCurrent();
-	
-	void deleteCurrent();
-	
 }

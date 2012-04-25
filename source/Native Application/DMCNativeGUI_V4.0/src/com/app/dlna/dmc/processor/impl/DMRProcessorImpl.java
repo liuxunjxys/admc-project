@@ -508,7 +508,7 @@ public class DMRProcessorImpl implements DMRProcessor {
 						m_playlistProcessor.next();
 						final PlaylistItem item = m_playlistProcessor.getCurrentItem();
 						if (item != null) {
-							setURIandPlay(item.getUri());
+							setURIandPlay(item.getUrl());
 						}
 					}
 					m_autoNextPending = 7;

@@ -22,6 +22,7 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
 import app.dlna.controller.v4.R;
@@ -30,6 +31,8 @@ import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.customview.adapter.AdapterItem;
 import com.app.dlna.dmc.gui.customview.adapter.CustomArrayAdapter;
 import com.app.dlna.dmc.gui.customview.listener.DMRListenerView;
+import com.app.dlna.dmc.gui.dialog.DeviceDetailsDialog;
+import com.app.dlna.dmc.gui.dialog.DeviceDetailsDialog.DeviceDetailsListener;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor.DMSProcessorListner;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
@@ -48,11 +51,13 @@ public class HomeNetworkView extends DMRListenerView {
 	public HomeNetworkView(Context context) {
 		super(context);
 		m_isBrowsing = false;
-		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.cv_homenetwork, this);
+		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.cv_homenetwork,
+				this);
 		m_listView = (ListView) findViewById(R.id.lv_mediasource_browsing);
 		m_adapter = new CustomArrayAdapter(context, 0);
 		m_listView.setAdapter(m_adapter);
 		m_listView.setOnItemClickListener(m_itemClick);
+		m_listView.setOnItemLongClickListener(m_itemLongClick);
 		m_listView.setOnScrollListener(m_scrollListener);
 		m_progressDlg = new ProgressDialog(MainActivity.INSTANCE);
 		m_progressDlg.setTitle("Loading");
@@ -84,8 +89,8 @@ public class HomeNetworkView extends DMRListenerView {
 						&& !m_progressDlg.isShowing()
 						&& firstVisibleItem + visibleItemCount == totalItemCount
 						&& m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData() instanceof DIDLObject
-						&& ((DIDLObject) m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData()).getId().equals(
-								"-1")) {
+						&& ((DIDLObject) m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData()).getId()
+								.equals("-1")) {
 					doLoadMoreItems();
 				}
 			} catch (Exception ex) {
@@ -126,6 +131,35 @@ public class HomeNetworkView extends DMRListenerView {
 
 	};
 
+	private OnItemLongClickListener m_itemLongClick = new OnItemLongClickListener() {
+
+		@SuppressWarnings("rawtypes")
+		@Override
+		public boolean onItemLongClick(AdapterView<?> adapter, final View view, final int position, final long id) {
+			Object object = m_adapter.getItem(position).getData();
+			if (object instanceof Device) {
+				new DeviceDetailsDialog(getContext(), (Device) object, new DeviceDetailsListener() {
+
+					@Override
+					public void onWriteTAGClick(Device device) {
+						MainActivity.INSTANCE.waitToWriteTAG("dms:"
+								+ device.getIdentity().getUdn().getIdentifierString());
+					}
+
+					@Override
+					public void onSelectClick(Device device) {
+						m_listView.performItemClick(view, position, id);
+					}
+				}).show();
+			} else if (object instanceof DIDLObject) {
+				// TODO: show context menu
+			}
+
+			return true;
+		}
+
+	};
+
 	private void doLoadMoreItems() {
 		m_loadMore = true;
 		m_progressDlg.show();
@@ -147,7 +181,7 @@ public class HomeNetworkView extends DMRListenerView {
 			m_adapter.notifyVisibleItemChanged(m_listView);
 			Toast.makeText(getContext(), "Added item to playlist", Toast.LENGTH_SHORT).show();
 			playlistProcessor.setCurrentItem(added);
-			dmrProcessor.setURIandPlay(playlistProcessor.getCurrentItem().getUri());
+			dmrProcessor.setURIandPlay(playlistProcessor.getCurrentItem().getUrl());
 		} else {
 			if (playlistProcessor.isFull()) {
 				Toast.makeText(getContext(), "Current playlist is full", Toast.LENGTH_SHORT).show();
@@ -187,8 +221,8 @@ public class HomeNetworkView extends DMRListenerView {
 		@Override
 		public void onBrowseComplete(final String objectID, final boolean haveNext, boolean havePrev,
 				final Map<String, List<? extends DIDLObject>> result) {
-			Log.i(TAG, "browse complete: object id = " + objectID + " haveNext = " + haveNext + "; havePrev =" + havePrev
-					+ "; result size = " + result.size());
+			Log.i(TAG, "browse complete: object id = " + objectID + " haveNext = " + haveNext + "; havePrev ="
+					+ havePrev + "; result size = " + result.size());
 			m_isRoot = objectID.equals("0");
 			MainActivity.INSTANCE.runOnUiThread(new Runnable() {
 

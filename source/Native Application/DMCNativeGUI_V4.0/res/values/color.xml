@@ -13,5 +13,6 @@
     <color name="pager_tiltle_stip">#000000</color>
     <color name="tab_background_gray">#CCCCCCCC</color>
     <color name="custom_menu_background">#ff222222</color>
+    <color name="common_background">#000</color>
 
 </resources>
