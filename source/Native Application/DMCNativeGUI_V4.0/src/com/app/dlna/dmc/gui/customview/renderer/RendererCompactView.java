@@ -27,7 +27,7 @@ import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.dialog.DeviceDetailsDialog;
 import com.app.dlna.dmc.gui.dialog.DeviceDetailsDialog.DeviceDetailsListener;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor.DMRProcessorListner;
-import com.app.dlna.dmc.processor.interfaces.UpnpProcessor.UpnpProcessorListener;
+import com.app.dlna.dmc.processor.interfaces.UpnpProcessor.DevicesListener;
 
 public class RendererCompactView extends LinearLayout {
 
@@ -50,13 +50,12 @@ public class RendererCompactView extends LinearLayout {
 				MainActivity.UPNP_PROCESSOR.setCurrentDMR(device.getIdentity().getUdn());
 			}
 		}
+		MainActivity.UPNP_PROCESSOR.addDevicesListener(m_deviceListener);
 		updateListRenderer();
-		setDevicesListener();
 		m_btn_quickPlayPause = (ImageView) findViewById(R.id.btn_quickPlayPause);
 		m_btn_quickPlayPause.setOnClickListener(m_quickPlayPauseClick);
 		m_btn_quickPlayPause.setTag(R.string.play);
 		setDMRListener();
-
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -250,7 +249,7 @@ public class RendererCompactView extends LinearLayout {
 	public void updateListRenderer() {
 		Device currentDMR = MainActivity.UPNP_PROCESSOR.getCurrentDMR();
 		for (int i = 0; i < m_ll_renderers.getChildCount(); ++i) {
-			if (currentDMR.getIdentity().getUdn().equals(m_ll_renderers.getChildAt(i).getTag())) {
+			if (currentDMR.equals(m_ll_renderers.getChildAt(i).getTag())) {
 				m_ll_renderers.getChildAt(i).setSelected(true);
 				m_ll_renderers.getChildAt(i).invalidate();
 			} else {
@@ -261,41 +260,8 @@ public class RendererCompactView extends LinearLayout {
 		m_ll_renderers.invalidate();
 	}
 
-	private void setDevicesListener() {
-		MainActivity.UPNP_PROCESSOR.addListener(m_deviceListener);
-	}
-
 	// Devices listener
-	private UpnpProcessorListener m_deviceListener = new UpnpProcessorListener() {
-
-		@Override
-		public void onStartFailed() {
-
-		}
-
-		@Override
-		public void onStartComplete() {
-
-		}
-
-		@Override
-		public void onRouterError(String cause) {
-
-		}
-
-		@Override
-		public void onRouterEnabledEvent() {
-
-		}
-
-		@Override
-		public void onRouterDisabledEvent() {
-
-		}
-
-		@Override
-		public void onNetworkChanged() {
-		}
+	private DevicesListener m_deviceListener = new DevicesListener() {
 
 		@SuppressWarnings("rawtypes")
 		@Override
@@ -310,6 +276,7 @@ public class RendererCompactView extends LinearLayout {
 		@SuppressWarnings("rawtypes")
 		@Override
 		public void onDeviceAdded(Device device) {
+
 			if (device.getType().getNamespace().equals("schemas-upnp-org")) {
 				if (device.getType().getType().equals("MediaRenderer")) {
 					addDMR(device);
@@ -321,6 +288,7 @@ public class RendererCompactView extends LinearLayout {
 
 	@SuppressWarnings("rawtypes")
 	private void addDMR(final Device device) {
+		Log.e(TAG, "DMR Added " + device);
 		MainActivity.INSTANCE.runOnUiThread(new Runnable() {
 
 			@Override
@@ -333,13 +301,14 @@ public class RendererCompactView extends LinearLayout {
 
 	@SuppressWarnings("rawtypes")
 	private void removeDMR(final Device device) {
+		Log.e(TAG, "DMR Removed " + device);
 		MainActivity.INSTANCE.runOnUiThread(new Runnable() {
 
 			@Override
 			public void run() {
 				for (int idx = 0; idx < m_ll_renderers.getChildCount(); ++idx) {
-					if (m_ll_renderers.getChildAt(idx).getTag() != null
-							&& m_ll_renderers.getChildAt(idx).getTag().equals(device.getIdentity().getUdn())) {
+					Object viewTag = m_ll_renderers.getChildAt(idx).getTag();
+					if (viewTag != null && viewTag.equals(device)) {
 						m_ll_renderers.removeViewAt(idx);
 						break;
 					}

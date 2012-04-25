@@ -26,6 +26,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
@@ -50,7 +51,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 	public static UpnpProcessor UPNP_PROCESSOR = null;
 	private static final int DEFAULT_TAB_INDEX = 0;
 	private ProgressDialog m_routerProgressDialog;
-	private ProgressDialog m_pd_nfcWriteWaiting;
+	private ProgressDialog m_nfcProgressDialog;
 	public static MainActivity INSTANCE;
 	private LinearLayout m_ll_menu;
 	private BroadcastReceiver m_mountedReceiver = new SDCardReceiver();
@@ -92,10 +93,11 @@ public class MainActivity extends UpnpListenerTabActivity {
 		m_filters = new IntentFilter[] { ndef, };
 		m_techLists = new String[][] { new String[] { MifareClassic.class.getName() } };
 
-		m_pd_nfcWriteWaiting = new ProgressDialog(MainActivity.this);
-		m_pd_nfcWriteWaiting.setTitle("Tap for a NFC TAG to write");
-		m_pd_nfcWriteWaiting.setCancelable(true);
-		m_pd_nfcWriteWaiting.setOnDismissListener(new OnDismissListener() {
+		m_nfcProgressDialog = new ProgressDialog(MainActivity.this);
+		m_nfcProgressDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		m_nfcProgressDialog.setMessage("Tap for a NFC TAG to write");
+		m_nfcProgressDialog.setCancelable(true);
+		m_nfcProgressDialog.setOnDismissListener(new OnDismissListener() {
 
 			@Override
 			public void onDismiss(DialogInterface dialog) {
@@ -408,10 +410,10 @@ public class MainActivity extends UpnpListenerTabActivity {
 				try {
 					Tag detectedTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
 					if (NFCUtils.writeTag(NFCUtils.getNdefMessageFromString(m_messageToWrite), detectedTag)) {
-						m_pd_nfcWriteWaiting.dismiss();
+						m_nfcProgressDialog.dismiss();
 						Toast.makeText(this, "Success: Wrote text to nfc tag", Toast.LENGTH_LONG).show();
 					} else {
-						m_pd_nfcWriteWaiting.dismiss();
+						m_nfcProgressDialog.dismiss();
 						Toast.makeText(this, "Write failed", Toast.LENGTH_LONG).show();
 					}
 				} catch (UnsupportedEncodingException e) {
@@ -478,7 +480,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 	public void waitToWriteTAG(String text) {
 		m_messageToWrite = text;
 		m_waitToWriteTAG = true;
-		m_pd_nfcWriteWaiting.show();
+		m_nfcProgressDialog.show();
 	}
 
 }

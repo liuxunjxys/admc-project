@@ -8,9 +8,13 @@ import org.teleal.cling.model.types.UDN;
 import org.teleal.cling.registry.Registry;
 
 public interface UpnpProcessor {
-	void addListener(UpnpProcessorListener listener);
+	void addDevicesListener(DevicesListener listener);
 
-	void removeListener(UpnpProcessorListener listener);
+	void removeDevicesListener(DevicesListener listener);
+	
+	void addSystemListener(SystemListener listener);
+	
+	void removeSystemListener(SystemListener listener);
 
 	void bindUpnpService();
 
@@ -19,7 +23,7 @@ public interface UpnpProcessor {
 	void setCurrentDMS(UDN uDN);
 
 	void setCurrentDMR(UDN uDN);
-	
+
 	Registry getRegistry();
 
 	@SuppressWarnings("rawtypes")
@@ -43,10 +47,10 @@ public interface UpnpProcessor {
 	DMRProcessor getDMRProcessor();
 
 	DownloadProcessor getDownloadProcessor();
-	
+
 	void setPlaylistProcessor(PlaylistProcessor playlistProcessor);
 
-	public interface UpnpProcessorListener {
+	public interface DevicesListener {
 
 		@SuppressWarnings("rawtypes")
 		void onDeviceAdded(Device device);
@@ -54,6 +58,9 @@ public interface UpnpProcessor {
 		@SuppressWarnings("rawtypes")
 		void onDeviceRemoved(Device device);
 
+	}
+
+	public interface SystemListener {
 		void onStartComplete();
 
 		void onStartFailed();
@@ -65,9 +72,6 @@ public interface UpnpProcessor {
 		void onRouterEnabledEvent();
 
 		void onRouterDisabledEvent();
-
 	}
-
-	
 
 }
