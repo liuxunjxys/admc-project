@@ -18,7 +18,7 @@ public class PlaylistItem {
 		return m_id;
 	}
 
-	public String getUri() {
+	public String getUrl() {
 		return m_url;
 	}
 
@@ -47,7 +47,7 @@ public class PlaylistItem {
 		if (!(o instanceof PlaylistItem))
 			return false;
 		PlaylistItem other = (PlaylistItem) o;
-		if (other.getUri().equals(this.m_url) && other.getType().equals(this.m_type)
+		if (other.getUrl().equals(this.m_url) && other.getType().equals(this.m_type)
 				&& other.getTitle().equals(this.m_title))
 			return true;
 		return false;

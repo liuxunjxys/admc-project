@@ -20,11 +20,6 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 		m_context = context;
 	}
 
-	// @Override
-	// public void setURI(String uri) {
-	//
-	// }
-
 	@Override
 	public void setURIandPlay(String uri) {
 		String extension = MimeTypeMap.getFileExtensionFromUrl(uri).toLowerCase();
@@ -114,20 +109,17 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 
 	@Override
 	public void setURIandPlay(PlaylistItem item, boolean proxyMode) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void setSeftAutoNext(boolean autoNext) {
-		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public String getCurrentTrackURI() {
-		// TODO Auto-generated method stub
-		return null;
+		return "";
 	}
 
 }

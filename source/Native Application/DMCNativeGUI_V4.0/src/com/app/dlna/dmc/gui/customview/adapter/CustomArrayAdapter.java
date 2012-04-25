@@ -226,7 +226,7 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 			holder.icon.setImageResource(R.drawable.ic_didlobject_video);
 			break;
 		case IMAGE:
-			Utility.loadImageItemThumbnail(holder.icon, object.getUri(), Cache.getBitmapCache(), MAX_SIZE);
+			Utility.loadImageItemThumbnail(holder.icon, object.getUrl(), Cache.getBitmapCache(), MAX_SIZE);
 			break;
 		default:
 			holder.icon.setImageResource(R.drawable.ic_didlobject_unknow);
@@ -234,7 +234,7 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 		}
 		holder.action.setVisibility(View.VISIBLE);
 		holder.action.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_remove));
-		if (object.getUri().equals(MainActivity.UPNP_PROCESSOR.getDMRProcessor().getCurrentTrackURI())) {
+		if (object.getUrl().equals(MainActivity.UPNP_PROCESSOR.getDMRProcessor().getCurrentTrackURI())) {
 			holder.playing.setVisibility(View.VISIBLE);
 		} else {
 			holder.playing.setVisibility(View.GONE);

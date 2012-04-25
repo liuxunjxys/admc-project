@@ -30,19 +30,15 @@ public class PlaylistProvider extends ContentProvider {
 	public int delete(Uri uri, String selection, String[] selectionArgs) {
 		switch (uriMatcher.match(uri)) {
 		case PLAYLIST: {
-			Log.i(TAG, "Delete playlist, selection = " + selection);
 			SQLiteDatabase database = dbPlaylistHelper.getWritableDatabase();
 			int deleted = database.delete(PlaylistSQLiteHelper.TABLE_PLAYLISTS, selection, selectionArgs);
 			database.close();
-			Log.i(TAG, "Delete " + deleted + " items");
 			return deleted;
 		}
 		case PLAYLIST_ITEM: {
-			Log.i(TAG, "Delete playlist item, selection = " + selection);
 			SQLiteDatabase database = dbPlaylistHelper.getWritableDatabase();
 			int deleted = database.delete(PlaylistSQLiteHelper.TABLE_PLAYLIST_ITEMS, selection, selectionArgs);
 			database.close();
-			Log.i(TAG, "Delete " + deleted + " items");
 			return deleted;
 		}
 		}
@@ -64,6 +60,7 @@ public class PlaylistProvider extends ContentProvider {
 			return Uri.parse(PLAYLIST_URI.toString() + "/?newid=" + newId);
 		}
 		case PLAYLIST_ITEM: {
+			Log.i(TAG, "Insert playlist item " + values.toString());
 			SQLiteDatabase database = dbPlaylistHelper.getWritableDatabase();
 			long newId = database.insert(PlaylistSQLiteHelper.TABLE_PLAYLIST_ITEMS, null, values);
 			database.close();
@@ -105,7 +102,22 @@ public class PlaylistProvider extends ContentProvider {
 
 	@Override
 	public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-		return 0;
+		int count = -1;
+		switch (uriMatcher.match(uri)) {
+		case PLAYLIST: {
+			break;
+		}
+		case PLAYLIST_ITEM: {
+			Log.i(TAG, "UpdateItem = " + values.toString());
+			SQLiteDatabase database = dbPlaylistHelper.getWritableDatabase();
+			count = database.update(PlaylistSQLiteHelper.TABLE_PLAYLIST_ITEMS, values, selection, selectionArgs);
+			database.close();
+			break;
+		}
+		default:
+			break;
+		}
+		return count;
 	}
 
 }

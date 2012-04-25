@@ -12,11 +12,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentFilter.MalformedMimeTypeException;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
+import android.nfc.Tag;
 import android.nfc.tech.MifareClassic;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -38,6 +40,7 @@ import com.app.dlna.dmc.gui.subactivity.NowPlayingActivity;
 import com.app.dlna.dmc.processor.impl.UpnpProcessorImpl;
 import com.app.dlna.dmc.processor.interfaces.UpnpProcessor;
 import com.app.dlna.dmc.processor.localdevice.service.LocalContentDirectoryService;
+import com.app.dlna.dmc.processor.nfc.NFCUtils;
 import com.app.dlna.dmc.processor.receiver.SDCardReceiver;
 import com.app.dlna.dmc.processor.systemservice.RestartService;
 
@@ -47,6 +50,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 	public static UpnpProcessor UPNP_PROCESSOR = null;
 	private static final int DEFAULT_TAB_INDEX = 0;
 	private ProgressDialog m_routerProgressDialog;
+	private ProgressDialog m_pd_nfcWriteWaiting;
 	public static MainActivity INSTANCE;
 	private LinearLayout m_ll_menu;
 	private BroadcastReceiver m_mountedReceiver = new SDCardReceiver();
@@ -54,6 +58,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 	private PendingIntent m_pendingIntent;
 	private IntentFilter[] m_filters;
 	private String[][] m_techLists;
+	private boolean m_waitToWriteTAG = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -86,6 +91,17 @@ public class MainActivity extends UpnpListenerTabActivity {
 		}
 		m_filters = new IntentFilter[] { ndef, };
 		m_techLists = new String[][] { new String[] { MifareClassic.class.getName() } };
+
+		m_pd_nfcWriteWaiting = new ProgressDialog(MainActivity.this);
+		m_pd_nfcWriteWaiting.setTitle("Tap for a NFC TAG to write");
+		m_pd_nfcWriteWaiting.setCancelable(true);
+		m_pd_nfcWriteWaiting.setOnDismissListener(new OnDismissListener() {
+
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				m_waitToWriteTAG = false;
+			}
+		});
 	}
 
 	private OnTabChangeListener changeListener = new OnTabChangeListener() {
@@ -208,8 +224,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 			public void run() {
 				if (m_routerProgressDialog != null)
 					m_routerProgressDialog.dismiss();
-				new AlertDialog.Builder(MainActivity.this).setTitle("Network error").setMessage(cause).setCancelable(false)
-						.setPositiveButton("OK", new OnClickListener() {
+				new AlertDialog.Builder(MainActivity.this).setTitle("Network error").setMessage(cause)
+						.setCancelable(false).setPositiveButton("OK", new OnClickListener() {
 
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
@@ -297,6 +313,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 			}
 		}
 	};
+	private String m_messageToWrite;
 
 	private void refreshDevicesList() {
 		if (UPNP_PROCESSOR != null) {
@@ -376,7 +393,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 					tv.setTag(i);
 					tv.setOnClickListener(customMenuItemClick);
 					tv.setTextSize(20);
-					tv.setBackgroundDrawable(MainActivity.this.getResources().getDrawable(R.drawable.bg_actionbar_normal));
+					tv.setBackgroundDrawable(MainActivity.this.getResources().getDrawable(
+							R.drawable.bg_actionbar_normal));
 					m_ll_menu.addView(tv);
 				}
 			}
@@ -385,37 +403,82 @@ public class MainActivity extends UpnpListenerTabActivity {
 
 	protected void onNewIntent(Intent intent) {
 		if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
-			Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-			if (rawMsgs != null) {
-				NdefMessage[] msgs = new NdefMessage[rawMsgs.length];
-				for (int i = 0; i < rawMsgs.length; i++) {
-					msgs[i] = (NdefMessage) rawMsgs[i];
-					Log.e(TAG, "NFC Tag receive");
-					byte[] buffer = msgs[i].getRecords()[0].getPayload();
-					String textEncoding = (buffer[0] & 0200) == 0 ? "UTF-8" : "UTF-16";
-					int languageCodeLength = buffer[0] & 0077;
-					try {
-						String text = new String(buffer, languageCodeLength + 1, buffer.length - languageCodeLength - 1,
-								textEncoding);
-						if (UPNP_PROCESSOR != null) {
-							UPNP_PROCESSOR.setCurrentDMR(new UDN(text));
-							if (UPNP_PROCESSOR.getDMRProcessor() != null) {
-								Toast.makeText(MainActivity.this,
-										"Current DMR: " + UPNP_PROCESSOR.getCurrentDMR().getDetails().getFriendlyName(),
-										Toast.LENGTH_SHORT).show();
-							} else {
-								Toast.makeText(MainActivity.this, "Cannot find DMR from NFC Tag, udn = " + text,
-										Toast.LENGTH_SHORT).show();
-							}
-						}
-					} catch (UnsupportedEncodingException e) {
-						e.printStackTrace();
-						Log.e(TAG, "NFC TAG parse text error");
+			if (m_waitToWriteTAG && m_messageToWrite != null) {
+				// write message to TAG
+				try {
+					Tag detectedTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+					if (NFCUtils.writeTag(NFCUtils.getNdefMessageFromString(m_messageToWrite), detectedTag)) {
+						m_pd_nfcWriteWaiting.dismiss();
+						Toast.makeText(this, "Success: Wrote text to nfc tag", Toast.LENGTH_LONG).show();
+					} else {
+						m_pd_nfcWriteWaiting.dismiss();
+						Toast.makeText(this, "Write failed", Toast.LENGTH_LONG).show();
 					}
+				} catch (UnsupportedEncodingException e) {
+					e.printStackTrace();
+					Log.e(TAG, "Unsupport encoding");
+					Toast.makeText(this, "Write failed; cause = " + e.getMessage(), Toast.LENGTH_LONG).show();
+				}
+			} else {
+				Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+				if (rawMsgs != null) {
+					NdefMessage[] msgs = new NdefMessage[rawMsgs.length];
+					for (int i = 0; i < rawMsgs.length; i++) {
+						msgs[i] = (NdefMessage) rawMsgs[i];
+						Log.e(TAG, "NFC Tag receive");
+						byte[] buffer = msgs[i].getRecords()[0].getPayload();
+						String textEncoding = (buffer[0] & 0200) == 0 ? "UTF-8" : "UTF-16";
+						int languageCodeLength = buffer[0] & 0077;
+						try {
+							String text = new String(buffer, languageCodeLength + 1, buffer.length - languageCodeLength
+									- 1, textEncoding);
+							String deviceType = text.substring(0, 3);
+							String deviceUDN = text.substring(4);
+							if (UPNP_PROCESSOR != null) {
+								if (deviceType.toLowerCase().equals("dmr")) {
+									UPNP_PROCESSOR.setCurrentDMR(new UDN(deviceUDN));
+									if (UPNP_PROCESSOR.getDMRProcessor() != null) {
+										Toast.makeText(
+												MainActivity.this,
+												"Current DMR: "
+														+ UPNP_PROCESSOR.getCurrentDMR().getDetails().getFriendlyName(),
+												Toast.LENGTH_SHORT).show();
+									} else {
+										Toast.makeText(MainActivity.this,
+												"Cannot find DMR from NFC Tag, udn = " + deviceUDN, Toast.LENGTH_SHORT)
+												.show();
+									}
+								} else if (deviceType.toLowerCase().equals("dms")) {
+									UPNP_PROCESSOR.setCurrentDMS(new UDN(deviceUDN));
+									if (UPNP_PROCESSOR.getDMSProcessor() != null) {
+										Toast.makeText(
+												MainActivity.this,
+												"Current DMS: "
+														+ UPNP_PROCESSOR.getCurrentDMS().getDetails().getFriendlyName(),
+												Toast.LENGTH_SHORT).show();
+									} else {
+										Toast.makeText(MainActivity.this,
+												"Cannot find DMS from NFC Tag, udn = " + deviceUDN, Toast.LENGTH_SHORT)
+												.show();
+									}
 
+								}
+							}
+						} catch (UnsupportedEncodingException e) {
+							e.printStackTrace();
+							Log.e(TAG, "NFC TAG parse text error");
+						}
+
+					}
 				}
 			}
 		}
 	};
+
+	public void waitToWriteTAG(String text) {
+		m_messageToWrite = text;
+		m_waitToWriteTAG = true;
+		m_pd_nfcWriteWaiting.show();
+	}
 
 }

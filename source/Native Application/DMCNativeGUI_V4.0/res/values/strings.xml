@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <resources>
-
     <string name="app_name">Media2Share</string>
     <string name="upnp_service">Upnp Service</string>
     <string name="refresh">Refresh</string>
@@ -39,19 +38,21 @@
     <string name="play">play</string>
     <string name="pause">pause</string>
     <string name="deselectall">deselectAll</string>
-
     <string-array name="libray_pager_list">
         <item>Home Network</item>
         <item>Playlist</item>
         <item>Internet</item>
     </string-array>
-    
     <string-array name="menu_items">
         <item>Refresh</item>
         <item>Settings</item>
         <item>About</item>
     </string-array>
-        <string name="minimize">Minimize</string>
-        <string name="close">Close</string>
-
+    <string name="minimize">Minimize</string>
+    <string name="close">Close</string>
+    <string name="device_name">Device Name:</string>
+    <string name="device_type">Device Type:</string>
+    <string name="device_udn">Device UDN:</string>
+    <string name="select">Select</string>
+    <string name="writeToTag">Write TAG</string>
 </resources>

@@ -24,7 +24,8 @@ public class DMRListenerView extends LinearLayout {
 
 		@Override
 		public void onUpdatePosition(long current, long max) {
-
+			if (MainActivity.UPNP_PROCESSOR == null)
+				return;
 			if (!m_currentURI.equals(MainActivity.UPNP_PROCESSOR.getDMRProcessor().getCurrentTrackURI())) {
 				int start = m_listView.getFirstVisiblePosition();
 				int end = m_listView.getLastVisiblePosition();

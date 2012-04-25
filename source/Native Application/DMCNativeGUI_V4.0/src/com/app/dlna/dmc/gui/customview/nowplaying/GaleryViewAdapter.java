@@ -58,7 +58,7 @@ public class GaleryViewAdapter extends BaseAdapter {
 			break;
 		case IMAGE:
 			holder.image.setScaleType(ScaleType.FIT_START);
-			Utility.loadImageItemThumbnail(holder.image, item.getUri(), Cache.getBitmapCache(), MAX_SIZE);
+			Utility.loadImageItemThumbnail(holder.image, item.getUrl(), Cache.getBitmapCache(), MAX_SIZE);
 			break;
 		default:
 			holder.image.setImageResource(R.drawable.ic_didlobject_unknow);

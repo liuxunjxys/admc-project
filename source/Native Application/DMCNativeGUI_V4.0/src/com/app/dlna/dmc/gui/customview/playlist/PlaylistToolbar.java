@@ -14,6 +14,7 @@ import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.customview.localnetwork.HomeNetworkView;
+import com.app.dlna.dmc.processor.async.ProgressDialogAsyncTask;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.playlist.Playlist;
 import com.app.dlna.dmc.processor.playlist.PlaylistManager;
@@ -51,14 +52,6 @@ public class PlaylistToolbar extends LinearLayout {
 		m_playlistView = playlistView;
 	}
 
-	public void enableBack() {
-		m_btn_back.setEnabled(true);
-	}
-
-	public void disableBack() {
-		m_btn_back.setEnabled(false);
-	}
-
 	private OnClickListener m_backClick = new OnClickListener() {
 
 		@Override
@@ -71,7 +64,7 @@ public class PlaylistToolbar extends LinearLayout {
 
 		@Override
 		public void onClick(View v) {
-			if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getData().getId() == -1)
+			if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getData().getId() == 1)
 				createSaveDialog();
 		}
 	};
@@ -79,7 +72,20 @@ public class PlaylistToolbar extends LinearLayout {
 
 		@Override
 		public void onClick(View v) {
+			new ProgressDialogAsyncTask<Void, Void, Void>("Clear Playlist") {
 
+				@Override
+				protected Void doInBackground(Void... params) {
+					PlaylistManager.clearPlaylist(MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getData().getId());
+					return null;
+				}
+
+				protected void onPostExecute(Void result) {
+					super.onPostExecute(result);
+					m_playlistView.backToListPlaylist();
+				};
+
+			}.execute(new Void[] {});
 		}
 	};
 	private OnClickListener m_removeClick = new OnClickListener() {
@@ -104,14 +110,25 @@ public class PlaylistToolbar extends LinearLayout {
 
 		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
-				PlaylistProcessor processor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
 				String value = input.getText().toString();
 				if (value != null && value.trim().length() != 0) {
-					// insert to db
-					Playlist playlist = new Playlist();
+					final Playlist playlist = new Playlist();
 					playlist.setName(value);
-					PlaylistManager.createPlaylist(playlist);
-					m_playlistView.backToListPlaylist();
+
+					new ProgressDialogAsyncTask<Void, Void, Void>("Create Playlist") {
+
+						@Override
+						protected Void doInBackground(Void... params) {
+							PlaylistManager.createPlaylist(playlist);
+							return null;
+						}
+
+						protected void onPostExecute(Void result) {
+							super.onPostExecute(result);
+							m_playlistView.backToListPlaylist();
+						};
+					};
+
 				}
 			}
 		});
@@ -130,17 +147,54 @@ public class PlaylistToolbar extends LinearLayout {
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				if (PlaylistManager.deletePlaylist(processor)) {
-					Toast.makeText(getContext(), "Delete playlist success", Toast.LENGTH_SHORT).show();
-					m_playlistView.backToListPlaylist();
-				} else {
-					Toast.makeText(getContext(), "Delete playlist failed, try again later", Toast.LENGTH_SHORT).show();
-				}
+
+				new ProgressDialogAsyncTask<Void, Void, Boolean>("Delete Playlist") {
+
+					@Override
+					protected Boolean doInBackground(Void... params) {
+						return PlaylistManager.deletePlaylist(processor);
+					}
+
+					@Override
+					protected void onPostExecute(Boolean result) {
+						super.onPostExecute(result);
+						String resultText = "";
+						if (result) {
+							resultText = "Delete playlist success";
+						} else {
+							resultText = "Delete playlist failed, try again later";
+						}
+						Toast.makeText(getContext(), resultText, Toast.LENGTH_SHORT).show();
+						m_playlistView.backToListPlaylist();
+					}
+
+				};
+
 			}
 		});
 
 		alert.setNegativeButton("Canel", null);
 
 		alert.show();
+	}
+
+	public void updateToolbar(int state) {
+		switch (state) {
+		case PlaylistView.VM_LIST:
+			this.setVisibility(View.GONE);
+			break;
+		case PlaylistView.VM_DETAILS:
+			this.setVisibility(View.VISIBLE);
+			PlaylistProcessor processor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
+			if (processor.getData().getId() == 1) {
+				// Unsaved playlist
+				m_btn_remove.setVisibility(View.GONE);
+				m_btn_save.setVisibility(View.VISIBLE);
+			} else {
+				m_btn_remove.setVisibility(View.VISIBLE);
+				m_btn_save.setVisibility(View.GONE);
+			}
+			break;
+		}
 	}
 }
