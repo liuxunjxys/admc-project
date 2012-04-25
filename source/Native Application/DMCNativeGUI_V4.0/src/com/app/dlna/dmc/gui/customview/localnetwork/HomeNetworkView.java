@@ -36,7 +36,7 @@ import com.app.dlna.dmc.gui.dialog.DeviceDetailsDialog.DeviceDetailsListener;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor.DMSProcessorListner;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
-import com.app.dlna.dmc.processor.interfaces.UpnpProcessor.UpnpProcessorListener;
+import com.app.dlna.dmc.processor.interfaces.UpnpProcessor.DevicesListener;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 
 public class HomeNetworkView extends DMRListenerView {
@@ -63,7 +63,7 @@ public class HomeNetworkView extends DMRListenerView {
 		m_progressDlg.setTitle("Loading");
 		m_progressDlg.setMessage("Waiting for loading items");
 		m_progressDlg.setCancelable(true);
-		MainActivity.UPNP_PROCESSOR.addListener(m_upnpListener);
+		MainActivity.UPNP_PROCESSOR.addDevicesListener(m_upnpListener);
 
 		m_toolbar = (HomeNetworkToolbar) findViewById(R.id.botToolbar);
 		m_toolbar.setLocalNetworkView(this);
@@ -274,36 +274,7 @@ public class HomeNetworkView extends DMRListenerView {
 		return false;
 	};
 
-	private UpnpProcessorListener m_upnpListener = new UpnpProcessorListener() {
-
-		@Override
-		public void onStartFailed() {
-
-		}
-
-		@Override
-		public void onStartComplete() {
-
-		}
-
-		@Override
-		public void onRouterError(String cause) {
-		}
-
-		@Override
-		public void onRouterEnabledEvent() {
-
-		}
-
-		@Override
-		public void onRouterDisabledEvent() {
-
-		}
-
-		@Override
-		public void onNetworkChanged() {
-
-		}
+	private DevicesListener m_upnpListener = new DevicesListener() {
 
 		@SuppressWarnings("rawtypes")
 		@Override

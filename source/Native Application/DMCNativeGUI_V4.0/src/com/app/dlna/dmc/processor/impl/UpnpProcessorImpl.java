@@ -41,14 +41,17 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener, CoreU
 
 	private ServiceConnection m_serviceConnection;
 
-	private List<UpnpProcessorListener> m_listeners;
+	private List<DevicesListener> m_devicesListeners;
+
+	private List<SystemListener> m_systemListeners;
 
 	private DownloadProcessor m_downloadProcessor;
 
 	public UpnpProcessorImpl(UpnpListenerTabActivity activity) {
 		m_activity = activity;
-		m_listeners = new ArrayList<UpnpProcessorListener>();
-		m_listeners.add(activity);
+		m_systemListeners = new ArrayList<SystemListener>();
+		m_systemListeners.add(activity);
+		m_devicesListeners = new ArrayList<DevicesListener>();
 		m_downloadProcessor = new DownloadProcessorImpl(activity);
 	}
 
@@ -107,18 +110,18 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener, CoreU
 		}
 	}
 
-	public void addListener(UpnpProcessorListener listener) {
-		synchronized (m_listeners) {
-			if (!m_listeners.contains(listener)) {
-				m_listeners.add(listener);
+	public void addDevicesListener(DevicesListener listener) {
+		synchronized (m_devicesListeners) {
+			if (!m_devicesListeners.contains(listener)) {
+				m_devicesListeners.add(listener);
 			}
 		}
 	}
 
-	public void removeListener(UpnpProcessorListener listener) {
-		synchronized (m_listeners) {
-			if (m_listeners.contains(listener)) {
-				m_listeners.remove(listener);
+	public void removeDevicesListener(DevicesListener listener) {
+		synchronized (m_devicesListeners) {
+			if (m_devicesListeners.contains(listener)) {
+				m_devicesListeners.remove(listener);
 			}
 		}
 	}
@@ -132,48 +135,48 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener, CoreU
 	}
 
 	private void fireOnStartCompleteEvent() {
-		synchronized (m_listeners) {
-			for (UpnpProcessorListener listener : m_listeners) {
+		synchronized (m_systemListeners) {
+			for (SystemListener listener : m_systemListeners) {
 				listener.onStartComplete();
 			}
 		}
 	}
 
 	private void fireOnStartFailedEvent() {
-		synchronized (m_listeners) {
-			for (UpnpProcessorListener listener : m_listeners) {
+		synchronized (m_systemListeners) {
+			for (SystemListener listener : m_systemListeners) {
 				listener.onStartFailed();
 			}
 		}
 	}
 
 	private void fireOnRouterErrorEvent(String cause) {
-		synchronized (m_listeners) {
-			for (UpnpProcessorListener listener : m_listeners) {
+		synchronized (m_systemListeners) {
+			for (SystemListener listener : m_systemListeners) {
 				listener.onRouterError(cause);
 			}
 		}
 	}
 
 	private void fireOnNetworkChangedEvent() {
-		synchronized (m_listeners) {
-			for (UpnpProcessorListener listener : m_listeners) {
+		synchronized (m_systemListeners) {
+			for (SystemListener listener : m_systemListeners) {
 				listener.onNetworkChanged();
 			}
 		}
 	}
 
 	private void fireOnRouterDisabledEvent() {
-		synchronized (m_listeners) {
-			for (UpnpProcessorListener listener : m_listeners) {
+		synchronized (m_systemListeners) {
+			for (SystemListener listener : m_systemListeners) {
 				listener.onRouterDisabledEvent();
 			}
 		}
 	}
 
 	private void fireOnRouterEnabledEvent() {
-		synchronized (m_listeners) {
-			for (UpnpProcessorListener listener : m_listeners) {
+		synchronized (m_systemListeners) {
+			for (SystemListener listener : m_systemListeners) {
 				listener.onRouterEnabledEvent();
 			}
 		}
@@ -223,8 +226,8 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener, CoreU
 
 	@SuppressWarnings("rawtypes")
 	private void fireDeviceAddedEvent(Device device) {
-		synchronized (m_listeners) {
-			for (UpnpProcessorListener listener : m_listeners) {
+		synchronized (m_devicesListeners) {
+			for (DevicesListener listener : m_devicesListeners) {
 				listener.onDeviceAdded(device);
 			}
 		}
@@ -232,8 +235,8 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener, CoreU
 
 	@SuppressWarnings("rawtypes")
 	private void fireDeviceRemovedEvent(Device device) {
-		synchronized (m_listeners) {
-			for (UpnpProcessorListener listener : m_listeners) {
+		synchronized (m_devicesListeners) {
+			for (DevicesListener listener : m_devicesListeners) {
 				listener.onDeviceRemoved(device);
 			}
 		}
@@ -336,6 +339,23 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener, CoreU
 	@Override
 	public void setPlaylistProcessor(PlaylistProcessor playlistProcessor) {
 		m_upnpService.setPlaylistProcessor(playlistProcessor);
+	}
+
+	@Override
+	public void addSystemListener(SystemListener listener) {
+		synchronized (m_systemListeners) {
+			if (!m_systemListeners.contains(listener))
+				m_systemListeners.add(listener);
+		}
+	}
+
+	@Override
+	public void removeSystemListener(SystemListener listener) {
+		synchronized (m_systemListeners) {
+			if (m_systemListeners.contains(listener))
+				m_systemListeners.add(listener);
+		}
+
 	}
 
 }
