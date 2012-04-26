@@ -51,8 +51,7 @@ public class HomeNetworkView extends DMRListenerView {
 	public HomeNetworkView(Context context) {
 		super(context);
 		m_isBrowsing = false;
-		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.cv_homenetwork,
-				this);
+		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.cv_homenetwork, this);
 		m_listView = (ListView) findViewById(R.id.lv_mediasource_browsing);
 		m_adapter = new CustomArrayAdapter(context, 0);
 		m_listView.setAdapter(m_adapter);
@@ -67,6 +66,7 @@ public class HomeNetworkView extends DMRListenerView {
 
 		m_toolbar = (HomeNetworkToolbar) findViewById(R.id.botToolbar);
 		m_toolbar.setLocalNetworkView(this);
+		m_toolbar.setVisibility(View.GONE);
 
 		for (Device device : MainActivity.UPNP_PROCESSOR.getDMSList()) {
 			m_adapter.add(new AdapterItem(device));
@@ -89,8 +89,8 @@ public class HomeNetworkView extends DMRListenerView {
 						&& !m_progressDlg.isShowing()
 						&& firstVisibleItem + visibleItemCount == totalItemCount
 						&& m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData() instanceof DIDLObject
-						&& ((DIDLObject) m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData()).getId()
-								.equals("-1")) {
+						&& ((DIDLObject) m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData()).getId().equals(
+								"-1")) {
 					doLoadMoreItems();
 				}
 			} catch (Exception ex) {
@@ -111,7 +111,7 @@ public class HomeNetworkView extends DMRListenerView {
 				m_progressDlg.show();
 				browse("0", 0);
 				m_isBrowsing = true;
-				m_toolbar.setBackButtonEnabled(true);
+				m_toolbar.setVisibility(View.VISIBLE);
 			} else {
 				final DIDLObject object = (DIDLObject) item.getData();
 				if (object instanceof Container) {
@@ -142,8 +142,7 @@ public class HomeNetworkView extends DMRListenerView {
 
 					@Override
 					public void onWriteTAGClick(Device device) {
-						MainActivity.INSTANCE.waitToWriteTAG("dms:"
-								+ device.getIdentity().getUdn().getIdentifierString());
+						MainActivity.INSTANCE.waitToWriteTAG("dms:" + device.getIdentity().getUdn().getIdentifierString());
 					}
 
 					@Override
@@ -209,7 +208,7 @@ public class HomeNetworkView extends DMRListenerView {
 								public void onClick(DialogInterface dialog, int which) {
 									m_isBrowsing = false;
 									m_isRoot = false;
-									m_toolbar.backToDeviceList();
+									backToPlaylist();
 								}
 							}).show();
 
@@ -221,8 +220,8 @@ public class HomeNetworkView extends DMRListenerView {
 		@Override
 		public void onBrowseComplete(final String objectID, final boolean haveNext, boolean havePrev,
 				final Map<String, List<? extends DIDLObject>> result) {
-			Log.i(TAG, "browse complete: object id = " + objectID + " haveNext = " + haveNext + "; havePrev ="
-					+ havePrev + "; result size = " + result.size());
+			Log.i(TAG, "browse complete: object id = " + objectID + " haveNext = " + haveNext + "; havePrev =" + havePrev
+					+ "; result size = " + result.size());
 			m_isRoot = objectID.equals("0");
 			MainActivity.INSTANCE.runOnUiThread(new Runnable() {
 
@@ -295,6 +294,19 @@ public class HomeNetworkView extends DMRListenerView {
 				}
 			}
 		}
+
+		@Override
+		public void onDMSChanged() {
+			m_progressDlg.show();
+			browse("0", 0);
+			m_isBrowsing = true;
+			m_toolbar.setVisibility(View.VISIBLE);
+		}
+
+		@Override
+		public void onDMRChanged() {
+			// Not implemented here
+		}
 	};
 
 	@SuppressWarnings("rawtypes")
@@ -365,6 +377,20 @@ public class HomeNetworkView extends DMRListenerView {
 
 	public ListView getListView() {
 		return m_listView;
+	}
+
+	@SuppressWarnings("rawtypes")
+	public void backToPlaylist() {
+		m_adapter.clear();
+		for (Device dms : MainActivity.UPNP_PROCESSOR.getDMSList()) {
+			if (dms instanceof LocalDevice)
+				m_adapter.insert(new AdapterItem(dms), 0);
+			else
+				m_adapter.add(new AdapterItem(dms));
+		}
+		m_isBrowsing = false;
+		m_adapter.cancelPrepareImageCache();
+		m_toolbar.setVisibility(View.GONE);
 	}
 
 }

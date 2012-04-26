@@ -11,9 +11,9 @@ public interface UpnpProcessor {
 	void addDevicesListener(DevicesListener listener);
 
 	void removeDevicesListener(DevicesListener listener);
-	
+
 	void addSystemListener(SystemListener listener);
-	
+
 	void removeSystemListener(SystemListener listener);
 
 	void bindUpnpService();
@@ -23,6 +23,8 @@ public interface UpnpProcessor {
 	void setCurrentDMS(UDN uDN);
 
 	void setCurrentDMR(UDN uDN);
+	
+	void refreshDevicesList();
 
 	Registry getRegistry();
 
@@ -57,6 +59,10 @@ public interface UpnpProcessor {
 
 		@SuppressWarnings("rawtypes")
 		void onDeviceRemoved(Device device);
+
+		void onDMSChanged();
+
+		void onDMRChanged();
 
 	}
 

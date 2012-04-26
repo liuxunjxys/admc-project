@@ -5,6 +5,7 @@ import org.teleal.cling.model.meta.Action;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -31,6 +32,7 @@ public class RendererControlView extends LinearLayout {
 	private ImageView m_btn_playPause, m_btn_stop, m_btn_next, m_btn_prev;
 	private SeekBar m_sb_duration;
 	private boolean m_isSeeking = false;
+	private String TAG = RendererControlView.class.getName();
 
 	public RendererControlView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -222,12 +224,14 @@ public class RendererControlView extends LinearLayout {
 
 		@SuppressWarnings("rawtypes")
 		@Override
-		public void onActionFail(Action actionCallback, UpnpResponse response, final String cause) {
+		public void onActionFail(Action actionCallback, final UpnpResponse response, final String cause) {
 			MainActivity.INSTANCE.runOnUiThread(new Runnable() {
 
 				@Override
 				public void run() {
+					Log.e(TAG, "onActionFail = " + response);
 					Toast.makeText(getContext(), "Action fail: cause = " + cause, Toast.LENGTH_SHORT).show();
+					MainActivity.UPNP_PROCESSOR.refreshDevicesList();
 				}
 			});
 		}

@@ -226,8 +226,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 			public void run() {
 				if (m_routerProgressDialog != null)
 					m_routerProgressDialog.dismiss();
-				new AlertDialog.Builder(MainActivity.this).setTitle("Network error").setMessage(cause)
-						.setCancelable(false).setPositiveButton("OK", new OnClickListener() {
+				new AlertDialog.Builder(MainActivity.this).setTitle("Network error").setMessage(cause).setCancelable(false)
+						.setPositiveButton("OK", new OnClickListener() {
 
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
@@ -318,10 +318,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 	private String m_messageToWrite;
 
 	private void refreshDevicesList() {
-		if (UPNP_PROCESSOR != null) {
-			UPNP_PROCESSOR.getRegistry().removeAllRemoteDevices();
-			UPNP_PROCESSOR.getControlPoint().search();
-		}
+		UPNP_PROCESSOR.refreshDevicesList();
 	}
 
 	@Override
@@ -395,8 +392,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 					tv.setTag(i);
 					tv.setOnClickListener(customMenuItemClick);
 					tv.setTextSize(20);
-					tv.setBackgroundDrawable(MainActivity.this.getResources().getDrawable(
-							R.drawable.bg_actionbar_normal));
+					tv.setBackgroundDrawable(MainActivity.this.getResources().getDrawable(R.drawable.bg_actionbar_normal));
 					m_ll_menu.addView(tv);
 				}
 			}
@@ -432,36 +428,30 @@ public class MainActivity extends UpnpListenerTabActivity {
 						String textEncoding = (buffer[0] & 0200) == 0 ? "UTF-8" : "UTF-16";
 						int languageCodeLength = buffer[0] & 0077;
 						try {
-							String text = new String(buffer, languageCodeLength + 1, buffer.length - languageCodeLength
-									- 1, textEncoding);
+							String text = new String(buffer, languageCodeLength + 1, buffer.length - languageCodeLength - 1,
+									textEncoding);
 							String deviceType = text.substring(0, 3);
 							String deviceUDN = text.substring(4);
 							if (UPNP_PROCESSOR != null) {
 								if (deviceType.toLowerCase().equals("dmr")) {
 									UPNP_PROCESSOR.setCurrentDMR(new UDN(deviceUDN));
 									if (UPNP_PROCESSOR.getDMRProcessor() != null) {
-										Toast.makeText(
-												MainActivity.this,
-												"Current DMR: "
-														+ UPNP_PROCESSOR.getCurrentDMR().getDetails().getFriendlyName(),
+										Toast.makeText(MainActivity.this,
+												"Current DMR: " + UPNP_PROCESSOR.getCurrentDMR().getDetails().getFriendlyName(),
 												Toast.LENGTH_SHORT).show();
 									} else {
-										Toast.makeText(MainActivity.this,
-												"Cannot find DMR from NFC Tag, udn = " + deviceUDN, Toast.LENGTH_SHORT)
-												.show();
+										Toast.makeText(MainActivity.this, "Cannot find DMR from NFC Tag, udn = " + deviceUDN,
+												Toast.LENGTH_SHORT).show();
 									}
 								} else if (deviceType.toLowerCase().equals("dms")) {
 									UPNP_PROCESSOR.setCurrentDMS(new UDN(deviceUDN));
 									if (UPNP_PROCESSOR.getDMSProcessor() != null) {
-										Toast.makeText(
-												MainActivity.this,
-												"Current DMS: "
-														+ UPNP_PROCESSOR.getCurrentDMS().getDetails().getFriendlyName(),
+										Toast.makeText(MainActivity.this,
+												"Current DMS: " + UPNP_PROCESSOR.getCurrentDMS().getDetails().getFriendlyName(),
 												Toast.LENGTH_SHORT).show();
 									} else {
-										Toast.makeText(MainActivity.this,
-												"Cannot find DMS from NFC Tag, udn = " + deviceUDN, Toast.LENGTH_SHORT)
-												.show();
+										Toast.makeText(MainActivity.this, "Cannot find DMS from NFC Tag, udn = " + deviceUDN,
+												Toast.LENGTH_SHORT).show();
 									}
 
 								}

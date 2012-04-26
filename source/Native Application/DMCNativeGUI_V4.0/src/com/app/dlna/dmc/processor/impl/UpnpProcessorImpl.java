@@ -242,6 +242,22 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener, CoreU
 		}
 	}
 
+	private void fireOnDMSChangedEvent() {
+		synchronized (m_devicesListeners) {
+			for (DevicesListener listener : m_devicesListeners) {
+				listener.onDMSChanged();
+			}
+		}
+	}
+
+	private void fireOnDMRChangedEvent() {
+		synchronized (m_devicesListeners) {
+			for (DevicesListener listener : m_devicesListeners) {
+				listener.onDMRChanged();
+			}
+		}
+	}
+
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Collection<Device> getDMSList() {
@@ -264,21 +280,28 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener, CoreU
 		return new ArrayList<Device>();
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void setCurrentDMS(UDN uDN) {
-		if (m_upnpService != null)
-			m_upnpService.setCurrentDMS(uDN);
-		else {
-			Log.e(TAG, "Upnp Service = null");
+		Device currentDMS = m_upnpService.getCurrentDMS();
+		m_upnpService.setCurrentDMS(uDN);
+		if (currentDMS == null
+				|| (m_upnpService.getCurrentDMS() != null && !currentDMS.getIdentity().equals(
+						m_upnpService.getCurrentDMS().getIdentity()))) {
+			fireOnDMSChangedEvent();
 		}
+
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void setCurrentDMR(UDN uDN) {
-		if (m_upnpService != null)
-			m_upnpService.setCurrentDMR(uDN);
-		else {
-			Log.e(TAG, "Upnp Service = null");
+		Device currentDMR = m_upnpService.getCurrentDMR();
+		m_upnpService.setCurrentDMR(uDN);
+		if (currentDMR == null
+				|| (m_upnpService.getCurrentDMR() != null && !currentDMR.getIdentity().equals(
+						m_upnpService.getCurrentDMR().getIdentity()))) {
+			fireOnDMRChangedEvent();
 		}
 	}
 
@@ -356,6 +379,12 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener, CoreU
 				m_systemListeners.add(listener);
 		}
 
+	}
+
+	@Override
+	public void refreshDevicesList() {
+		m_upnpService.getRegistry().removeAllRemoteDevices();
+		m_upnpService.getControlPoint().search();
 	}
 
 }

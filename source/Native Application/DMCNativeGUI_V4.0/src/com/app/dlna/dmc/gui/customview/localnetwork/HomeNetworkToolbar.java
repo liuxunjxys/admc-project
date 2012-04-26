@@ -1,8 +1,5 @@
 package com.app.dlna.dmc.gui.customview.localnetwork;
 
-import org.teleal.cling.model.meta.Device;
-import org.teleal.cling.model.meta.LocalDevice;
-
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.util.AttributeSet;
@@ -14,7 +11,6 @@ import android.widget.Toast;
 import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
-import com.app.dlna.dmc.gui.customview.adapter.AdapterItem;
 import com.app.dlna.dmc.gui.customview.adapter.CustomArrayAdapter;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor.DMSAddRemoveContainerListener;
@@ -30,13 +26,11 @@ public class HomeNetworkToolbar extends LinearLayout {
 
 	public HomeNetworkToolbar(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
-				R.layout.cv_toolbar_homenetwork, this);
+		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.cv_toolbar_homenetwork,
+				this);
 		m_btn_back = ((ImageView) findViewById(R.id.btn_back));
 		m_btn_back.setOnClickListener(onBackClick);
 		m_btn_back.setOnLongClickListener(onBackLongclick);
-		m_btn_back.setEnabled(false);
-
 		((ImageView) findViewById(R.id.btn_containerSelectAll)).setOnClickListener(onSelectAll);
 		((ImageView) findViewById(R.id.btn_containerDeselectAll)).setOnClickListener(onDeselectAll);
 	}
@@ -69,18 +63,8 @@ public class HomeNetworkToolbar extends LinearLayout {
 		}
 	};
 
-	@SuppressWarnings("rawtypes")
-	public void backToDeviceList() {
-		m_homeNetworkAdapter.clear();
-		for (Device dms : MainActivity.UPNP_PROCESSOR.getDMSList()) {
-			if (dms instanceof LocalDevice)
-				m_homeNetworkAdapter.insert(new AdapterItem(dms), 0);
-			else
-				m_homeNetworkAdapter.add(new AdapterItem(dms));
-		}
-		m_homeNetworkView.setBrowsing(false);
-		m_homeNetworkAdapter.cancelPrepareImageCache();
-		m_btn_back.setEnabled(false);
+	private void backToDeviceList() {
+		m_homeNetworkView.backToPlaylist();
 	}
 
 	private void upOneLevel() {
@@ -91,10 +75,6 @@ public class HomeNetworkToolbar extends LinearLayout {
 			m_homeNetworkView.setLoadMore(false);
 			MainActivity.UPNP_PROCESSOR.getDMSProcessor().back(m_homeNetworkView.getBrowseListener());
 		}
-	}
-
-	public void setBackButtonEnabled(boolean enabled) {
-		m_btn_back.setEnabled(enabled);
 	}
 
 	private void modifyPlaylist(String type) {
@@ -126,8 +106,7 @@ public class HomeNetworkToolbar extends LinearLayout {
 
 				@Override
 				public void run() {
-					m_progreProgressDialog = ProgressDialog
-							.show(getContext(), "Processing", "Waiting to add all items");
+					m_progreProgressDialog = ProgressDialog.show(getContext(), "Processing", "Waiting to add all items");
 					m_progreProgressDialog.setCancelable(false);
 				}
 			});

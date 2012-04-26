@@ -185,71 +185,6 @@ public class DMRProcessorImpl implements DMRProcessor {
 		m_updateThread.start();
 	}
 
-	// @SuppressWarnings({ "rawtypes" })
-	// @Override
-	// public void setURI(final String uri) {
-	// if (m_controlPoint == null || m_avtransportService == null)
-	// return;
-	// m_isBusy = true;
-	// m_controlPoint.execute(new GetMediaInfo(m_avtransportService) {
-	//
-	// @Override
-	// public void failure(ActionInvocation invocation, UpnpResponse operation,
-	// String defaultMsg) {
-	// fireOnFailEvent(invocation.getAction(), operation, defaultMsg);
-	// m_isBusy = false;
-	// }
-	//
-	// @Override
-	// public void received(ActionInvocation invocation, MediaInfo mediaInfo) {
-	// if (mediaInfo != null && mediaInfo.getCurrentURIMetaData() != null)
-	// Log.e(TAG, mediaInfo.getCurrentURIMetaData());
-	// String current_uri = null;
-	// String currentPath = null;
-	// String newPath = null;
-	// String currentQuery = null;
-	// String newQuery = null;
-	//
-	// try {
-	// current_uri = mediaInfo.getCurrentURI();
-	// if (current_uri != null) {
-	// URI _uri = new URI(current_uri);
-	// currentPath = _uri.getPath();
-	// currentQuery = _uri.getQuery();
-	// }
-	// URI _uri = new URI(uri);
-	// newPath = _uri.getPath();
-	// newQuery = _uri.getQuery();
-	// } catch (URISyntaxException e) {
-	// current_uri = null;
-	// }
-	// if (currentPath != null && newPath != null && currentPath.equals(newPath)
-	// && (currentQuery == newQuery || (currentQuery != null && newQuery != null
-	// && currentQuery.equals(newQuery)))) {
-	// play();
-	// } else {
-	// stop();
-	// Log.e(TAG, "set AV uri = " + uri);
-	// m_controlPoint.execute(new SetAVTransportURI(m_avtransportService, uri,
-	// null) {
-	// @Override
-	// public void success(ActionInvocation invocation) {
-	// super.success(invocation);
-	// m_isBusy = false;
-	// }
-	//
-	// @Override
-	// public void failure(ActionInvocation invocation, UpnpResponse response,
-	// String defaultMsg) {
-	// fireOnFailEvent(invocation.getAction(), response, defaultMsg);
-	// m_isBusy = false;
-	// }
-	// });
-	// }
-	// }
-	// });
-	// }
-
 	@SuppressWarnings({ "rawtypes" })
 	@Override
 	public void setURIandPlay(final String uri) {
@@ -443,10 +378,13 @@ public class DMRProcessorImpl implements DMRProcessor {
 
 	@SuppressWarnings("rawtypes")
 	private void fireOnFailEvent(Action action, UpnpResponse response, String message) {
+		if (!m_isRunning)
+			return;
 		synchronized (m_listeners) {
 			for (DMRProcessorListner listener : m_listeners) {
 				listener.onActionFail(action, response, message);
 			}
+			m_isRunning = false;
 		}
 	}
 
