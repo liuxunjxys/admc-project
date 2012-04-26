@@ -17,8 +17,8 @@ import android.widget.Toast;
 import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
+import com.app.dlna.dmc.gui.subactivity.NowPlayingActivity;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor.DMRProcessorListner;
-import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 import com.app.dlna.dmc.utility.Utility;
 
 public class RendererControlView extends LinearLayout {
@@ -57,7 +57,7 @@ public class RendererControlView extends LinearLayout {
 	}
 
 	public void connectToDMR() {
-		MainActivity.UPNP_PROCESSOR.getDMRProcessor().addListener(dmrListener);
+		MainActivity.UPNP_PROCESSOR.getDMRProcessor().addListener(m_dmrListener);
 	}
 
 	private OnClickListener onPlayPauseClick = new OnClickListener() {
@@ -89,43 +89,39 @@ public class RendererControlView extends LinearLayout {
 
 		@Override
 		public void onClick(View v) {
-			doNext();
+			// doNext();
+			NowPlayingActivity nowplaying = (NowPlayingActivity) RendererControlView.this.getContext();
+			nowplaying.doNext();
 		}
 	};
+
+	// private void doNext() {
+	// if (RendererControlView.this.getContext() instanceof NowPlayingActivity)
+	// {
+	// NowPlayingActivity nowplaying = (NowPlayingActivity)
+	// RendererControlView.this.getContext();
+	// nowplaying.doNext();
+	// }
+	// }
 
 	private OnClickListener onPrevClick = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
-			doPrevious();
+			// doPrev();
+			NowPlayingActivity nowplaying = (NowPlayingActivity) RendererControlView.this.getContext();
+			nowplaying.doPrev();
 		}
 	};
 
-	private void doNext() {
-		if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor() != null && MainActivity.UPNP_PROCESSOR.getDMRProcessor() != null) {
-			MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().next();
-			updateCurrentPlaylistItem();
-		}
-	}
-
-	private void updateCurrentPlaylistItem() {
-		final PlaylistItem item = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getCurrentItem();
-		if (item != null) {
-			if (MainActivity.UPNP_PROCESSOR.getDMRProcessor() != null)
-				MainActivity.UPNP_PROCESSOR.getDMRProcessor().setURIandPlay(item.getUrl());
-		}
-	}
-
-	public void onPreviousClick(View view) {
-		doPrevious();
-	}
-
-	private void doPrevious() {
-		if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor() != null && MainActivity.UPNP_PROCESSOR.getDMRProcessor() != null) {
-			MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().previous();
-			updateCurrentPlaylistItem();
-		}
-	}
+	// private void doPrev() {
+	// if (RendererControlView.this.getContext() instanceof NowPlayingActivity)
+	// {
+	// NowPlayingActivity nowplaying = (NowPlayingActivity)
+	// RendererControlView.this.getContext();
+	// nowplaying.doPrev();
+	// }
+	// }
 
 	private OnSeekBarChangeListener onSeekListener = new OnSeekBarChangeListener() {
 
@@ -147,7 +143,7 @@ public class RendererControlView extends LinearLayout {
 		}
 	};
 
-	private DMRProcessorListner dmrListener = new DMRProcessorListner() {
+	private DMRProcessorListner m_dmrListener = new DMRProcessorListner() {
 
 		@Override
 		public void onUpdatePosition(final long current, final long max) {
@@ -175,7 +171,8 @@ public class RendererControlView extends LinearLayout {
 
 				@Override
 				public void run() {
-					m_btn_playPause.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_media_play));
+					m_btn_playPause.setImageDrawable(getContext().getResources().getDrawable(
+							R.drawable.ic_btn_media_play));
 				}
 			});
 		}
@@ -187,7 +184,8 @@ public class RendererControlView extends LinearLayout {
 
 				@Override
 				public void run() {
-					m_btn_playPause.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_media_pause));
+					m_btn_playPause.setImageDrawable(getContext().getResources().getDrawable(
+							R.drawable.ic_btn_media_pause));
 				}
 			});
 
@@ -200,7 +198,8 @@ public class RendererControlView extends LinearLayout {
 
 				@Override
 				public void run() {
-					m_btn_playPause.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_media_play));
+					m_btn_playPause.setImageDrawable(getContext().getResources().getDrawable(
+							R.drawable.ic_btn_media_play));
 				}
 			});
 
@@ -235,6 +234,7 @@ public class RendererControlView extends LinearLayout {
 				}
 			});
 		}
+
 	};
 
 }

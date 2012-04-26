@@ -18,12 +18,14 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 	private int m_currentItemIdx;
 	private int m_maxSize;
 	private Playlist m_data;
+	private List<PlaylistListener> m_listeners;
 
 	public PlaylistProcessorImpl(Playlist data, int maxItem) {
 		m_playlistItems = new ArrayList<PlaylistItem>();
 		m_currentItemIdx = 0;
 		m_maxSize = maxItem;
 		m_data = data;
+		m_listeners = new ArrayList<PlaylistProcessor.PlaylistListener>();
 	}
 
 	@Override
@@ -54,6 +56,15 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 		if (m_currentItemIdx >= m_playlistItems.size()) {
 			m_currentItemIdx = 0;
 		}
+		fireOnNextEvent();
+	}
+
+	private void fireOnNextEvent() {
+		synchronized (m_listeners) {
+			for (PlaylistListener listener : m_listeners) {
+				listener.onNext();
+			}
+		}
 	}
 
 	@Override
@@ -63,6 +74,15 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 		m_currentItemIdx = (m_currentItemIdx - 1) % m_playlistItems.size();
 		if (m_currentItemIdx < 0) {
 			m_currentItemIdx = m_playlistItems.size() - 1;
+		}
+		fireOnPrevEvent();
+	}
+
+	private void fireOnPrevEvent() {
+		synchronized (m_listeners) {
+			for (PlaylistListener listener : m_listeners) {
+				listener.onPrev();
+			}
 		}
 	}
 
@@ -168,4 +188,21 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 	public PlaylistItem getItemAt(int idx) {
 		return m_playlistItems.get(idx);
 	}
+
+	@Override
+	public void addListener(PlaylistListener listener) {
+		synchronized (m_listeners) {
+			if (!m_listeners.contains(listener))
+				m_listeners.add(listener);
+		}
+	}
+
+	@Override
+	public void removeListener(PlaylistListener listener) {
+		synchronized (m_listeners) {
+			if (!m_listeners.contains(listener))
+				m_listeners.add(listener);
+		}
+	}
+
 }

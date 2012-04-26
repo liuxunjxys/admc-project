@@ -13,11 +13,11 @@ public class ActivitySwipeDetector implements View.OnTouchListener {
 	}
 
 	public void onRightToLeftSwipe() {
-		m_activity.loadNext();
+		m_activity.doNext();
 	}
 
 	public void onLeftToRightSwipe() {
-		m_activity.loadPrev();
+		m_activity.doPrev();
 	}
 
 	public boolean onTouch(View v, MotionEvent event) {

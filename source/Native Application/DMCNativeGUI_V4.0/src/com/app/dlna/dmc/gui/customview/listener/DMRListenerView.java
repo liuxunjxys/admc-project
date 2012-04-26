@@ -9,6 +9,7 @@ import android.widget.ListView;
 
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.customview.adapter.CustomArrayAdapter;
+import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor.DMRProcessorListner;
 
 public class DMRListenerView extends LinearLayout {
@@ -24,7 +25,7 @@ public class DMRListenerView extends LinearLayout {
 
 		@Override
 		public void onUpdatePosition(long current, long max) {
-			if (MainActivity.UPNP_PROCESSOR == null)
+			if (MainActivity.UPNP_PROCESSOR == null || MainActivity.UPNP_PROCESSOR.getDMRProcessor() == null)
 				return;
 			if (!m_currentURI.equals(MainActivity.UPNP_PROCESSOR.getDMRProcessor().getCurrentTrackURI())) {
 				int start = m_listView.getFirstVisiblePosition();
@@ -74,10 +75,13 @@ public class DMRListenerView extends LinearLayout {
 		public void onActionFail(Action actionCallback, UpnpResponse response, String cause) {
 
 		}
+
 	};
 
 	public void updateDMRListener() {
-		MainActivity.UPNP_PROCESSOR.getDMRProcessor().addListener(m_dmrListner);
+		DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
+		if (dmrProcessor != null)
+			dmrProcessor.addListener(m_dmrListner);
 	}
 
 }

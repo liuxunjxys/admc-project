@@ -34,6 +34,7 @@ import com.app.dlna.dmc.gui.customview.listener.DMRListenerView;
 import com.app.dlna.dmc.gui.dialog.DeviceDetailsDialog;
 import com.app.dlna.dmc.gui.dialog.DeviceDetailsDialog.DeviceDetailsListener;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
+import com.app.dlna.dmc.processor.interfaces.DMSProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor.DMSProcessorListner;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.interfaces.UpnpProcessor.DevicesListener;
@@ -51,7 +52,8 @@ public class HomeNetworkView extends DMRListenerView {
 	public HomeNetworkView(Context context) {
 		super(context);
 		m_isBrowsing = false;
-		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.cv_homenetwork, this);
+		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.cv_homenetwork,
+				this);
 		m_listView = (ListView) findViewById(R.id.lv_mediasource_browsing);
 		m_adapter = new CustomArrayAdapter(context, 0);
 		m_listView.setAdapter(m_adapter);
@@ -89,8 +91,8 @@ public class HomeNetworkView extends DMRListenerView {
 						&& !m_progressDlg.isShowing()
 						&& firstVisibleItem + visibleItemCount == totalItemCount
 						&& m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData() instanceof DIDLObject
-						&& ((DIDLObject) m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData()).getId().equals(
-								"-1")) {
+						&& ((DIDLObject) m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData()).getId()
+								.equals("-1")) {
 					doLoadMoreItems();
 				}
 			} catch (Exception ex) {
@@ -142,7 +144,7 @@ public class HomeNetworkView extends DMRListenerView {
 
 					@Override
 					public void onWriteTAGClick(Device device) {
-						MainActivity.INSTANCE.waitToWriteTAG("dms:" + device.getIdentity().getUdn().getIdentifierString());
+						MainActivity.INSTANCE.waitToWriteTAG(device.getIdentity().getUdn().getIdentifierString());
 					}
 
 					@Override
@@ -166,10 +168,14 @@ public class HomeNetworkView extends DMRListenerView {
 	}
 
 	private void browse(String id, int pageIndex) {
-		Log.e(TAG, "Browse id = " + id);
-		m_progressDlg.show();
-		m_loadMore = false;
-		MainActivity.UPNP_PROCESSOR.getDMSProcessor().browse(id, pageIndex, m_browseListener);
+		DMSProcessor dmsProcessor = MainActivity.UPNP_PROCESSOR.getDMSProcessor();
+		if (dmsProcessor != null) {
+			m_progressDlg.show();
+			Log.e(TAG, "Browse id = " + id);
+			m_progressDlg.show();
+			m_loadMore = false;
+			dmsProcessor.browse(id, pageIndex, m_browseListener);
+		}
 	}
 
 	private void addToPlaylistAndPlay(DIDLObject object) {
@@ -220,8 +226,8 @@ public class HomeNetworkView extends DMRListenerView {
 		@Override
 		public void onBrowseComplete(final String objectID, final boolean haveNext, boolean havePrev,
 				final Map<String, List<? extends DIDLObject>> result) {
-			Log.i(TAG, "browse complete: object id = " + objectID + " haveNext = " + haveNext + "; havePrev =" + havePrev
-					+ "; result size = " + result.size());
+			Log.i(TAG, "browse complete: object id = " + objectID + " haveNext = " + haveNext + "; havePrev ="
+					+ havePrev + "; result size = " + result.size());
 			m_isRoot = objectID.equals("0");
 			MainActivity.INSTANCE.runOnUiThread(new Runnable() {
 
@@ -297,7 +303,6 @@ public class HomeNetworkView extends DMRListenerView {
 
 		@Override
 		public void onDMSChanged() {
-			m_progressDlg.show();
 			browse("0", 0);
 			m_isBrowsing = true;
 			m_toolbar.setVisibility(View.VISIBLE);

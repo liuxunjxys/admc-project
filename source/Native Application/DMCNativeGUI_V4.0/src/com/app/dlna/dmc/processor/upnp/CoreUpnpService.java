@@ -218,18 +218,18 @@ public class CoreUpnpService extends Service {
 		}
 
 		public DMSProcessor getDMSProcessor() {
-			if (m_dmsProcessor == null) {
-				// TODO: Change to local DMS
-				setCurrentDMS(m_localDMS_UDN);
-			}
+			// if (m_dmsProcessor == null) {
+			// // TODO: Change to local DMS
+			// setCurrentDMS(m_localDMS_UDN);
+			// }
 			return m_dmsProcessor;
 		}
 
 		public DMRProcessor getDMRProcessor() {
-			if (m_dmrProcessor == null) {
-				// TODO: change to local DMS
-				setCurrentDMR(m_localDMR_UDN);
-			}
+			// if (m_dmrProcessor == null) {
+			// // TODO: change to local DMS
+			// setCurrentDMR(m_localDMR_UDN);
+			// }
 
 			return m_dmrProcessor;
 		}
@@ -239,9 +239,6 @@ public class CoreUpnpService extends Service {
 			m_currentDMS = upnpService.getRegistry().getDevice(uDN, true);
 			if (m_currentDMS != null) {
 				Log.d(TAG, "CURRENT DMS:" + m_currentDMS.toString());
-				// Toast.makeText(getApplicationContext(), "Set DMS complete: "
-				// + m_currentDMS.getDisplayString(),
-				// Toast.LENGTH_SHORT).show();
 				m_dmsProcessor = new DMSProcessorImpl(m_currentDMS, getControlPoint());
 			} else {
 				Log.e(TAG, "GET DMS FAIL:" + uDN.toString());
@@ -258,9 +255,6 @@ public class CoreUpnpService extends Service {
 			m_currentDMR = upnpService.getRegistry().getDevice(uDN, true);
 			if (m_currentDMR != null) {
 				Log.d(TAG, "CURRENT DMR:" + m_currentDMR.toString());
-				// Toast.makeText(getApplicationContext(), "Set DMR complete: "
-				// + m_currentDMR.getDisplayString(),
-				// Toast.LENGTH_SHORT).show();
 				if (m_currentDMR instanceof LocalDevice)
 					m_dmrProcessor = new LocalDMRProcessorImpl(CoreUpnpService.this);
 				else

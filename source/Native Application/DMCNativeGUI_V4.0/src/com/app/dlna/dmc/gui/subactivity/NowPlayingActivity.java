@@ -2,13 +2,10 @@ package com.app.dlna.dmc.gui.subactivity;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.HashMap;
-import java.util.Map;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -23,6 +20,8 @@ import app.dlna.controller.v4.R;
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.customview.nowplaying.RendererControlView;
 import com.app.dlna.dmc.processor.async.AsyncTaskWithProgressDialog;
+import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
+import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor.PlaylistListener;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 import com.app.dlna.dmc.utility.Utility;
 
@@ -32,12 +31,11 @@ public class NowPlayingActivity extends Activity {
 	protected String TAG = NowPlayingActivity.class.getName();
 	private ViewFlipper m_viewFlipper;
 	private ProgressDialog m_progressDialog;
-	private View m_CurrentView;
 	private Animation m_animFlipInNext;
 	private Animation m_animFlipOutNext;
 	private Animation m_animFlipInPrevious;
 	private Animation m_animFlipOutPrevious;
-	private boolean m_isAnimating;
+	private boolean m_waiting;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -61,11 +59,51 @@ public class NowPlayingActivity extends Activity {
 		m_viewFlipper.addView(getLayoutInflater().inflate(R.layout.cv_galery_image, null));
 	}
 
+	private PlaylistListener m_playlistListener = new PlaylistListener() {
+
+		@Override
+		public void onPrev() {
+			runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					if (m_waiting)
+						return;
+					m_viewFlipper.setInAnimation(m_animFlipInPrevious);
+					m_viewFlipper.setOutAnimation(m_animFlipOutPrevious);
+					m_viewFlipper.getInAnimation().setAnimationListener(m_animationListner);
+					m_viewFlipper.showPrevious();
+					updateCurrentPlaylistItem();
+					updateItemInfo();
+				}
+			});
+		}
+
+		@Override
+		public void onNext() {
+			runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					if (m_waiting)
+						return;
+					m_viewFlipper.setInAnimation(m_animFlipInNext);
+					m_viewFlipper.setOutAnimation(m_animFlipOutNext);
+					m_viewFlipper.getInAnimation().setAnimationListener(m_animationListner);
+					m_viewFlipper.showNext();
+					updateCurrentPlaylistItem();
+					updateItemInfo();
+				}
+			});
+
+		}
+	};
+
 	private AnimationListener m_animationListner = new AnimationListener() {
 
 		@Override
 		public void onAnimationStart(Animation animation) {
-			m_isAnimating = true;
+			m_waiting = true;
 		}
 
 		@Override
@@ -75,31 +113,16 @@ public class NowPlayingActivity extends Activity {
 
 		@Override
 		public void onAnimationEnd(Animation animation) {
-			m_isAnimating = false;
+			m_waiting = false;
 		}
 	};
 
-	public void loadNext() {
-		if (m_isAnimating)
-			return;
-		m_viewFlipper.setInAnimation(m_animFlipInNext);
-		m_viewFlipper.setOutAnimation(m_animFlipOutNext);
-		m_viewFlipper.getInAnimation().setAnimationListener(m_animationListner);
-		m_viewFlipper.showNext();
+	public void doNext() {
 		MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().next();
-		updateCurrentPlaylistItem();
-		updateItemInfo();
 	}
 
-	public void loadPrev() {
-		if (m_isAnimating)
-			return;
-		m_viewFlipper.setInAnimation(m_animFlipInPrevious);
-		m_viewFlipper.setOutAnimation(m_animFlipOutPrevious);
-		m_viewFlipper.getInAnimation().setAnimationListener(m_animationListner);
-		m_viewFlipper.showPrevious();
+	public void doPrev() {
 		MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().previous();
-		updateCurrentPlaylistItem();
 	}
 
 	private void updateItemInfo() {
@@ -122,6 +145,7 @@ public class NowPlayingActivity extends Activity {
 			new AsyncTaskWithProgressDialog<String, Void, Bitmap>("Loading image") {
 
 				protected void onPreExecute() {
+					m_waiting = true;
 				};
 
 				@Override
@@ -144,14 +168,16 @@ public class NowPlayingActivity extends Activity {
 				@Override
 				protected void onPostExecute(Bitmap result) {
 					// super.onPostExecute(result);
+					m_waiting = false;
 					ImageView iv = (ImageView) m_viewFlipper.getCurrentView().findViewById(R.id.image);
 					if (result == null) {
 						iv.setImageDrawable(getResources().getDrawable(R.drawable.ic_didlobject_image_large));
 					} else {
+						Log.i(TAG, "w = " + result.getWidth() + "; h = " + result.getHeight());
 						iv.setImageBitmap(result);
 					}
 				}
-			}.execute(new String[] { item.getUrl(), "256", "256" });
+			}.execute(new String[] { item.getUrl(), "512", "512" });
 			break;
 		default:
 			break;
@@ -170,56 +196,9 @@ public class NowPlayingActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		m_rendererControl.connectToDMR();
+		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
+		if (playlistProcessor != null)
+			playlistProcessor.addListener(m_playlistListener);
 		updateItemInfo();
-	}
-
-	private class LoadImageAsync extends AsyncTask<String, Void, Map<Integer, Bitmap>> {
-
-		@Override
-		protected void onPreExecute() {
-			Log.i(TAG, "On pre excute");
-			m_viewFlipper.setClickable(false);
-			m_viewFlipper.setEnabled(false);
-			m_progressDialog.show();
-			super.onPreExecute();
-		}
-
-		@Override
-		protected Map<Integer, Bitmap> doInBackground(String... params) {
-			Log.i(TAG, "Load in background");
-			String url = params[0];
-			int width = Integer.parseInt(params[1]);
-			int height = Integer.parseInt(params[2]);
-			try {
-				Map<Integer, Bitmap> result = new HashMap<Integer, Bitmap>();
-				result.put(Integer.parseInt(params[3]), Utility.getBitmapFromURL(url, width < height ? width : height));
-				return result;
-			} catch (MalformedURLException e) {
-				e.printStackTrace();
-				return null;
-			} catch (IOException e) {
-				e.printStackTrace();
-				return null;
-			}
-		}
-
-		@Override
-		protected void onPostExecute(Map<Integer, Bitmap> result) {
-			if (result == null) {
-				return;
-			} else {
-				int position = result.keySet().iterator().next();
-				if (m_CurrentView != null) {
-					ImageView img = (ImageView) m_CurrentView.findViewById(R.id.image);
-					img.setImageBitmap(result.get(position));
-					img.invalidate();
-				}
-			}
-			m_viewFlipper.setEnabled(true);
-			m_viewFlipper.setClickable(true);
-			m_progressDialog.dismiss();
-			super.onPostExecute(result);
-		}
-
 	}
 }
