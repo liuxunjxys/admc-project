@@ -284,25 +284,45 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener, CoreU
 	@Override
 	public void setCurrentDMS(UDN uDN) {
 		Device currentDMS = m_upnpService.getCurrentDMS();
-		m_upnpService.setCurrentDMS(uDN);
-		if (currentDMS == null
-				|| (m_upnpService.getCurrentDMS() != null && !currentDMS.getIdentity().equals(
-						m_upnpService.getCurrentDMS().getIdentity()))) {
-			fireOnDMSChangedEvent();
-		}
+		Device newDMS = m_upnpService.getRegistry().getDevice(uDN, true);
 
+		if (currentDMS == null || !newDMS.getIdentity().equals(currentDMS.getIdentity())) {
+			m_upnpService.setCurrentDMS(uDN);
+		}
+		fireOnDMSChangedEvent();
 	}
 
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void setCurrentDMR(UDN uDN) {
+		// Device currentDMR = m_upnpService.getCurrentDMR();
+		// m_upnpService.setCurrentDMR(uDN);
+		// if (currentDMR == null
+		// || (m_upnpService.getCurrentDMR() != null &&
+		// !currentDMR.getIdentity().equals(
+		// m_upnpService.getCurrentDMR().getIdentity()))) {
+		// fireOnDMRChangedEvent();
+		// }
+		// Device currentDMR = m_upnpService.getCurrentDMR();
+		// Device newDMR = m_upnpService.getRegistry().getDevice(uDN, true);
+		//
+		// if (newDMR != null) {
+		// if (currentDMR == null) {
+		// m_upnpService.setCurrentDMR(uDN);
+		// fireOnDMRChangedEvent();
+		// } else {
+		// if (!currentDMR.getIdentity().equals(newDMR)) {
+		// fireOnDMRChangedEvent();
+		// }
+		// }
+		// }
 		Device currentDMR = m_upnpService.getCurrentDMR();
-		m_upnpService.setCurrentDMR(uDN);
-		if (currentDMR == null
-				|| (m_upnpService.getCurrentDMR() != null && !currentDMR.getIdentity().equals(
-						m_upnpService.getCurrentDMR().getIdentity()))) {
-			fireOnDMRChangedEvent();
+		Device newDMR = m_upnpService.getRegistry().getDevice(uDN, true);
+
+		if (currentDMR == null || !newDMR.getIdentity().equals(currentDMR.getIdentity())) {
+			m_upnpService.setCurrentDMR(uDN);
 		}
+		fireOnDMRChangedEvent();
 	}
 
 	@SuppressWarnings("rawtypes")

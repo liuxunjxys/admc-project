@@ -2,6 +2,7 @@ package com.app.dlna.dmc.gui;
 
 import java.io.UnsupportedEncodingException;
 
+import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.model.types.UDN;
 
 import android.app.Activity;
@@ -404,6 +405,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	protected void onNewIntent(Intent intent) {
 		if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
 			if (m_waitToWriteTAG && m_messageToWrite != null) {
@@ -422,36 +424,29 @@ public class MainActivity extends UpnpListenerTabActivity {
 						try {
 							String text = new String(buffer, languageCodeLength + 1, buffer.length - languageCodeLength
 									- 1, textEncoding);
-							String deviceType = text.substring(0, 3);
-							String deviceUDN = text.substring(4);
+							String deviceUDN = "";
+							if (text.startsWith("uuid:"))
+								deviceUDN = text.substring(5);
+							else
+								deviceUDN = text;
 							if (UPNP_PROCESSOR != null) {
-								if (deviceType.toLowerCase().equals("dmr")) {
-									UPNP_PROCESSOR.setCurrentDMR(new UDN(deviceUDN));
-									if (UPNP_PROCESSOR.getDMRProcessor() != null) {
-										Toast.makeText(
-												MainActivity.this,
-												"Current DMR: "
-														+ UPNP_PROCESSOR.getCurrentDMR().getDetails().getFriendlyName(),
-												Toast.LENGTH_SHORT).show();
-									} else {
-										Toast.makeText(MainActivity.this,
-												"Cannot find DMR from NFC Tag, udn = " + deviceUDN, Toast.LENGTH_SHORT)
-												.show();
+								Device newDevice = null;
+								if ((newDevice = UPNP_PROCESSOR.getRegistry().getDevice(new UDN(deviceUDN), true)) != null) {
+									String alert = null;
+									if (newDevice.getType().getType().equals("MediaServer")) {
+										alert = "Detect Media Server From TAG";
+										UPNP_PROCESSOR.setCurrentDMS(newDevice.getIdentity().getUdn());
+									} else if (newDevice.getType().getType().equals("MediaRenderer")) {
+										alert = "Detect Media Renderer From TAG";
+										UPNP_PROCESSOR.setCurrentDMR(newDevice.getIdentity().getUdn());
 									}
-								} else if (deviceType.toLowerCase().equals("dms")) {
-									UPNP_PROCESSOR.setCurrentDMS(new UDN(deviceUDN));
-									if (UPNP_PROCESSOR.getDMSProcessor() != null) {
-										Toast.makeText(
-												MainActivity.this,
-												"Current DMS: "
-														+ UPNP_PROCESSOR.getCurrentDMS().getDetails().getFriendlyName(),
-												Toast.LENGTH_SHORT).show();
-									} else {
-										Toast.makeText(MainActivity.this,
-												"Cannot find DMS from NFC Tag, udn = " + deviceUDN, Toast.LENGTH_SHORT)
-												.show();
-									}
-
+									if (alert != null)
+										Toast.makeText(MainActivity.this, alert, Toast.LENGTH_SHORT).show();
+								} else {
+									Toast.makeText(
+											MainActivity.this,
+											"Cannot find specified device from Nfc TAG, please check if device is connected to the network or the data on your TAG",
+											Toast.LENGTH_LONG).show();
 								}
 							}
 						} catch (UnsupportedEncodingException e) {

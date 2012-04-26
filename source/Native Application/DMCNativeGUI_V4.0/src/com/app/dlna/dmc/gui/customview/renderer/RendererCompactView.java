@@ -27,6 +27,7 @@ import app.dlna.controller.v4.R;
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.dialog.DeviceDetailsDialog;
 import com.app.dlna.dmc.gui.dialog.DeviceDetailsDialog.DeviceDetailsListener;
+import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor.DMRProcessorListner;
 import com.app.dlna.dmc.processor.interfaces.UpnpProcessor.DevicesListener;
 
@@ -41,7 +42,8 @@ public class RendererCompactView extends LinearLayout {
 	@SuppressWarnings("rawtypes")
 	public RendererCompactView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.cv_renderer_compact, this);
+		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
+				R.layout.cv_renderer_compact, this);
 		m_ll_renderers = (LinearLayout) ((HorizontalScrollView) findViewById(R.id.gridView_renderer)).getChildAt(0);
 		m_inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		for (Device device : MainActivity.UPNP_PROCESSOR.getDMRList()) {
@@ -69,7 +71,8 @@ public class RendererCompactView extends LinearLayout {
 		ret.setTag(device);
 		final ImageView icon = (ImageView) ret.findViewById(R.id.icon);
 		final Icon[] icons = device.getIcons();
-		if (device instanceof RemoteDevice && icons != null && icons.length > 0 && icons[0] != null && icons[0].getUri() != null) {
+		if (device instanceof RemoteDevice && icons != null && icons.length > 0 && icons[0] != null
+				&& icons[0].getUri() != null) {
 			loadRendererIcon(device, icon, icons);
 		} else {
 			icon.setImageResource(R.drawable.ic_device_unknow_player);
@@ -89,7 +92,8 @@ public class RendererCompactView extends LinearLayout {
 					final RemoteDevice remoteDevice = (RemoteDevice) device;
 
 					String urlString = remoteDevice.getIdentity().getDescriptorURL().getProtocol() + "://"
-							+ remoteDevice.getIdentity().getDescriptorURL().getAuthority() + icons[0].getUri().toString();
+							+ remoteDevice.getIdentity().getDescriptorURL().getAuthority()
+							+ icons[0].getUri().toString();
 					URL url = new URL(urlString);
 					final Bitmap bm = BitmapFactory.decodeStream(url.openConnection().getInputStream());
 					MainActivity.INSTANCE.runOnUiThread(new Runnable() {
@@ -142,7 +146,7 @@ public class RendererCompactView extends LinearLayout {
 
 				@Override
 				public void onWriteTAGClick(Device device) {
-					MainActivity.INSTANCE.waitToWriteTAG("dmr:" + device.getIdentity().getUdn().getIdentifierString());
+					MainActivity.INSTANCE.waitToWriteTAG(device.getIdentity().getUdn().getIdentifierString());
 				}
 
 				@Override
@@ -175,7 +179,9 @@ public class RendererCompactView extends LinearLayout {
 	};
 
 	private void setDMRListener() {
-		MainActivity.UPNP_PROCESSOR.getDMRProcessor().addListener(m_dmrListener);
+		DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
+		if (dmrProcessor != null)
+			dmrProcessor.addListener(m_dmrListener);
 	}
 
 	private DMRProcessorListner m_dmrListener = new DMRProcessorListner() {
@@ -190,7 +196,8 @@ public class RendererCompactView extends LinearLayout {
 
 				@Override
 				public void run() {
-					m_btn_quickPlayPause.setImageDrawable(getResources().getDrawable(R.drawable.ic_btn_media_quickplay));
+					m_btn_quickPlayPause
+							.setImageDrawable(getResources().getDrawable(R.drawable.ic_btn_media_quickplay));
 					m_btn_quickPlayPause.setTag(R.string.play);
 					m_btn_quickPlayPause.invalidate();
 				}
@@ -203,7 +210,8 @@ public class RendererCompactView extends LinearLayout {
 
 				@Override
 				public void run() {
-					m_btn_quickPlayPause.setImageDrawable(getResources().getDrawable(R.drawable.ic_btn_media_quickpause));
+					m_btn_quickPlayPause.setImageDrawable(getResources()
+							.getDrawable(R.drawable.ic_btn_media_quickpause));
 					m_btn_quickPlayPause.setTag(R.string.pause);
 					m_btn_quickPlayPause.invalidate();
 				}
@@ -216,7 +224,8 @@ public class RendererCompactView extends LinearLayout {
 
 				@Override
 				public void run() {
-					m_btn_quickPlayPause.setImageDrawable(getResources().getDrawable(R.drawable.ic_btn_media_quickplay));
+					m_btn_quickPlayPause
+							.setImageDrawable(getResources().getDrawable(R.drawable.ic_btn_media_quickplay));
 					m_btn_quickPlayPause.setTag(R.string.play);
 					m_btn_quickPlayPause.invalidate();
 				}
@@ -248,6 +257,8 @@ public class RendererCompactView extends LinearLayout {
 	@SuppressWarnings("rawtypes")
 	public void updateListRenderer() {
 		Device currentDMR = MainActivity.UPNP_PROCESSOR.getCurrentDMR();
+		if (currentDMR == null)
+			return;
 		for (int i = 0; i < m_ll_renderers.getChildCount(); ++i) {
 			if (currentDMR.equals(m_ll_renderers.getChildAt(i).getTag())) {
 				m_ll_renderers.getChildAt(i).setSelected(true);
@@ -337,5 +348,5 @@ public class RendererCompactView extends LinearLayout {
 	public void setOnDMRChangeListener(onDMRChangeListener listener) {
 		m_onDMRChangeListener = listener;
 	}
-
+	
 }

@@ -12,6 +12,10 @@ public interface PlaylistProcessor {
 
 	void previous();
 
+	void addListener(PlaylistListener listener);
+
+	void removeListener(PlaylistListener listener);
+
 	PlaylistItem getCurrentItem();
 
 	PlaylistItem addItem(PlaylistItem item);
@@ -35,9 +39,15 @@ public interface PlaylistProcessor {
 	int setCurrentItem(int idx);
 
 	int setCurrentItem(PlaylistItem item);
-	
+
 	Playlist getData();
-	
+
 	void setData(Playlist data);
-	
+
+	public interface PlaylistListener {
+		void onNext();
+
+		void onPrev();
+	}
+
 }

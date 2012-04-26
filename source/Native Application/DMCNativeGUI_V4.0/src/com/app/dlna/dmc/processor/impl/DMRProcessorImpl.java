@@ -83,13 +83,15 @@ public class DMRProcessorImpl implements DMRProcessor {
 						@SuppressWarnings("rawtypes")
 						@Override
 						public void received(ActionInvocation invocation, PositionInfo positionInfo) {
-							Log.v(TAG, positionInfo.toString());
-							Log.v(TAG, "Track uri = " + positionInfo.getTrackURI());
+							// Log.v(TAG, positionInfo.toString());
+							// Log.v(TAG, "Track uri = " +
+							// positionInfo.getTrackURI());
 							m_currentTrackURI = positionInfo.getTrackURI();
-							fireUpdatePositionEvent(positionInfo.getTrackElapsedSeconds(), positionInfo.getTrackDurationSeconds());
+							fireUpdatePositionEvent(positionInfo.getTrackElapsedSeconds(),
+									positionInfo.getTrackDurationSeconds());
 
 							if (positionInfo.getTrackDurationSeconds() == 0) {
-								Log.v(TAG, "auto next");
+								// Log.v(TAG, "auto next");
 								m_state = STOP;
 								new Thread(new Runnable() {
 
@@ -202,8 +204,9 @@ public class DMRProcessorImpl implements DMRProcessor {
 
 			@Override
 			public void received(ActionInvocation invocation, MediaInfo mediaInfo) {
-				if (mediaInfo != null && mediaInfo.getCurrentURIMetaData() != null)
-					Log.e(TAG, mediaInfo.getCurrentURIMetaData());
+				// if (mediaInfo != null && mediaInfo.getCurrentURIMetaData() !=
+				// null)
+				// Log.e(TAG, mediaInfo.getCurrentURIMetaData());
 				String current_uri = null;
 				String currentPath = null;
 				String newPath = null;
@@ -230,7 +233,7 @@ public class DMRProcessorImpl implements DMRProcessor {
 								.equals(newQuery)))) {
 					play();
 				} else {
-					Log.e(TAG, "set AV uri = " + uri);
+					// Log.e(TAG, "set AV uri = " + uri);
 					Stop stop = new Stop(m_avtransportService) {
 						@Override
 						public void success(ActionInvocation invocation) {
@@ -245,8 +248,9 @@ public class DMRProcessorImpl implements DMRProcessor {
 									m_controlPoint.execute(new Play(m_avtransportService) {
 
 										@Override
-										public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
-											Log.e(TAG, "Call fail");
+										public void failure(ActionInvocation invocation, UpnpResponse operation,
+												String defaultMsg) {
+											// Log.e(TAG, "Call fail");
 											fireOnFailEvent(invocation.getAction(), operation, defaultMsg);
 											m_isBusy = false;
 										}
@@ -259,7 +263,8 @@ public class DMRProcessorImpl implements DMRProcessor {
 								}
 
 								@Override
-								public void failure(ActionInvocation invocation, UpnpResponse response, String defaultMsg) {
+								public void failure(ActionInvocation invocation, UpnpResponse response,
+										String defaultMsg) {
 									fireOnFailEvent(invocation.getAction(), response, defaultMsg);
 									m_isBusy = false;
 								}
@@ -434,13 +439,13 @@ public class DMRProcessorImpl implements DMRProcessor {
 			return;
 		synchronized (m_listeners) {
 			if (m_listeners.size() > 0) {
-				Log.i(TAG, "fire auto next with ");
+				// Log.i(TAG, "fire auto next with ");
 				for (DMRProcessorListner listener : m_listeners) {
 					listener.onEndTrack();
 				}
 			}
 			if (m_seftAutoNext) {
-				Log.i(TAG, "seft next");
+				// Log.i(TAG, "seft next");
 				if (m_autoNextPending == 0) {
 					if (m_playlistProcessor != null) {
 						m_playlistProcessor.next();
@@ -475,14 +480,14 @@ public class DMRProcessorImpl implements DMRProcessor {
 
 	public void seek(String position) {
 		m_isBusy = true;
-		Log.e(TAG, "Call seek");
+		// Log.e(TAG, "Call seek");
 		@SuppressWarnings("rawtypes")
 		Seek seek = new Seek(m_avtransportService, SeekMode.REL_TIME, position) {
 			@Override
 			public void success(ActionInvocation invocation) {
 				super.success(invocation);
 				m_isBusy = false;
-				Log.e(TAG, "Call seek complete");
+				// Log.e(TAG, "Call seek complete");
 				try {
 					Thread.sleep(SEEK_DELAY_INTERVAL);
 					m_isBusy = false;
@@ -493,7 +498,7 @@ public class DMRProcessorImpl implements DMRProcessor {
 
 			@Override
 			public void failure(ActionInvocation invocation, UpnpResponse reponse, String defaultMsg) {
-				Log.e(TAG, "Seek fail: " + defaultMsg);
+				// Log.e(TAG, "Seek fail: " + defaultMsg);
 				m_isBusy = false;
 			}
 		};
