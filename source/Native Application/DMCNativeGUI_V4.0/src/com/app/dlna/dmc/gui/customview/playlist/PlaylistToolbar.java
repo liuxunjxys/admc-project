@@ -14,7 +14,7 @@ import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.customview.localnetwork.HomeNetworkView;
-import com.app.dlna.dmc.processor.async.ProgressDialogAsyncTask;
+import com.app.dlna.dmc.processor.async.AsyncTaskWithProgressDialog;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.playlist.Playlist;
 import com.app.dlna.dmc.processor.playlist.PlaylistManager;
@@ -29,8 +29,7 @@ public class PlaylistToolbar extends LinearLayout {
 
 	public PlaylistToolbar(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
-				R.layout.cv_toolbar_playlist, this);
+		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.cv_toolbar_playlist, this);
 		m_btn_back = (ImageView) findViewById(R.id.btn_back);
 		m_btn_back.setOnClickListener(m_backClick);
 		m_btn_save = (ImageView) findViewById(R.id.btn_save);
@@ -72,7 +71,7 @@ public class PlaylistToolbar extends LinearLayout {
 
 		@Override
 		public void onClick(View v) {
-			new ProgressDialogAsyncTask<Void, Void, Void>("Clear Playlist") {
+			new AsyncTaskWithProgressDialog<Void, Void, Void>("Clear Playlist") {
 
 				@Override
 				protected Void doInBackground(Void... params) {
@@ -115,7 +114,7 @@ public class PlaylistToolbar extends LinearLayout {
 					final Playlist playlist = new Playlist();
 					playlist.setName(value);
 
-					new ProgressDialogAsyncTask<Void, Void, Void>("Create Playlist") {
+					new AsyncTaskWithProgressDialog<Void, Void, Void>("Create Playlist") {
 
 						@Override
 						protected Void doInBackground(Void... params) {
@@ -127,7 +126,7 @@ public class PlaylistToolbar extends LinearLayout {
 							super.onPostExecute(result);
 							m_playlistView.backToListPlaylist();
 						};
-					};
+					}.execute(new Void[] {});
 
 				}
 			}
@@ -148,7 +147,7 @@ public class PlaylistToolbar extends LinearLayout {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 
-				new ProgressDialogAsyncTask<Void, Void, Boolean>("Delete Playlist") {
+				new AsyncTaskWithProgressDialog<Void, Void, Boolean>("Delete Playlist") {
 
 					@Override
 					protected Boolean doInBackground(Void... params) {
@@ -168,8 +167,7 @@ public class PlaylistToolbar extends LinearLayout {
 						m_playlistView.backToListPlaylist();
 					}
 
-				};
-
+				}.execute(new Void[] {});
 			}
 		});
 

@@ -11,6 +11,10 @@ public final class R {
     public static final class anim {
         public static final int compactrenderer_slidein=0x7f040000;
         public static final int compactrenderer_slideout=0x7f040001;
+        public static final int flipinnext=0x7f040002;
+        public static final int flipinprevious=0x7f040003;
+        public static final int flipoutnext=0x7f040004;
+        public static final int flipoutprevious=0x7f040005;
     }
     public static final class array {
         public static final int libray_pager_list=0x7f080000;
@@ -138,54 +142,56 @@ public final class R {
         public static final int ic_tab_playlist=0x7f02005e;
     }
     public static final class id {
-        public static final int action=0x7f0b002e;
+        public static final int action=0x7f0b0030;
         public static final int actionbar_compat=0x7f0b0000;
-        public static final int botToolbar=0x7f0b000b;
-        public static final int btn_back=0x7f0b0010;
-        public static final int btn_clear=0x7f0b001b;
-        public static final int btn_close=0x7f0b0026;
-        public static final int btn_containerDeselectAll=0x7f0b0012;
-        public static final int btn_containerSelectAll=0x7f0b0011;
-        public static final int btn_next=0x7f0b0016;
-        public static final int btn_playPause=0x7f0b0014;
-        public static final int btn_prev=0x7f0b0013;
-        public static final int btn_quickPlayPause=0x7f0b000f;
-        public static final int btn_remove=0x7f0b001c;
-        public static final int btn_save=0x7f0b001a;
-        public static final int btn_select=0x7f0b0024;
-        public static final int btn_stop=0x7f0b0015;
+        public static final int botToolbar=0x7f0b000d;
+        public static final int btn_back=0x7f0b0012;
+        public static final int btn_clear=0x7f0b001d;
+        public static final int btn_close=0x7f0b0028;
+        public static final int btn_containerDeselectAll=0x7f0b0014;
+        public static final int btn_containerSelectAll=0x7f0b0013;
+        public static final int btn_next=0x7f0b0018;
+        public static final int btn_playPause=0x7f0b0016;
+        public static final int btn_prev=0x7f0b0015;
+        public static final int btn_quickPlayPause=0x7f0b0011;
+        public static final int btn_remove=0x7f0b001e;
+        public static final int btn_save=0x7f0b001c;
+        public static final int btn_select=0x7f0b0026;
+        public static final int btn_stop=0x7f0b0017;
         public static final int btn_toggleMenu=0x7f0b0006;
         public static final int btn_toggleShowHide=0x7f0b0002;
-        public static final int btn_writeToTag=0x7f0b0025;
-        public static final int contentName=0x7f0b0029;
+        public static final int btn_writeToTag=0x7f0b0027;
+        public static final int contentName=0x7f0b002b;
         public static final int cv_compact_dmr=0x7f0b0001;
-        public static final int desc=0x7f0b002d;
-        public static final int deviceName=0x7f0b001e;
-        public static final int deviceType=0x7f0b0020;
-        public static final int deviceUDN=0x7f0b0022;
-        public static final int downloadProgress=0x7f0b0028;
-        public static final int download_icon=0x7f0b0027;
-        public static final int downloaded=0x7f0b002a;
-        public static final int gridView_renderer=0x7f0b000e;
-        public static final int icon=0x7f0b002b;
-        public static final int image=0x7f0b000a;
-        public static final int linearLayout1=0x7f0b0023;
+        public static final int desc=0x7f0b002f;
+        public static final int deviceName=0x7f0b0020;
+        public static final int deviceType=0x7f0b0022;
+        public static final int deviceUDN=0x7f0b0024;
+        public static final int downloadProgress=0x7f0b002a;
+        public static final int download_icon=0x7f0b0029;
+        public static final int downloaded=0x7f0b002c;
+        public static final int gridView_renderer=0x7f0b0010;
+        public static final int icon=0x7f0b002d;
+        public static final int image=0x7f0b000c;
+        public static final int linearLayout1=0x7f0b0025;
         public static final int ll_floatMenu=0x7f0b0007;
-        public static final int lv_mediasource_browsing=0x7f0b000c;
-        public static final int lv_playlist=0x7f0b000d;
-        public static final int menu_refresh=0x7f0b0030;
-        public static final int menu_settings=0x7f0b0031;
-        public static final int name=0x7f0b002c;
-        public static final int playing=0x7f0b002f;
+        public static final int lv_mediasource_browsing=0x7f0b000e;
+        public static final int lv_playlist=0x7f0b000f;
+        public static final int menu_refresh=0x7f0b0032;
+        public static final int menu_settings=0x7f0b0033;
+        public static final int name=0x7f0b002e;
+        public static final int playing=0x7f0b0031;
         public static final int rendererControlView=0x7f0b0009;
-        public static final int sb_duration=0x7f0b0019;
+        public static final int sb_duration=0x7f0b001b;
         public static final int tabwidget_container=0x7f0b0005;
-        public static final int textView1=0x7f0b001d;
-        public static final int textView3=0x7f0b001f;
-        public static final int textView5=0x7f0b0021;
+        public static final int textView1=0x7f0b001f;
+        public static final int textView3=0x7f0b0021;
+        public static final int textView5=0x7f0b0023;
+        public static final int title=0x7f0b000b;
         public static final int topToolbar=0x7f0b0008;
-        public static final int tv_current=0x7f0b0017;
-        public static final int tv_max=0x7f0b0018;
+        public static final int tv_current=0x7f0b0019;
+        public static final int tv_max=0x7f0b001a;
+        public static final int viewFlipper=0x7f0b000a;
         public static final int viewPager=0x7f0b0003;
         public static final int viewPagerStrip=0x7f0b0004;
     }
@@ -213,6 +219,7 @@ public final class R {
         public static final int main=0x7f0a0000;
     }
     public static final class string {
+        public static final int anim_duration=0x7f07002d;
         public static final int app_name=0x7f070000;
         public static final int back=0x7f070020;
         public static final int browselocal=0x7f070006;

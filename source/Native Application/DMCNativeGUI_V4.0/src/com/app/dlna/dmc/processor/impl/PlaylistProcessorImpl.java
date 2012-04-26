@@ -19,11 +19,11 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 	private int m_maxSize;
 	private Playlist m_data;
 
-	public PlaylistProcessorImpl(Playlist LIST_DATA, int maxItem) {
+	public PlaylistProcessorImpl(Playlist data, int maxItem) {
 		m_playlistItems = new ArrayList<PlaylistItem>();
-		m_currentItemIdx = -1;
+		m_currentItemIdx = 0;
 		m_maxSize = maxItem;
-		m_data = LIST_DATA;
+		m_data = data;
 	}
 
 	@Override
@@ -68,6 +68,9 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 
 	@Override
 	public PlaylistItem getCurrentItem() {
+		if (m_currentItemIdx == -1 && m_playlistItems.size() > 0) {
+			return m_playlistItems.get(m_currentItemIdx = 0);
+		}
 		if (m_playlistItems.size() > 0 && m_currentItemIdx < m_playlistItems.size()) {
 			return m_playlistItems.get(m_currentItemIdx);
 		}

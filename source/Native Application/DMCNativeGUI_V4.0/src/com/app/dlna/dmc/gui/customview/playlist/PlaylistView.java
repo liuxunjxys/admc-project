@@ -15,7 +15,7 @@ import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.customview.adapter.AdapterItem;
 import com.app.dlna.dmc.gui.customview.adapter.CustomArrayAdapter;
 import com.app.dlna.dmc.gui.customview.listener.DMRListenerView;
-import com.app.dlna.dmc.processor.async.ProgressDialogAsyncTask;
+import com.app.dlna.dmc.processor.async.AsyncTaskWithProgressDialog;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.playlist.Playlist;
@@ -56,7 +56,7 @@ public class PlaylistView extends DMRListenerView {
 			m_playlistToolbar.updateToolbar(m_viewMode);
 			break;
 		case VM_LIST:
-			new ProgressDialogAsyncTask<Void, Void, List<Playlist>>("Loading All Playlist") {
+			new AsyncTaskWithProgressDialog<Void, Void, List<Playlist>>("Loading All Playlist") {
 
 				@Override
 				protected void onPreExecute() {
@@ -90,7 +90,7 @@ public class PlaylistView extends DMRListenerView {
 			final Object object = m_adapter.getItem(position).getData();
 			if (object instanceof Playlist) {
 
-				new ProgressDialogAsyncTask<Void, Void, PlaylistProcessor>("Loading Playlist Items") {
+				new AsyncTaskWithProgressDialog<Void, Void, PlaylistProcessor>("Loading Playlist Items") {
 
 					@Override
 					protected PlaylistProcessor doInBackground(Void... params) {

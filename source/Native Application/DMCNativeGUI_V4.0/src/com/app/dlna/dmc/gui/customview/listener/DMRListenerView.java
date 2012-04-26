@@ -61,7 +61,7 @@ public class DMRListenerView extends LinearLayout {
 
 		@Override
 		public void onErrorEvent(String error) {
-
+			MainActivity.UPNP_PROCESSOR.refreshDevicesList();
 		}
 
 		@Override
