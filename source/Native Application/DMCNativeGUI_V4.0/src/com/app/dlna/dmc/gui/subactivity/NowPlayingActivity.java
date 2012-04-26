@@ -117,8 +117,12 @@ public class NowPlayingActivity extends Activity {
 			iv.setImageDrawable(getResources().getDrawable(R.drawable.ic_didlobject_video_large));
 			break;
 		case IMAGE:
-			iv.setImageDrawable(getResources().getDrawable(R.drawable.ic_didlobject_image_large));
+			// iv.setImageDrawable(getResources().getDrawable(R.drawable.ic_didlobject_image_large));
+			iv.setImageDrawable(null);
 			new AsyncTaskWithProgressDialog<String, Void, Bitmap>("Loading image") {
+
+				protected void onPreExecute() {
+				};
 
 				@Override
 				protected Bitmap doInBackground(String... params) {
@@ -139,7 +143,7 @@ public class NowPlayingActivity extends Activity {
 
 				@Override
 				protected void onPostExecute(Bitmap result) {
-					super.onPostExecute(result);
+					// super.onPostExecute(result);
 					ImageView iv = (ImageView) m_viewFlipper.getCurrentView().findViewById(R.id.image);
 					if (result == null) {
 						iv.setImageDrawable(getResources().getDrawable(R.drawable.ic_didlobject_image_large));
