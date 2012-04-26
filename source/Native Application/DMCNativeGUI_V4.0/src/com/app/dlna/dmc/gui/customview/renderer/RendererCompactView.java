@@ -37,15 +37,24 @@ public class RendererCompactView extends LinearLayout {
 	private LinearLayout m_ll_renderers;
 	private LayoutInflater m_inflater;
 	private ImageView m_btn_quickPlayPause;
-	private onDMRChangeListener m_onDMRChangeListener;
+	private OnDMRChangeListener m_onDMRChangeListener;
 
-	@SuppressWarnings("rawtypes")
+
 	public RendererCompactView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
-				R.layout.cv_renderer_compact, this);
+		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.cv_renderer_compact, this);
 		m_ll_renderers = (LinearLayout) ((HorizontalScrollView) findViewById(R.id.gridView_renderer)).getChildAt(0);
 		m_inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		m_btn_quickPlayPause = (ImageView) findViewById(R.id.btn_quickPlayPause);
+		m_btn_quickPlayPause.setOnClickListener(m_quickPlayPauseClick);
+		m_btn_quickPlayPause.setTag(R.string.play);
+		initComponent();
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public void initComponent() {
+		if (MainActivity.UPNP_PROCESSOR == null)
+			return;
 		for (Device device : MainActivity.UPNP_PROCESSOR.getDMRList()) {
 			m_ll_renderers.addView(getView(device));
 			if (device instanceof LocalDevice) {
@@ -54,9 +63,6 @@ public class RendererCompactView extends LinearLayout {
 		}
 		MainActivity.UPNP_PROCESSOR.addDevicesListener(m_deviceListener);
 		updateListRenderer();
-		m_btn_quickPlayPause = (ImageView) findViewById(R.id.btn_quickPlayPause);
-		m_btn_quickPlayPause.setOnClickListener(m_quickPlayPauseClick);
-		m_btn_quickPlayPause.setTag(R.string.play);
 		setDMRListener();
 	}
 
@@ -71,8 +77,7 @@ public class RendererCompactView extends LinearLayout {
 		ret.setTag(device);
 		final ImageView icon = (ImageView) ret.findViewById(R.id.icon);
 		final Icon[] icons = device.getIcons();
-		if (device instanceof RemoteDevice && icons != null && icons.length > 0 && icons[0] != null
-				&& icons[0].getUri() != null) {
+		if (device instanceof RemoteDevice && icons != null && icons.length > 0 && icons[0] != null && icons[0].getUri() != null) {
 			loadRendererIcon(device, icon, icons);
 		} else {
 			icon.setImageResource(R.drawable.ic_device_unknow_player);
@@ -92,8 +97,7 @@ public class RendererCompactView extends LinearLayout {
 					final RemoteDevice remoteDevice = (RemoteDevice) device;
 
 					String urlString = remoteDevice.getIdentity().getDescriptorURL().getProtocol() + "://"
-							+ remoteDevice.getIdentity().getDescriptorURL().getAuthority()
-							+ icons[0].getUri().toString();
+							+ remoteDevice.getIdentity().getDescriptorURL().getAuthority() + icons[0].getUri().toString();
 					URL url = new URL(urlString);
 					final Bitmap bm = BitmapFactory.decodeStream(url.openConnection().getInputStream());
 					MainActivity.INSTANCE.runOnUiThread(new Runnable() {
@@ -196,8 +200,7 @@ public class RendererCompactView extends LinearLayout {
 
 				@Override
 				public void run() {
-					m_btn_quickPlayPause
-							.setImageDrawable(getResources().getDrawable(R.drawable.ic_btn_media_quickplay));
+					m_btn_quickPlayPause.setImageDrawable(getResources().getDrawable(R.drawable.ic_btn_media_quickplay));
 					m_btn_quickPlayPause.setTag(R.string.play);
 					m_btn_quickPlayPause.invalidate();
 				}
@@ -210,8 +213,7 @@ public class RendererCompactView extends LinearLayout {
 
 				@Override
 				public void run() {
-					m_btn_quickPlayPause.setImageDrawable(getResources()
-							.getDrawable(R.drawable.ic_btn_media_quickpause));
+					m_btn_quickPlayPause.setImageDrawable(getResources().getDrawable(R.drawable.ic_btn_media_quickpause));
 					m_btn_quickPlayPause.setTag(R.string.pause);
 					m_btn_quickPlayPause.invalidate();
 				}
@@ -224,8 +226,7 @@ public class RendererCompactView extends LinearLayout {
 
 				@Override
 				public void run() {
-					m_btn_quickPlayPause
-							.setImageDrawable(getResources().getDrawable(R.drawable.ic_btn_media_quickplay));
+					m_btn_quickPlayPause.setImageDrawable(getResources().getDrawable(R.drawable.ic_btn_media_quickplay));
 					m_btn_quickPlayPause.setTag(R.string.play);
 					m_btn_quickPlayPause.invalidate();
 				}
@@ -318,6 +319,8 @@ public class RendererCompactView extends LinearLayout {
 			public void run() {
 				m_ll_renderers.addView(getView(device));
 				m_ll_renderers.invalidate();
+				updateListRenderer();
+				setDMRListener();
 			}
 		});
 	}
@@ -337,16 +340,18 @@ public class RendererCompactView extends LinearLayout {
 					}
 				}
 				m_ll_renderers.invalidate();
+				updateListRenderer();
+				setDMRListener();
 			}
 		});
 	}
 
-	public interface onDMRChangeListener {
+	public interface OnDMRChangeListener {
 		void onDMRChange();
 	}
 
-	public void setOnDMRChangeListener(onDMRChangeListener listener) {
+	public void setOnDMRChangeListener(OnDMRChangeListener listener) {
 		m_onDMRChangeListener = listener;
 	}
-	
+
 }

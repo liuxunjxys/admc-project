@@ -195,10 +195,16 @@ public class NowPlayingActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		m_rendererControl.connectToDMR();
+		updateDMRControlView();
 		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
 		if (playlistProcessor != null)
 			playlistProcessor.addListener(m_playlistListener);
 		updateItemInfo();
 	}
+
+	public void updateDMRControlView() {
+		m_rendererControl.connectToDMR();
+	}
+	
+	
 }

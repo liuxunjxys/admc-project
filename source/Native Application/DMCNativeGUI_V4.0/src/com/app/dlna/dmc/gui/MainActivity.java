@@ -28,6 +28,10 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
@@ -37,6 +41,8 @@ import android.widget.Toast;
 import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.abstractactivity.UpnpListenerTabActivity;
+import com.app.dlna.dmc.gui.customview.renderer.RendererCompactView;
+import com.app.dlna.dmc.gui.customview.renderer.RendererCompactView.OnDMRChangeListener;
 import com.app.dlna.dmc.gui.subactivity.LibraryActivity;
 import com.app.dlna.dmc.gui.subactivity.NowPlayingActivity;
 import com.app.dlna.dmc.processor.impl.UpnpProcessorImpl;
@@ -61,6 +67,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 	private IntentFilter[] m_filters;
 	private String[][] m_techLists;
 	private boolean m_waitToWriteTAG = false;
+	private RendererCompactView m_rendererCompactView;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -109,6 +116,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 				m_waitToWriteTAG = false;
 			}
 		});
+
 	}
 
 	private OnTabChangeListener changeListener = new OnTabChangeListener() {
@@ -140,7 +148,22 @@ public class MainActivity extends UpnpListenerTabActivity {
 	public void onStartComplete() {
 		super.onStartComplete();
 		createTabs();
+		m_rendererCompactView = (RendererCompactView) findViewById(R.id.cv_compact_dmr);
+		m_rendererCompactView.initComponent();
+		m_rendererCompactView.setOnDMRChangeListener(m_onDMRChanged);
 	}
+
+	private OnDMRChangeListener m_onDMRChanged = new OnDMRChangeListener() {
+
+		@Override
+		public void onDMRChange() {
+			String tabTag = getTabHost().getCurrentTabTag();
+			Activity activity = getLocalActivityManager().getActivity(tabTag);
+			if (activity instanceof NowPlayingActivity) {
+				((NowPlayingActivity) activity).updateDMRControlView();
+			}
+		}
+	};
 
 	private void createTabs() {
 		Intent intent = null;
@@ -231,8 +254,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 			public void run() {
 				if (m_routerProgressDialog != null)
 					m_routerProgressDialog.dismiss();
-				new AlertDialog.Builder(MainActivity.this).setTitle("Network error").setMessage(cause)
-						.setCancelable(false).setPositiveButton("OK", new OnClickListener() {
+				new AlertDialog.Builder(MainActivity.this).setTitle("Network error").setMessage(cause).setCancelable(false)
+						.setPositiveButton("OK", new OnClickListener() {
 
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
@@ -397,8 +420,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 					tv.setTag(i);
 					tv.setOnClickListener(customMenuItemClick);
 					tv.setTextSize(20);
-					tv.setBackgroundDrawable(MainActivity.this.getResources().getDrawable(
-							R.drawable.bg_actionbar_normal));
+					tv.setBackgroundDrawable(MainActivity.this.getResources().getDrawable(R.drawable.bg_actionbar_normal));
 					m_ll_menu.addView(tv);
 				}
 			}
@@ -422,8 +444,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 						String textEncoding = (buffer[0] & 0200) == 0 ? "UTF-8" : "UTF-16";
 						int languageCodeLength = buffer[0] & 0077;
 						try {
-							String text = new String(buffer, languageCodeLength + 1, buffer.length - languageCodeLength
-									- 1, textEncoding);
+							String text = new String(buffer, languageCodeLength + 1, buffer.length - languageCodeLength - 1,
+									textEncoding);
 							String deviceUDN = "";
 							if (text.startsWith("uuid:"))
 								deviceUDN = text.substring(5);
@@ -488,4 +510,60 @@ public class MainActivity extends UpnpListenerTabActivity {
 		m_nfcProgressDialog.show();
 	}
 
+	public void showRendererCompactView() {
+		Animation animation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.compactrenderer_slidein);
+		animation.setAnimationListener(new AnimationListener() {
+
+			@Override
+			public void onAnimationStart(Animation animation) {
+				m_rendererCompactView.setVisibility(View.VISIBLE);
+				m_rendererCompactView.updateListRenderer();
+			}
+
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+			}
+
+			@Override
+			public void onAnimationEnd(Animation animation) {
+			}
+		});
+		m_rendererCompactView.startAnimation(animation);
+
+	}
+
+	public void hideRendererCompactView() {
+		Animation animation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.compactrenderer_slideout);
+		animation.setAnimationListener(new AnimationListener() {
+
+			@Override
+			public void onAnimationStart(Animation animation) {
+				m_rendererCompactView.setVisibility(View.VISIBLE);
+			}
+
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+			}
+
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				m_rendererCompactView.setVisibility(View.GONE);
+			}
+		});
+		m_rendererCompactView.startAnimation(animation);
+	}
+
+	public boolean isCompactRendererShowing() {
+		return m_rendererCompactView.getVisibility() == View.VISIBLE;
+	}
+
+	public void onShowHideClick(View view) {
+		if (isCompactRendererShowing()) {
+			hideRendererCompactView();
+			((ImageView) view).setImageDrawable(getResources().getDrawable(R.drawable.ic_btn_navigate_up));
+		} else {
+			showRendererCompactView();
+			((ImageView) view).setImageDrawable(getResources().getDrawable(R.drawable.ic_btn_navigate_down));
+		}
+	}
 }

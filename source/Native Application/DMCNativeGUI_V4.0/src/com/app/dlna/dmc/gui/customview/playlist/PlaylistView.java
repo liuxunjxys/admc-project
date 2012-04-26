@@ -31,8 +31,7 @@ public class PlaylistView extends DMRListenerView {
 
 	public PlaylistView(Context context) {
 		super(context);
-		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
-				R.layout.cv_playlist_allitem, this);
+		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.cv_playlist_allitem, this);
 		m_listView = (ListView) findViewById(R.id.lv_playlist);
 		m_adapter = new CustomArrayAdapter(getContext(), 0);
 		m_listView.setAdapter(m_adapter);
@@ -99,8 +98,11 @@ public class PlaylistView extends DMRListenerView {
 
 					protected void onPostExecute(PlaylistProcessor playlistProcessor) {
 						MainActivity.UPNP_PROCESSOR.setPlaylistProcessor(playlistProcessor);
-						MainActivity.UPNP_PROCESSOR.getDMRProcessor().setPlaylistProcessor(playlistProcessor);
-						MainActivity.UPNP_PROCESSOR.getDMRProcessor().setSeftAutoNext(true);
+						DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
+						if (dmrProcessor != null) {
+							dmrProcessor.setPlaylistProcessor(playlistProcessor);
+							dmrProcessor.setSeftAutoNext(true);
+						}
 						m_viewMode = VM_DETAILS;
 						preparePlaylist();
 						super.onPostExecute(playlistProcessor);

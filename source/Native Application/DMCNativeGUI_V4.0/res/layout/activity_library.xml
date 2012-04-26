@@ -4,46 +4,21 @@
     android:layout_height="match_parent"
     android:orientation="horizontal" >
 
-    <com.app.dlna.dmc.gui.customview.renderer.RendererCompactView
-        android:id="@+id/cv_compact_dmr"
-        android:layout_width="fill_parent"
-        android:layout_height="70dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true" 
-        android:visibility="gone">
-    </com.app.dlna.dmc.gui.customview.renderer.RendererCompactView>
-
-    <RelativeLayout
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewPager"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_above="@+id/cv_compact_dmr" >
+        android:layout_above="@+id/btn_toggleShowHide"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true" >
 
-        <ImageView
-            android:id="@+id/btn_toggleShowHide"
+        <android.support.v4.view.PagerTitleStrip
+            android:id="@+id/viewPagerStrip"
             android:layout_width="fill_parent"
-            android:layout_height="24dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:onClick="onShowHideClick"
-            android:scaleType="centerInside"
-            android:src="@drawable/ic_btn_navigate_up" />
-
-        <android.support.v4.view.ViewPager
-            android:id="@+id/viewPager"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_above="@+id/btn_toggleShowHide"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true" >
-
-            <android.support.v4.view.PagerTitleStrip
-                android:id="@+id/viewPagerStrip"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top"
-                android:background="@drawable/bg_pager_title_strip"
-                android:textColor="@color/blue" />
-        </android.support.v4.view.ViewPager>
-    </RelativeLayout>
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:background="@drawable/bg_pager_title_strip"
+            android:textColor="@color/blue" />
+    </android.support.v4.view.ViewPager>
 
 </RelativeLayout>

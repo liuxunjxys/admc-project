@@ -7,24 +7,17 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
-import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.customview.localnetwork.HomeNetworkView;
 import com.app.dlna.dmc.gui.customview.playlist.PlaylistView;
-import com.app.dlna.dmc.gui.customview.renderer.RendererCompactView;
-import com.app.dlna.dmc.gui.customview.renderer.RendererCompactView.onDMRChangeListener;
 
 public class LibraryActivity extends Activity {
 	private ViewPager m_pager;
 	private HomeNetworkView m_homeNetworkView;
 	private View m_internet;
 	private PlaylistView m_playlistView;
-	private RendererCompactView m_rendererCompactView;
 	private String[] m_pagerTitle;
 
 	@Override
@@ -37,76 +30,17 @@ public class LibraryActivity extends Activity {
 
 		setContentView(R.layout.activity_library);
 		m_pagerTitle = getResources().getStringArray(R.array.libray_pager_list);
-		m_rendererCompactView = (RendererCompactView) findViewById(R.id.cv_compact_dmr);
 
 		m_pager = (ViewPager) findViewById(R.id.viewPager);
 		m_pager.setOnPageChangeListener(m_onPageChangeListener);
 		m_pager.setAdapter(m_pagerAdapter);
 
-		m_rendererCompactView.setOnDMRChangeListener(m_DMRChangeListener);
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
 		m_homeNetworkView.updateListView();
-	}
-
-	public void showRendererCompactView() {
-		Animation animation = AnimationUtils.loadAnimation(LibraryActivity.this, R.anim.compactrenderer_slidein);
-		animation.setAnimationListener(new AnimationListener() {
-
-			@Override
-			public void onAnimationStart(Animation animation) {
-				m_rendererCompactView.setVisibility(View.VISIBLE);
-				m_rendererCompactView.updateListRenderer();
-			}
-
-			@Override
-			public void onAnimationRepeat(Animation animation) {
-			}
-
-			@Override
-			public void onAnimationEnd(Animation animation) {
-			}
-		});
-		m_rendererCompactView.startAnimation(animation);
-
-	}
-
-	public void hideRendererCompactView() {
-		Animation animation = AnimationUtils.loadAnimation(LibraryActivity.this, R.anim.compactrenderer_slideout);
-		animation.setAnimationListener(new AnimationListener() {
-
-			@Override
-			public void onAnimationStart(Animation animation) {
-				m_rendererCompactView.setVisibility(View.VISIBLE);
-			}
-
-			@Override
-			public void onAnimationRepeat(Animation animation) {
-			}
-
-			@Override
-			public void onAnimationEnd(Animation animation) {
-				m_rendererCompactView.setVisibility(View.GONE);
-			}
-		});
-		m_rendererCompactView.startAnimation(animation);
-	}
-
-	public boolean isCompactRendererShowing() {
-		return m_rendererCompactView.getVisibility() == View.VISIBLE;
-	}
-
-	public void onShowHideClick(View view) {
-		if (isCompactRendererShowing()) {
-			hideRendererCompactView();
-			((ImageView) view).setImageDrawable(getResources().getDrawable(R.drawable.ic_btn_navigate_up));
-		} else {
-			showRendererCompactView();
-			((ImageView) view).setImageDrawable(getResources().getDrawable(R.drawable.ic_btn_navigate_down));
-		}
 	}
 
 	private OnPageChangeListener m_onPageChangeListener = new OnPageChangeListener() {
@@ -173,14 +107,6 @@ public class LibraryActivity extends Activity {
 		@Override
 		public int getCount() {
 			return m_pagerTitle.length;
-		}
-	};
-	private onDMRChangeListener m_DMRChangeListener = new onDMRChangeListener() {
-
-		@Override
-		public void onDMRChange() {
-			m_homeNetworkView.updateDMRListener();
-			m_playlistView.updateDMRListener();
 		}
 	};
 
