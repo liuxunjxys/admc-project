@@ -18,6 +18,7 @@ import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.subactivity.NowPlayingActivity;
+import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor.DMRProcessorListner;
 import com.app.dlna.dmc.utility.Utility;
 
@@ -57,20 +58,26 @@ public class RendererControlView extends LinearLayout {
 	}
 
 	public void connectToDMR() {
-		MainActivity.UPNP_PROCESSOR.getDMRProcessor().addListener(m_dmrListener);
+		DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
+		if (dmrProcessor == null)
+			return;
+		dmrProcessor.addListener(m_dmrListener);
 	}
 
 	private OnClickListener onPlayPauseClick = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
+			DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
 			switch (m_playingState) {
 			case STATE__PAUSE:
 			case STATE_STOP:
-				MainActivity.UPNP_PROCESSOR.getDMRProcessor().play();
+				if (dmrProcessor != null)
+					dmrProcessor.play();
 				break;
 			case STATE_PLAYING:
-				MainActivity.UPNP_PROCESSOR.getDMRProcessor().pause();
+				if (dmrProcessor != null)
+					dmrProcessor.pause();
 				break;
 			default:
 				break;
@@ -81,7 +88,10 @@ public class RendererControlView extends LinearLayout {
 
 		@Override
 		public void onClick(View v) {
-			MainActivity.UPNP_PROCESSOR.getDMRProcessor().stop();
+			DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
+			if (dmrProcessor == null)
+				return;
+			dmrProcessor.stop();
 		}
 	};
 
@@ -128,7 +138,10 @@ public class RendererControlView extends LinearLayout {
 		@Override
 		public void onStopTrackingTouch(SeekBar seekBar) {
 			m_isSeeking = false;
-			MainActivity.UPNP_PROCESSOR.getDMRProcessor().seek(Utility.getTimeString(seekBar.getProgress()));
+			DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
+			if (dmrProcessor == null)
+				return;
+			dmrProcessor.seek(Utility.getTimeString(seekBar.getProgress()));
 		}
 
 		@Override
@@ -171,8 +184,7 @@ public class RendererControlView extends LinearLayout {
 
 				@Override
 				public void run() {
-					m_btn_playPause.setImageDrawable(getContext().getResources().getDrawable(
-							R.drawable.ic_btn_media_play));
+					m_btn_playPause.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_media_play));
 				}
 			});
 		}
@@ -184,8 +196,7 @@ public class RendererControlView extends LinearLayout {
 
 				@Override
 				public void run() {
-					m_btn_playPause.setImageDrawable(getContext().getResources().getDrawable(
-							R.drawable.ic_btn_media_pause));
+					m_btn_playPause.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_media_pause));
 				}
 			});
 
@@ -198,8 +209,7 @@ public class RendererControlView extends LinearLayout {
 
 				@Override
 				public void run() {
-					m_btn_playPause.setImageDrawable(getContext().getResources().getDrawable(
-							R.drawable.ic_btn_media_play));
+					m_btn_playPause.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_media_play));
 				}
 			});
 

@@ -165,7 +165,7 @@ public final class R {
         public static final int btn_toggleShowHide=0x7f0b0002;
         public static final int btn_writeToTag=0x7f0b0027;
         public static final int contentName=0x7f0b002b;
-        public static final int cv_compact_dmr=0x7f0b0001;
+        public static final int cv_compact_dmr=0x7f0b0004;
         public static final int desc=0x7f0b002f;
         public static final int deviceName=0x7f0b0020;
         public static final int deviceType=0x7f0b0022;
@@ -195,8 +195,8 @@ public final class R {
         public static final int tv_current=0x7f0b0019;
         public static final int tv_max=0x7f0b001a;
         public static final int viewFlipper=0x7f0b000a;
-        public static final int viewPager=0x7f0b0003;
-        public static final int viewPagerStrip=0x7f0b0004;
+        public static final int viewPager=0x7f0b0001;
+        public static final int viewPagerStrip=0x7f0b0003;
     }
     public static final class layout {
         public static final int actionbar_compat=0x7f030000;

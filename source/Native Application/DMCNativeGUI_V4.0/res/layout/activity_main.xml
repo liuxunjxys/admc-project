@@ -3,48 +3,75 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
 
-    <TabHost
-        android:id="@android:id/tabhost"
+    <com.app.dlna.dmc.gui.customview.renderer.RendererCompactView
+        android:id="@+id/cv_compact_dmr"
+        android:layout_width="fill_parent"
+        android:layout_height="70dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:visibility="gone" >
+    </com.app.dlna.dmc.gui.customview.renderer.RendererCompactView>
+
+    <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:layout_above="@id/cv_compact_dmr"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true" >
 
-        <LinearLayout
-            android:id="@+id/tabwidget_container"
+        <ImageView
+            android:id="@+id/btn_toggleShowHide"
+            android:layout_width="fill_parent"
+            android:layout_height="24dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:onClick="onShowHideClick"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_btn_navigate_up" />
+
+        <TabHost
+            android:id="@android:id/tabhost"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:orientation="vertical"
-            android:padding="5dp" >
+            android:layout_above="@id/btn_toggleShowHide"
+            android:layout_alignParentTop="true" >
 
             <LinearLayout
+                android:id="@+id/tabwidget_container"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:weightSum="10" >
+                android:layout_height="fill_parent"
+                android:orientation="vertical"
+                android:padding="5dp" >
 
-                <TabWidget
-                    android:id="@android:id/tabs"
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/tabwidget_height"
-                    android:layout_weight="9" />
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:weightSum="10" >
 
-                <ImageView
-                    android:id="@+id/btn_toggleMenu"
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/tabwidget_height"
-                    android:layout_weight="1"
-                    android:onClick="onMenuClick"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/ic_action_settings" />
+                    <TabWidget
+                        android:id="@android:id/tabs"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/tabwidget_height"
+                        android:layout_weight="9" />
+
+                    <ImageView
+                        android:id="@+id/btn_toggleMenu"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/tabwidget_height"
+                        android:layout_weight="1"
+                        android:onClick="onMenuClick"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_action_settings" />
+                </LinearLayout>
+
+                <FrameLayout
+                    android:id="@android:id/tabcontent"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent" >
+                </FrameLayout>
             </LinearLayout>
-
-            <FrameLayout
-                android:id="@android:id/tabcontent"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent" >
-            </FrameLayout>
-        </LinearLayout>
-    </TabHost>
+        </TabHost>
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/ll_floatMenu"
@@ -57,8 +84,8 @@
         android:clickable="true"
         android:focusable="true"
         android:orientation="vertical"
-        android:padding="5dp" 
-        android:visibility="gone">
+        android:padding="5dp"
+        android:visibility="gone" >
     </LinearLayout>
 
 </RelativeLayout>
