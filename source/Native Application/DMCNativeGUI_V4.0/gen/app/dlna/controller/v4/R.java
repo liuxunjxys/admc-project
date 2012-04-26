@@ -127,19 +127,22 @@ public final class R {
         public static final int ic_device_unknow_player=0x7f02004f;
         public static final int ic_device_unknow_server=0x7f020050;
         public static final int ic_didlobject_audio=0x7f020051;
-        public static final int ic_didlobject_container=0x7f020052;
-        public static final int ic_didlobject_image=0x7f020053;
-        public static final int ic_didlobject_unknow=0x7f020054;
-        public static final int ic_didlobject_video=0x7f020055;
-        public static final int ic_download=0x7f020056;
-        public static final int ic_launcher=0x7f020057;
-        public static final int ic_launcher_32x32=0x7f020058;
-        public static final int ic_playlist=0x7f020059;
-        public static final int ic_playlist_mark=0x7f02005a;
-        public static final int ic_scanning_sdcard=0x7f02005b;
-        public static final int ic_tab_mediasource=0x7f02005c;
-        public static final int ic_tab_nowplaying=0x7f02005d;
-        public static final int ic_tab_playlist=0x7f02005e;
+        public static final int ic_didlobject_audio_large=0x7f020052;
+        public static final int ic_didlobject_container=0x7f020053;
+        public static final int ic_didlobject_image=0x7f020054;
+        public static final int ic_didlobject_image_large=0x7f020055;
+        public static final int ic_didlobject_unknow=0x7f020056;
+        public static final int ic_didlobject_video=0x7f020057;
+        public static final int ic_didlobject_video_large=0x7f020058;
+        public static final int ic_download=0x7f020059;
+        public static final int ic_launcher=0x7f02005a;
+        public static final int ic_launcher_32x32=0x7f02005b;
+        public static final int ic_playlist=0x7f02005c;
+        public static final int ic_playlist_mark=0x7f02005d;
+        public static final int ic_scanning_sdcard=0x7f02005e;
+        public static final int ic_tab_mediasource=0x7f02005f;
+        public static final int ic_tab_nowplaying=0x7f020060;
+        public static final int ic_tab_playlist=0x7f020061;
     }
     public static final class id {
         public static final int action=0x7f0b0030;

@@ -22,6 +22,7 @@ import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.customview.nowplaying.RendererControlView;
+import com.app.dlna.dmc.processor.async.AsyncTaskWithProgressDialog;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 import com.app.dlna.dmc.utility.Utility;
 
@@ -110,13 +111,43 @@ public class NowPlayingActivity extends Activity {
 		ImageView iv = (ImageView) view.findViewById(R.id.image);
 		switch (item.getType()) {
 		case AUDIO:
-			iv.setImageDrawable(getResources().getDrawable(R.drawable.ic_didlobject_audio));
+			iv.setImageDrawable(getResources().getDrawable(R.drawable.ic_didlobject_audio_large));
 			break;
 		case VIDEO:
-			iv.setImageDrawable(getResources().getDrawable(R.drawable.ic_didlobject_video));
+			iv.setImageDrawable(getResources().getDrawable(R.drawable.ic_didlobject_video_large));
 			break;
 		case IMAGE:
-			iv.setImageDrawable(getResources().getDrawable(R.drawable.ic_didlobject_image));
+			iv.setImageDrawable(getResources().getDrawable(R.drawable.ic_didlobject_image_large));
+			new AsyncTaskWithProgressDialog<String, Void, Bitmap>("Loading image") {
+
+				@Override
+				protected Bitmap doInBackground(String... params) {
+					Log.i(TAG, "Load in background");
+					String url = params[0];
+					int width = Integer.parseInt(params[1]);
+					int height = Integer.parseInt(params[2]);
+					try {
+						return Utility.getBitmapFromURL(url, width < height ? width : height);
+					} catch (MalformedURLException e) {
+						e.printStackTrace();
+						return null;
+					} catch (IOException e) {
+						e.printStackTrace();
+						return null;
+					}
+				}
+
+				@Override
+				protected void onPostExecute(Bitmap result) {
+					super.onPostExecute(result);
+					ImageView iv = (ImageView) m_viewFlipper.getCurrentView().findViewById(R.id.image);
+					if (result == null) {
+						iv.setImageDrawable(getResources().getDrawable(R.drawable.ic_didlobject_image_large));
+					} else {
+						iv.setImageBitmap(result);
+					}
+				}
+			}.execute(new String[] { item.getUrl(), "256", "256" });
 			break;
 		default:
 			break;
