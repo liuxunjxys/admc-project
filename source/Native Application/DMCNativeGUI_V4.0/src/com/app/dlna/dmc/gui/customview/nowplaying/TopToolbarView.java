@@ -60,6 +60,14 @@ public class TopToolbarView extends LinearLayout {
 			}
 		});
 
+		m_tv_currentPlaylistName.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				m_spinner_playlist.performClick();
+			}
+		});
+
 		updateToolbar();
 	}
 
