@@ -70,11 +70,30 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 				initDIDLObject(didlObject, holder);
 			}
 		} else if (object.getData() instanceof PlaylistItem) {
-			initPlaylistItem((PlaylistItem) object.getData(), holder, position);
+			initPlaylistItem((PlaylistItem) object.getData(), holder, position, true);
 		} else if (object.getData() instanceof Playlist) {
 			initPlaylist((Playlist) object.getData(), holder, position);
 		}
 
+		return convertView;
+	}
+
+	@Override
+	public View getDropDownView(int position, View convertView, ViewGroup parent) {
+		if (convertView == null || convertView instanceof ProgressBar) {
+			convertView = m_inflater.inflate(R.layout.lvitem_generic_item, null, false);
+		}
+		if (convertView.getTag() == null) {
+			setViewHolder(convertView);
+		}
+		final AdapterItem object = getItem(position);
+
+		final ViewHolder holder = (ViewHolder) convertView.getTag();
+		holder.action.setTag(new Integer(position));
+		if (object.getData() instanceof Playlist) {
+			initPlaylist((Playlist) object.getData(), holder, position);
+		} else if (object.getData() instanceof PlaylistItem)
+			initPlaylistItem((PlaylistItem) object.getData(), holder, position, false);
 		return convertView;
 	}
 
@@ -216,7 +235,7 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 		}
 	}
 
-	private void initPlaylistItem(PlaylistItem object, ViewHolder holder, int position) {
+	private void initPlaylistItem(PlaylistItem object, ViewHolder holder, int position, boolean editable) {
 		holder.name.setText(object.getTitle());
 		switch (object.getType()) {
 		case AUDIO:
@@ -232,8 +251,11 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 			holder.icon.setImageResource(R.drawable.ic_didlobject_unknow);
 			break;
 		}
-		holder.action.setVisibility(View.VISIBLE);
-		holder.action.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_remove));
+		if (editable) {
+			holder.action.setVisibility(View.VISIBLE);
+			holder.action.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_remove));
+		} else
+			holder.action.setVisibility(View.GONE);
 		if (object.getUrl().equals(MainActivity.UPNP_PROCESSOR.getDMRProcessor().getCurrentTrackURI())) {
 			holder.playing.setVisibility(View.VISIBLE);
 		} else {
@@ -365,4 +387,5 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 				list.getAdapter().getView(i, view, list);
 		}
 	}
+
 }

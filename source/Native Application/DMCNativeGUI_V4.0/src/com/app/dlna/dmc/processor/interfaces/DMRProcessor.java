@@ -36,6 +36,8 @@ public interface DMRProcessor {
 	void setSeftAutoNext(boolean autoNext);
 	
 	String getCurrentTrackURI();
+	
+	void setRunning(boolean running);
 
 	public interface DMRProcessorListner {
 		void onUpdatePosition(long current, long max);

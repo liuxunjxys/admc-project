@@ -66,7 +66,7 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener, CoreU
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				m_upnpService = (CoreUpnpServiceBinder) service;
 				if (m_upnpService.isInitialized()) {
-					m_upnpService.getRegistry().addListener(UpnpProcessorImpl.this);
+					m_upnpService.addRegistryListener(UpnpProcessorImpl.this);
 					Log.i(TAG, "Upnp Service Ready");
 					fireOnStartCompleteEvent();
 					m_upnpService.setProcessor(UpnpProcessorImpl.this);
