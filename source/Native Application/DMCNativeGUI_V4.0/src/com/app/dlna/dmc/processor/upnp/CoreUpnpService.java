@@ -23,6 +23,7 @@ import org.teleal.cling.model.types.DeviceType;
 import org.teleal.cling.model.types.UDN;
 import org.teleal.cling.protocol.ProtocolFactory;
 import org.teleal.cling.registry.Registry;
+import org.teleal.cling.registry.RegistryListener;
 import org.teleal.cling.transport.Router;
 
 import android.app.Notification;
@@ -61,7 +62,7 @@ public class CoreUpnpService extends Service {
 	private static final int NOTIFICATION = 1500;
 	private static final String TAG = CoreUpnpService.class.getName();
 	private MainHttpProcessor m_httpThread;
-	private UpnpService upnpService;
+	private UpnpService m_upnpService;
 	private CoreUpnpServiceBinder binder = new CoreUpnpServiceBinder();
 	@SuppressWarnings("rawtypes")
 	private Device m_currentDMS;
@@ -79,6 +80,7 @@ public class CoreUpnpService extends Service {
 	private NetworkStateReceiver m_networkReceiver;
 	private UDN m_localDMS_UDN = null;
 	private UDN m_localDMR_UDN = null;
+	private RegistryListener m_registryListener;
 
 	@Override
 	public void onCreate() {
@@ -87,7 +89,7 @@ public class CoreUpnpService extends Service {
 		m_wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		m_connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		try {
-			upnpService = new UpnpServiceImpl(createConfiguration(m_wifiManager)) {
+			m_upnpService = new UpnpServiceImpl(createConfiguration(m_wifiManager)) {
 				@Override
 				protected Router createRouter(ProtocolFactory protocolFactory, Registry registry) {
 					AndroidWifiSwitchableRouter router = CoreUpnpService.this.createRouter(getConfiguration(),
@@ -183,11 +185,30 @@ public class CoreUpnpService extends Service {
 		} catch (Exception ex) {
 
 		}
-		if (upnpService != null)
-			try {
-				upnpService.shutdown();
-			} catch (Exception ex) {
-			}
+
+		if (m_dmsProcessor != null)
+			m_dmsProcessor.dispose();
+
+		if (m_dmrProcessor != null)
+			m_dmrProcessor.dispose();
+
+		if (m_upnpService != null)
+
+			new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					try {
+						m_upnpService.getRegistry().removeAllLocalDevices();
+						m_upnpService.getRegistry().removeAllRemoteDevices();
+						m_upnpService.getRegistry().removeListener(m_registryListener);
+						m_upnpService.shutdown();
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+				}
+			}).start();
+
 		if (m_wifiLock != null)
 			try {
 				m_wifiLock.release();
@@ -236,7 +257,7 @@ public class CoreUpnpService extends Service {
 
 		public void setCurrentDMS(UDN uDN) {
 			m_dmsProcessor = null;
-			m_currentDMS = upnpService.getRegistry().getDevice(uDN, true);
+			m_currentDMS = m_upnpService.getRegistry().getDevice(uDN, true);
 			if (m_currentDMS != null) {
 				Log.d(TAG, "CURRENT DMS:" + m_currentDMS.toString());
 				m_dmsProcessor = new DMSProcessorImpl(m_currentDMS, getControlPoint());
@@ -252,7 +273,7 @@ public class CoreUpnpService extends Service {
 			if (m_dmrProcessor != null)
 				m_dmrProcessor.dispose();
 			m_dmrProcessor = null;
-			m_currentDMR = upnpService.getRegistry().getDevice(uDN, true);
+			m_currentDMR = m_upnpService.getRegistry().getDevice(uDN, true);
 			if (m_currentDMR != null) {
 				Log.d(TAG, "CURRENT DMR:" + m_currentDMR.toString());
 				if (m_currentDMR instanceof LocalDevice)
@@ -278,19 +299,19 @@ public class CoreUpnpService extends Service {
 		}
 
 		public UpnpService get() {
-			return upnpService;
+			return m_upnpService;
 		}
 
 		public UpnpServiceConfiguration getConfiguration() {
-			return upnpService.getConfiguration();
+			return m_upnpService.getConfiguration();
 		}
 
 		public Registry getRegistry() {
-			return upnpService.getRegistry();
+			return m_upnpService.getRegistry();
 		}
 
 		public ControlPoint getControlPoint() {
-			return upnpService.getControlPoint();
+			return m_upnpService.getControlPoint();
 		}
 
 		public void setProcessor(CoreUpnpServiceListener upnpProcessor) {
@@ -299,6 +320,11 @@ public class CoreUpnpService extends Service {
 
 		public void setPlaylistProcessor(PlaylistProcessor playlistProcessor) {
 			m_playlistProcessor = playlistProcessor;
+		}
+
+		public void addRegistryListener(RegistryListener listener) {
+			m_registryListener = listener;
+			m_upnpService.getRegistry().addListener(listener);
 		}
 	}
 
@@ -324,7 +350,7 @@ public class CoreUpnpService extends Service {
 
 			LocalDevice localDevice = new LocalDevice(identity, type, details, localService);
 
-			upnpService.getRegistry().addDevice(localDevice);
+			m_upnpService.getRegistry().addDevice(localDevice);
 			Log.d(TAG, "Create Local Device complete");
 		} catch (Exception ex) {
 			Log.d(TAG, "Cannot create Local Device");
@@ -349,7 +375,7 @@ public class CoreUpnpService extends Service {
 
 			LocalDevice localDevice = new LocalDevice(identity, type, details, new LocalService[0]);
 
-			upnpService.getRegistry().addDevice(localDevice);
+			m_upnpService.getRegistry().addDevice(localDevice);
 			Log.d(TAG, "Create Local Device complete");
 		} catch (Exception ex) {
 			Log.d(TAG, "Cannot create Local Device");

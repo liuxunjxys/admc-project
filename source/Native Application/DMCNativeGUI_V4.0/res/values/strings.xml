@@ -59,5 +59,6 @@
     <string name="select">Select</string>
     <string name="writeToTag">Write TAG</string>
     <string name="anim_duration">300</string>
+    <string name="slash">/</string>
 
 </resources>

@@ -61,11 +61,9 @@ public class DMRProcessorImpl implements DMRProcessor {
 	private int m_autoNextPending = 0;
 	private String m_currentTrackURI;
 
-	private Thread m_updateThread = new Thread(new Runnable() {
-
+	private class UpdateThread extends Thread {
 		@Override
 		public void run() {
-
 			while (m_isRunning) {
 				if (m_avtransportService == null)
 					return;
@@ -174,8 +172,9 @@ public class DMRProcessorImpl implements DMRProcessor {
 					e.printStackTrace();
 				}
 			}
+			super.run();
 		}
-	});
+	}
 
 	@SuppressWarnings("rawtypes")
 	public DMRProcessorImpl(Device dmr, ControlPoint controlPoint) {
@@ -184,7 +183,7 @@ public class DMRProcessorImpl implements DMRProcessor {
 		m_avtransportService = m_device.findService(new ServiceType("schemas-upnp-org", "AVTransport"));
 		m_renderingControl = m_device.findService(new ServiceType("schemas-upnp-org", "RenderingControl"));
 		m_listeners = new ArrayList<DMRProcessor.DMRProcessorListner>();
-		m_updateThread.start();
+		new UpdateThread().start();
 	}
 
 	@SuppressWarnings({ "rawtypes" })
@@ -555,4 +554,10 @@ public class DMRProcessorImpl implements DMRProcessor {
 		return null == m_currentTrackURI ? "" : m_currentTrackURI;
 	}
 
+	@Override
+	public void setRunning(boolean running) {
+		m_isRunning = running;
+		if (m_isRunning)
+			new UpdateThread().start();
+	}
 }

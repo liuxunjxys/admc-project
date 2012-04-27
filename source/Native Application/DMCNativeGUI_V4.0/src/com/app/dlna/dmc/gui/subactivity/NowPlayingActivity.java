@@ -19,16 +19,18 @@ import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.customview.nowplaying.RendererControlView;
+import com.app.dlna.dmc.gui.customview.nowplaying.TopToolbarView;
 import com.app.dlna.dmc.processor.async.AsyncTaskWithProgressDialog;
+import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor.PlaylistListener;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 import com.app.dlna.dmc.utility.Utility;
 
 public class NowPlayingActivity extends Activity {
-
-	private RendererControlView m_rendererControl;
 	protected String TAG = NowPlayingActivity.class.getName();
+	private RendererControlView m_rendererControl;
+	private TopToolbarView m_topToolbar;
 	private ViewFlipper m_viewFlipper;
 	private ProgressDialog m_progressDialog;
 	private Animation m_animFlipInNext;
@@ -42,6 +44,7 @@ public class NowPlayingActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_nowplaying);
 		m_rendererControl = (RendererControlView) findViewById(R.id.rendererControlView);
+		m_topToolbar = (TopToolbarView) findViewById(R.id.topToolbar);
 
 		m_viewFlipper = (ViewFlipper) findViewById(R.id.viewFlipper);
 		m_progressDialog = new ProgressDialog(NowPlayingActivity.this);
@@ -125,7 +128,7 @@ public class NowPlayingActivity extends Activity {
 		MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().previous();
 	}
 
-	private void updateItemInfo() {
+	public void updateItemInfo() {
 		View view = m_viewFlipper.getCurrentView();
 		PlaylistItem item = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getCurrentItem();
 		if (item == null)
@@ -182,6 +185,10 @@ public class NowPlayingActivity extends Activity {
 		default:
 			break;
 		}
+		DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
+		if (dmrProcessor != null) {
+			dmrProcessor.setURIandPlay(item.getUrl());
+		}
 	}
 
 	private void updateCurrentPlaylistItem() {
@@ -195,16 +202,29 @@ public class NowPlayingActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		updateDMRControlView();
+		m_rendererControl.connectToDMR();
+		updatePlaylist();
+		updateItemInfo();
+		m_topToolbar.updateToolbar();
+	}
+
+	public void updatePlaylist() {
 		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
 		if (playlistProcessor != null)
 			playlistProcessor.addListener(m_playlistListener);
-		updateItemInfo();
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		m_rendererControl.disconnectToDMR();
+		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
+		if (playlistProcessor != null)
+			playlistProcessor.removeListener(m_playlistListener);
 	}
 
 	public void updateDMRControlView() {
 		m_rendererControl.connectToDMR();
 	}
-	
-	
+
 }

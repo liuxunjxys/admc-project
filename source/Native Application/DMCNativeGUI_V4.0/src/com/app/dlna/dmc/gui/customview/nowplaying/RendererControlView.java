@@ -5,7 +5,6 @@ import org.teleal.cling.model.meta.Action;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -13,7 +12,6 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
-import android.widget.Toast;
 import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
@@ -32,8 +30,8 @@ public class RendererControlView extends LinearLayout {
 	private TextView m_tv_max;
 	private ImageView m_btn_playPause, m_btn_stop, m_btn_next, m_btn_prev;
 	private SeekBar m_sb_duration;
+	private SeekBar m_sb_volume;
 	private boolean m_isSeeking = false;
-	private String TAG = RendererControlView.class.getName();
 
 	public RendererControlView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -53,7 +51,9 @@ public class RendererControlView extends LinearLayout {
 		m_btn_next.setOnClickListener(onNextClick);
 
 		m_sb_duration = (SeekBar) findViewById(R.id.sb_duration);
+		m_sb_volume = (SeekBar) findViewById(R.id.sb_volume);
 		m_sb_duration.setOnSeekBarChangeListener(onSeekListener);
+		m_sb_volume.setOnSeekBarChangeListener(onSeekListener);
 
 	}
 
@@ -62,6 +62,15 @@ public class RendererControlView extends LinearLayout {
 		if (dmrProcessor == null)
 			return;
 		dmrProcessor.addListener(m_dmrListener);
+		dmrProcessor.setRunning(true);
+
+	}
+
+	public void disconnectToDMR() {
+		DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
+		if (dmrProcessor == null)
+			return;
+		dmrProcessor.removeListener(m_dmrListener);
 	}
 
 	private OnClickListener onPlayPauseClick = new OnClickListener() {
@@ -141,7 +150,11 @@ public class RendererControlView extends LinearLayout {
 			DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
 			if (dmrProcessor == null)
 				return;
-			dmrProcessor.seek(Utility.getTimeString(seekBar.getProgress()));
+			if (seekBar.equals(m_sb_duration)) {
+				dmrProcessor.seek(Utility.getTimeString(seekBar.getProgress()));
+			} else {
+				dmrProcessor.setVolume(seekBar.getProgress());
+			}
 		}
 
 		@Override
@@ -152,7 +165,8 @@ public class RendererControlView extends LinearLayout {
 
 		@Override
 		public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-			m_tv_current.setText(Utility.getTimeString(m_sb_duration.getProgress()));
+			if (seekBar.equals(m_sb_duration))
+				m_tv_current.setText(Utility.getTimeString(m_sb_duration.getProgress()));
 		}
 	};
 
@@ -173,6 +187,7 @@ public class RendererControlView extends LinearLayout {
 					m_sb_duration.setMax((int) max);
 					m_sb_duration.setProgress((int) current);
 					m_sb_duration.invalidate();
+					m_sb_volume.setProgress(MainActivity.UPNP_PROCESSOR.getDMRProcessor().getVolume());
 				}
 			});
 		}
@@ -184,7 +199,8 @@ public class RendererControlView extends LinearLayout {
 
 				@Override
 				public void run() {
-					m_btn_playPause.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_media_play));
+					m_btn_playPause.setImageDrawable(getContext().getResources().getDrawable(
+							R.drawable.ic_btn_media_play));
 				}
 			});
 		}
@@ -196,7 +212,8 @@ public class RendererControlView extends LinearLayout {
 
 				@Override
 				public void run() {
-					m_btn_playPause.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_media_pause));
+					m_btn_playPause.setImageDrawable(getContext().getResources().getDrawable(
+							R.drawable.ic_btn_media_pause));
 				}
 			});
 
@@ -209,7 +226,8 @@ public class RendererControlView extends LinearLayout {
 
 				@Override
 				public void run() {
-					m_btn_playPause.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_media_play));
+					m_btn_playPause.setImageDrawable(getContext().getResources().getDrawable(
+							R.drawable.ic_btn_media_play));
 				}
 			});
 
@@ -221,7 +239,7 @@ public class RendererControlView extends LinearLayout {
 
 				@Override
 				public void run() {
-					Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
+					MainActivity.UPNP_PROCESSOR.refreshDevicesList();
 				}
 			});
 		}
@@ -238,8 +256,6 @@ public class RendererControlView extends LinearLayout {
 
 				@Override
 				public void run() {
-					Log.e(TAG, "onActionFail = " + response);
-					Toast.makeText(getContext(), "Action fail: cause = " + cause, Toast.LENGTH_SHORT).show();
 					MainActivity.UPNP_PROCESSOR.refreshDevicesList();
 				}
 			});

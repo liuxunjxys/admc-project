@@ -163,6 +163,16 @@ public class MainActivity extends UpnpListenerTabActivity {
 				((NowPlayingActivity) activity).updateDMRControlView();
 			}
 		}
+
+		@Override
+		public void onDMRUpdate() {
+			Log.e(TAG, "On DMR Update");
+			String tabTag = getTabHost().getCurrentTabTag();
+			Activity activity = getLocalActivityManager().getActivity(tabTag);
+			if (activity instanceof NowPlayingActivity) {
+				((NowPlayingActivity) activity).updateDMRControlView();
+			}
+		}
 	};
 
 	private void createTabs() {
@@ -254,8 +264,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 			public void run() {
 				if (m_routerProgressDialog != null)
 					m_routerProgressDialog.dismiss();
-				new AlertDialog.Builder(MainActivity.this).setTitle("Network error").setMessage(cause).setCancelable(false)
-						.setPositiveButton("OK", new OnClickListener() {
+				new AlertDialog.Builder(MainActivity.this).setTitle("Network error").setMessage(cause)
+						.setCancelable(false).setPositiveButton("OK", new OnClickListener() {
 
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
@@ -420,7 +430,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 					tv.setTag(i);
 					tv.setOnClickListener(customMenuItemClick);
 					tv.setTextSize(20);
-					tv.setBackgroundDrawable(MainActivity.this.getResources().getDrawable(R.drawable.bg_actionbar_normal));
+					tv.setBackgroundDrawable(MainActivity.this.getResources().getDrawable(
+							R.drawable.bg_actionbar_normal));
 					m_ll_menu.addView(tv);
 				}
 			}
@@ -444,8 +455,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 						String textEncoding = (buffer[0] & 0200) == 0 ? "UTF-8" : "UTF-16";
 						int languageCodeLength = buffer[0] & 0077;
 						try {
-							String text = new String(buffer, languageCodeLength + 1, buffer.length - languageCodeLength - 1,
-									textEncoding);
+							String text = new String(buffer, languageCodeLength + 1, buffer.length - languageCodeLength
+									- 1, textEncoding);
 							String deviceUDN = "";
 							if (text.startsWith("uuid:"))
 								deviceUDN = text.substring(5);

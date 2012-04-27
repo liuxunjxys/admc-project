@@ -122,4 +122,10 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 		return "";
 	}
 
+	@Override
+	public void setRunning(boolean running) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
