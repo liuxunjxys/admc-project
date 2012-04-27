@@ -31,7 +31,8 @@ public class PlaylistView extends DMRListenerView {
 
 	public PlaylistView(Context context) {
 		super(context);
-		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.cv_playlist_allitem, this);
+		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
+				R.layout.cv_playlist_allitem, this);
 		m_listView = (ListView) findViewById(R.id.lv_playlist);
 		m_adapter = new CustomArrayAdapter(getContext(), 0);
 		m_listView.setAdapter(m_adapter);
@@ -45,11 +46,16 @@ public class PlaylistView extends DMRListenerView {
 	}
 
 	public void preparePlaylist() {
-		m_adapter.clear();
+
 		switch (m_viewMode) {
 		case VM_DETAILS:
+			if (m_adapter.getCount() > 0) {
+				if (!(m_adapter.getItem(0).getData() instanceof PlaylistItem))
+					m_adapter.clear();
+			}
 			for (PlaylistItem item : MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getAllItems()) {
-				m_adapter.add(new AdapterItem(item));
+				if (m_adapter.getPosition(new AdapterItem(item)) < 0)
+					m_adapter.add(new AdapterItem(item));
 			}
 			m_playlistToolbar.setVisibility(View.VISIBLE);
 			m_playlistToolbar.updateToolbar(m_viewMode);
@@ -59,7 +65,6 @@ public class PlaylistView extends DMRListenerView {
 
 				@Override
 				protected void onPreExecute() {
-					super.onPreExecute();
 				}
 
 				@Override
@@ -69,9 +74,13 @@ public class PlaylistView extends DMRListenerView {
 
 				@Override
 				protected void onPostExecute(List<Playlist> result) {
-					super.onPostExecute(result);
+					if (m_adapter.getCount() > 0) {
+						if (!(m_adapter.getItem(0).getData() instanceof Playlist))
+							m_adapter.clear();
+					}
 					for (Playlist playlist : result)
-						m_adapter.add(new AdapterItem(playlist));
+						if (m_adapter.getPosition(new AdapterItem(playlist)) < 0)
+							m_adapter.add(new AdapterItem(playlist));
 					m_playlistToolbar.setVisibility(View.GONE);
 				}
 			}.execute(new Void[] {});

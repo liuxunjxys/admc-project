@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -14,6 +15,7 @@ import com.app.dlna.dmc.gui.customview.localnetwork.HomeNetworkView;
 import com.app.dlna.dmc.gui.customview.playlist.PlaylistView;
 
 public class LibraryActivity extends Activity {
+	protected static final String TAG = LibraryActivity.class.getName();
 	private ViewPager m_pager;
 	private HomeNetworkView m_homeNetworkView;
 	private View m_internet;
@@ -44,22 +46,9 @@ public class LibraryActivity extends Activity {
 	}
 
 	private OnPageChangeListener m_onPageChangeListener = new OnPageChangeListener() {
-
 		@Override
 		public void onPageSelected(int position) {
-			switch (position) {
-			case 0:
-				m_homeNetworkView.updateListView();
-				break;
-			case 1:
-				m_playlistView.preparePlaylist();
-				break;
-			case 2:
-				break;
 
-			default:
-				break;
-			}
 		}
 
 		@Override
@@ -68,8 +57,21 @@ public class LibraryActivity extends Activity {
 		}
 
 		@Override
-		public void onPageScrollStateChanged(int arg0) {
+		public void onPageScrollStateChanged(int state) {
+			if (state == 0)
+				switch (m_pager.getCurrentItem()) {
+				case 0:
+					m_homeNetworkView.updateListView();
+					break;
+				case 1:
+					m_playlistView.preparePlaylist();
+					break;
+				case 2:
+					break;
 
+				default:
+					break;
+				}
 		}
 	};
 
