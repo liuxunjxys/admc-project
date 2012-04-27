@@ -33,8 +33,8 @@ public class MainHttpProcessor extends Thread {
 	public void run() {
 		Log.i(TAG, "Start HTTP Thread");
 		try {
-			m_server = new ServerSocket(0);
-			HTTPServerData.PORT = m_server.getLocalPort();
+			m_server = new ServerSocket(HTTPServerData.PORT);
+			// HTTPServerData.PORT = m_server.getLocalPort();
 			Log.e(TAG, "Host = " + HTTPServerData.HOST + " PORT = " + String.valueOf(HTTPServerData.PORT));
 			while (HTTPServerData.RUNNING) {
 				final Socket client = m_server.accept();
@@ -71,7 +71,8 @@ public class MainHttpProcessor extends Thread {
 								Log.d(TAG, "Request = " + request);
 								if (HTTPLinkManager.LINK_MAP.containsKey(request)) {
 									Log.d(TAG, "Youtube Proxy mode");
-									HTTPHelper.handleProxyDataRequest(client, rawrequest, HTTPLinkManager.LINK_MAP.get(request));
+									HTTPHelper.handleProxyDataRequest(client, rawrequest,
+											HTTPLinkManager.LINK_MAP.get(request));
 								} else {
 									Log.d(TAG, "Play-to mode");
 									filename = URLDecoder.decode(request, "ASCII");

@@ -19,4 +19,13 @@ public class Playlist {
 	public void setName(String name) {
 		this.m_name = name;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o != null && o instanceof Playlist) {
+			Playlist other = (Playlist) o;
+			return m_name.equals(other.m_name) && m_id == other.m_id;
+		}
+		return false;
+	}
 }
