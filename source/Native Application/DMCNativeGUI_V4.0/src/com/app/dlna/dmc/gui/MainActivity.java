@@ -129,13 +129,15 @@ public class MainActivity extends UpnpListenerTabActivity {
 
 	protected void onResume() {
 		super.onResume();
-		m_nfcAdapter.enableForegroundDispatch(this, m_pendingIntent, m_filters, m_techLists);
+		if (m_nfcAdapter != null)
+			m_nfcAdapter.enableForegroundDispatch(this, m_pendingIntent, m_filters, m_techLists);
 	};
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		m_nfcAdapter.disableForegroundDispatch(MainActivity.this);
+		if (m_nfcAdapter != null)
+			m_nfcAdapter.disableForegroundDispatch(MainActivity.this);
 	}
 
 	protected void onDestroy() {
