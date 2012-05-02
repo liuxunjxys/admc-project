@@ -41,6 +41,7 @@ public class LibraryActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		m_playlistView.updateListView();
 	}
 
 	private OnPageChangeListener m_onPageChangeListener = new OnPageChangeListener() {
@@ -62,7 +63,7 @@ public class LibraryActivity extends Activity {
 					m_homeNetworkView.updateListView();
 					break;
 				case 1:
-					m_playlistView.preparePlaylist();
+					m_playlistView.updateListView();
 					break;
 				case 2:
 					break;
@@ -87,7 +88,7 @@ public class LibraryActivity extends Activity {
 				return m_homeNetworkView;
 			} else if (position == 1) {
 				((ViewPager) container).addView(m_playlistView);
-				m_playlistView.updateListView();
+				m_playlistView.backToListPlaylist();
 				return m_playlistView;
 			} else if (position == 2) {
 				((ViewPager) container).addView(m_internet);

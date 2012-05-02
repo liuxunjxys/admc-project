@@ -24,7 +24,7 @@ public class Playlist {
 	public boolean equals(Object o) {
 		if (o != null && o instanceof Playlist) {
 			Playlist other = (Playlist) o;
-			return m_name.equals(other.m_name) && m_id == other.m_id;
+			return m_name != null && other.m_name != null && m_name.equals(other.m_name) && m_id == other.m_id;
 		}
 		return false;
 	}

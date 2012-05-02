@@ -37,8 +37,8 @@ public class TopToolbarView extends LinearLayout {
 
 	public TopToolbarView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
-				R.layout.cv_toolbar_nowplayling_top, this);
+		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.cv_toolbar_nowplayling_top,
+				this);
 
 		m_tv_currentPlaylistName = (TextView) findViewById(R.id.tv_playlistName);
 
@@ -72,7 +72,7 @@ public class TopToolbarView extends LinearLayout {
 		updateToolbar();
 	}
 
-	OnItemSelectedListener m_playlistItemSelected = new OnItemSelectedListener() {
+	private OnItemSelectedListener m_playlistItemSelected = new OnItemSelectedListener() {
 
 		@Override
 		public void onItemSelected(AdapterView<?> adapter, View view, int position, long arg3) {
@@ -105,8 +105,8 @@ public class TopToolbarView extends LinearLayout {
 				m_flagPlaylist = !m_flagPlaylist;
 				return;
 			}
-			PlaylistProcessor playlistProcessor = PlaylistManager.getPlaylistProcessor((Playlist) m_playlistAdapter
-					.getItem(position).getData());
+			PlaylistProcessor playlistProcessor = PlaylistManager.getPlaylistProcessor((Playlist) m_playlistAdapter.getItem(
+					position).getData());
 			MainActivity.UPNP_PROCESSOR.setPlaylistProcessor(playlistProcessor);
 			MainActivity.UPNP_PROCESSOR.getDMRProcessor().setPlaylistProcessor(playlistProcessor);
 			m_tv_currentPlaylistName.setText(MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getData().getName());
@@ -123,11 +123,12 @@ public class TopToolbarView extends LinearLayout {
 	};
 
 	public void updateToolbar() {
+		m_playlistAdapter.clear();
+		for (Playlist playlist : PlaylistManager.getAllPlaylist())
+			m_playlistAdapter.add(new AdapterItem(playlist));
 		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
 		if (playlistProcessor != null) {
-			m_playlistAdapter.clear();
-			for (Playlist playlist : PlaylistManager.getAllPlaylist())
-				m_playlistAdapter.add(new AdapterItem(playlist));
+			m_spinner_playlist.setSelection(m_playlistAdapter.getPosition(new AdapterItem(playlistProcessor.getData())));
 			m_tv_currentPlaylistName.setText(playlistProcessor.getData().getName());
 			updatePlaylistItemSpinner();
 			DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
@@ -138,8 +139,19 @@ public class TopToolbarView extends LinearLayout {
 
 	public void updatePlaylistItemSpinner() {
 		m_playlistItemAdapter.clear();
-		for (PlaylistItem item : MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getAllItems())
-			m_playlistItemAdapter.add(new AdapterItem(item));
+		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
+		if (playlistProcessor != null) {
+			for (PlaylistItem item : playlistProcessor.getAllItems())
+				m_playlistItemAdapter.add(new AdapterItem(item));
+			setCurrentSpinnerSelected(playlistProcessor.getCurrentItem());
+		}
+
 	}
 
+	public void setCurrentSpinnerSelected(PlaylistItem item) {
+		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
+		if (playlistProcessor.getAllItems().size() > 0)
+			m_spinner_playlistItem.setSelection(m_playlistItemAdapter.getPosition(new AdapterItem(playlistProcessor
+					.getCurrentItem())));
+	}
 }
