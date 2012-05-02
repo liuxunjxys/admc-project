@@ -2,7 +2,6 @@ package com.app.dlna.dmc.gui.customview.nowplaying;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -33,6 +32,8 @@ public class TopToolbarView extends LinearLayout {
 	private CustomArrayAdapter m_playlistItemAdapter;
 	private TextView m_tv_currentPlaylistName;
 	private ImageView m_btn_fakeDropdown;
+	private boolean m_flagPlaylistItem = true;
+	private boolean m_flagPlaylist = true;
 
 	public TopToolbarView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -44,7 +45,7 @@ public class TopToolbarView extends LinearLayout {
 		m_spinner_playlist = (Spinner) findViewById(R.id.spinner_playlist);
 		m_playlistAdapter = new CustomArrayAdapter(MainActivity.INSTANCE, 0);
 		m_spinner_playlist.setAdapter(m_playlistAdapter);
-		m_spinner_playlist.setOnItemSelectedListener(m_itemSelected);
+		m_spinner_playlist.setOnItemSelectedListener(m_playlistSelected);
 
 		m_spinner_playlistItem = (Spinner) findViewById(R.id.playlistItem);
 		m_playlistItemAdapter = new CustomArrayAdapter(MainActivity.INSTANCE, 0);
@@ -75,6 +76,10 @@ public class TopToolbarView extends LinearLayout {
 
 		@Override
 		public void onItemSelected(AdapterView<?> adapter, View view, int position, long arg3) {
+			if (m_flagPlaylistItem) {
+				m_flagPlaylistItem = !m_flagPlaylistItem;
+				return;
+			}
 			PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
 			if (playlistProcessor == null)
 				return;
@@ -92,13 +97,18 @@ public class TopToolbarView extends LinearLayout {
 		}
 	};
 
-	private OnItemSelectedListener m_itemSelected = new OnItemSelectedListener() {
+	private OnItemSelectedListener m_playlistSelected = new OnItemSelectedListener() {
 
 		@Override
 		public void onItemSelected(AdapterView<?> adapter, View view, int position, long arg3) {
-			Log.e(TAG, "Select item at " + position);
-			MainActivity.UPNP_PROCESSOR.setPlaylistProcessor(PlaylistManager
-					.getPlaylistProcessor((Playlist) m_playlistAdapter.getItem(position).getData()));
+			if (m_flagPlaylist) {
+				m_flagPlaylist = !m_flagPlaylist;
+				return;
+			}
+			PlaylistProcessor playlistProcessor = PlaylistManager.getPlaylistProcessor((Playlist) m_playlistAdapter
+					.getItem(position).getData());
+			MainActivity.UPNP_PROCESSOR.setPlaylistProcessor(playlistProcessor);
+			MainActivity.UPNP_PROCESSOR.getDMRProcessor().setPlaylistProcessor(playlistProcessor);
 			m_tv_currentPlaylistName.setText(MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getData().getName());
 			updatePlaylistItemSpinner();
 			NowPlayingActivity activity = (NowPlayingActivity) getContext();

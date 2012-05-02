@@ -3,13 +3,9 @@ package com.app.dlna.dmc.processor.interfaces;
 import org.teleal.cling.model.message.UpnpResponse;
 import org.teleal.cling.model.meta.Action;
 
-import com.app.dlna.dmc.processor.playlist.PlaylistItem;
-
 public interface DMRProcessor {
 
 	void setURIandPlay(String uri);
-
-	void setURIandPlay(PlaylistItem item, boolean proxyMode);
 
 	void play();
 
@@ -22,6 +18,8 @@ public interface DMRProcessor {
 	void setVolume(int newVolume);
 
 	int getVolume();
+	
+	int getMaxVolume();
 
 	void addListener(DMRProcessorListner listener);
 
@@ -34,9 +32,9 @@ public interface DMRProcessor {
 	void setPlaylistProcessor(PlaylistProcessor playlistProcessor);
 
 	void setSeftAutoNext(boolean autoNext);
-	
+
 	String getCurrentTrackURI();
-	
+
 	void setRunning(boolean running);
 
 	public interface DMRProcessorListner {
@@ -51,7 +49,7 @@ public interface DMRProcessor {
 		void onEndTrack();
 
 		void onErrorEvent(String error);
-		
+
 		@SuppressWarnings("rawtypes")
 		void onActionFail(Action actionCallback, UpnpResponse response, final String cause);
 	}

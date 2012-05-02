@@ -143,7 +143,6 @@ public class NowPlayingActivity extends Activity {
 			iv.setImageDrawable(getResources().getDrawable(R.drawable.ic_didlobject_video_large));
 			break;
 		case IMAGE:
-			// iv.setImageDrawable(getResources().getDrawable(R.drawable.ic_didlobject_image_large));
 			iv.setImageDrawable(null);
 			new AsyncTaskWithProgressDialog<String, Void, Bitmap>("Loading image") {
 
