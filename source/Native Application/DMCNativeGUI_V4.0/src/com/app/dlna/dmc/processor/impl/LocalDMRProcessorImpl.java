@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.teleal.cling.model.message.UpnpResponse;
-import org.teleal.cling.model.meta.Action;
-
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -73,7 +70,6 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 		m_player.setOnErrorListener(m_onErrorListener);
 		m_audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 		m_maxVolume = m_audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-		m_audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, m_maxVolume, AudioManager.FLAG_VIBRATE);
 		m_isRunning = true;
 		m_selfAutoNext = true;
 		new UpdateThread().start();
@@ -243,16 +239,6 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 		m_isRunning = running;
 		if (running)
 			new UpdateThread().start();
-	}
-
-	@SuppressWarnings("rawtypes")
-	private void fireOnFailEvent(Action action, UpnpResponse response, String message) {
-		synchronized (m_listeners) {
-			for (DMRProcessorListner listener : m_listeners) {
-				listener.onActionFail(action, response, message);
-			}
-			m_isRunning = false;
-		}
 	}
 
 	private void fireUpdatePositionEvent(long current, long max) {

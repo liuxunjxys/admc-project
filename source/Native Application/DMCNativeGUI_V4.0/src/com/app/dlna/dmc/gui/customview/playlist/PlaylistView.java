@@ -31,8 +31,7 @@ public class PlaylistView extends DMRListenerView {
 
 	public PlaylistView(Context context) {
 		super(context);
-		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
-				R.layout.cv_playlist_allitem, this);
+		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.cv_playlist_allitem, this);
 		m_listView = (ListView) findViewById(R.id.lv_playlist);
 		m_adapter = new CustomArrayAdapter(getContext(), 0);
 		m_listView.setAdapter(m_adapter);
@@ -48,11 +47,22 @@ public class PlaylistView extends DMRListenerView {
 	public void preparePlaylist() {
 		switch (m_viewMode) {
 		case VM_DETAILS:
+			PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
+			if (playlistProcessor == null || playlistProcessor.getData() == null || playlistProcessor.getData().getName() == null) {
+				m_viewMode = VM_LIST;
+				preparePlaylist();
+				return;
+			}
 			if (m_adapter.getCount() > 0) {
-				if (!(m_adapter.getItem(0).getData() instanceof PlaylistItem))
+				if (m_adapter.getItem(0).getData() instanceof PlaylistItem) {
+					PlaylistItem item = (PlaylistItem) m_adapter.getItem(0).getData();
+					if (!playlistProcessor.getAllItems().contains(item))
+						m_adapter.clear();
+				} else
 					m_adapter.clear();
 			}
-			for (PlaylistItem item : MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getAllItems()) {
+
+			for (PlaylistItem item : playlistProcessor.getAllItems()) {
 				if (m_adapter.getPosition(new AdapterItem(item)) < 0)
 					m_adapter.add(new AdapterItem(item));
 			}
@@ -133,13 +143,13 @@ public class PlaylistView extends DMRListenerView {
 
 				playlistProcessor.setCurrentItem((PlaylistItem) object);
 				dmrProcessor.setURIandPlay(playlistProcessor.getCurrentItem().getUrl());
-				// TODO: high light current item
 			}
 
 		}
 	};
 
 	public void backToListPlaylist() {
+		super.updateListView();
 		m_viewMode = VM_LIST;
 		preparePlaylist();
 	}

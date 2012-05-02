@@ -188,6 +188,7 @@ public class NowPlayingActivity extends Activity {
 		if (dmrProcessor != null) {
 			dmrProcessor.setURIandPlay(item.getUrl());
 		}
+		m_topToolbar.setCurrentSpinnerSelected(item);
 	}
 
 	private void updateCurrentPlaylistItem() {

@@ -32,6 +32,7 @@ import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.processor.cache.Cache;
+import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.playlist.Playlist;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 import com.app.dlna.dmc.utility.Utility;
@@ -102,7 +103,12 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 		holder.name.setText(data.getName());
 		holder.desc.setText("");
 		holder.icon.setImageResource(R.drawable.ic_playlist);
-		holder.playing.setVisibility(View.GONE);
+		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
+		if (playlistProcessor != null && playlistProcessor.getData() != null && playlistProcessor.getData().equals(data)) {
+			holder.playing.setVisibility(View.VISIBLE);
+		} else {
+			holder.playing.setVisibility(View.GONE);
+		}
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -150,8 +156,7 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 					final RemoteDevice remoteDevice = (RemoteDevice) device;
 
 					String urlString = remoteDevice.getIdentity().getDescriptorURL().getProtocol() + "://"
-							+ remoteDevice.getIdentity().getDescriptorURL().getAuthority()
-							+ icons[0].getUri().toString();
+							+ remoteDevice.getIdentity().getDescriptorURL().getAuthority() + icons[0].getUri().toString();
 					URL url = new URL(urlString);
 					final Bitmap icon = BitmapFactory.decodeStream(url.openConnection().getInputStream());
 					m_cacheDMSIcon.put(udn, icon);
@@ -206,8 +211,8 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 			} else if (object instanceof VideoItem) {
 				holder.icon.setImageResource(R.drawable.ic_didlobject_video);
 			} else if (object instanceof ImageItem) {
-				Utility.loadImageItemThumbnail(holder.icon, object.getResources().get(0).getValue(),
-						Cache.getBitmapCache(), MAX_SIZE);
+				Utility.loadImageItemThumbnail(holder.icon, object.getResources().get(0).getValue(), Cache.getBitmapCache(),
+						MAX_SIZE);
 			} else {
 				holder.icon.setImageResource(R.drawable.ic_didlobject_unknow);
 			}
@@ -217,8 +222,7 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 			}
 			if (object instanceof Item) {
 				holder.action.setVisibility(View.VISIBLE);
-				if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().containsUrl(
-						object.getResources().get(0).getValue())) {
+				if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().containsUrl(object.getResources().get(0).getValue())) {
 					holder.action.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_remove));
 				} else {
 					holder.action.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_add));
@@ -335,8 +339,7 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 			} else if (item instanceof DIDLObject) {
 				final DIDLObject object = (DIDLObject) item;
 				if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor() != null)
-					if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().containsUrl(
-							object.getResources().get(0).getValue())) {
+					if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().containsUrl(object.getResources().get(0).getValue())) {
 						if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().removeDIDLObject(object) != null)
 							updateSingleView(v, position);
 					} else {
