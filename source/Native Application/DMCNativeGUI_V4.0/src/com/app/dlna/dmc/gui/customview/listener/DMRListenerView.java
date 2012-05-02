@@ -78,7 +78,7 @@ public class DMRListenerView extends LinearLayout {
 
 	};
 
-	public void updateDMRListener() {
+	public void updateListView() {
 		DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
 		if (dmrProcessor != null)
 			dmrProcessor.addListener(m_dmrListner);

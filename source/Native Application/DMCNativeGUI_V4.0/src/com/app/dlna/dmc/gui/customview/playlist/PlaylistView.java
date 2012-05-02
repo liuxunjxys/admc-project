@@ -40,13 +40,12 @@ public class PlaylistView extends DMRListenerView {
 
 		m_playlistToolbar = (PlaylistToolbar) findViewById(R.id.botToolbar);
 		m_playlistToolbar.setPlaylistView(this);
+		super.updateListView();
 		m_viewMode = VM_LIST;
 		preparePlaylist();
-		updateDMRListener();
 	}
 
 	public void preparePlaylist() {
-
 		switch (m_viewMode) {
 		case VM_DETAILS:
 			if (m_adapter.getCount() > 0) {
@@ -142,6 +141,13 @@ public class PlaylistView extends DMRListenerView {
 
 	public void backToListPlaylist() {
 		m_viewMode = VM_LIST;
+		preparePlaylist();
+	}
+
+	@Override
+	public void updateListView() {
+		super.updateListView();
+		m_viewMode = VM_DETAILS;
 		preparePlaylist();
 	}
 }

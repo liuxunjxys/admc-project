@@ -187,7 +187,9 @@ public class RendererControlView extends LinearLayout {
 					m_sb_duration.setMax((int) max);
 					m_sb_duration.setProgress((int) current);
 					m_sb_duration.invalidate();
-					m_sb_volume.setProgress(MainActivity.UPNP_PROCESSOR.getDMRProcessor().getVolume());
+					DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
+					m_sb_volume.setMax(dmrProcessor.getMaxVolume());
+					m_sb_volume.setProgress(dmrProcessor.getVolume());
 				}
 			});
 		}
@@ -201,6 +203,7 @@ public class RendererControlView extends LinearLayout {
 				public void run() {
 					m_btn_playPause.setImageDrawable(getContext().getResources().getDrawable(
 							R.drawable.ic_btn_media_play));
+					m_sb_duration.setProgress(0);
 				}
 			});
 		}

@@ -74,7 +74,6 @@ public class HomeNetworkView extends DMRListenerView {
 			m_adapter.add(new AdapterItem(device));
 		}
 
-		updateDMRListener();
 	}
 
 	private OnScrollListener m_scrollListener = new OnScrollListener() {
@@ -377,6 +376,7 @@ public class HomeNetworkView extends DMRListenerView {
 	}
 
 	public void updateListView() {
+		super.updateListView();
 		m_adapter.notifyVisibleItemChanged(m_listView);
 	}
 

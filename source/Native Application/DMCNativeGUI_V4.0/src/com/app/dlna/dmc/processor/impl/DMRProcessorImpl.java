@@ -36,6 +36,7 @@ import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 public class DMRProcessorImpl implements DMRProcessor {
 	private static final int UPDATE_INTERVAL = 1000;
 	private static final String TAG = DMRProcessorImpl.class.getName();
+	private static final int MAX_VOLUME = 100;
 	protected static final long SEEK_DELAY_INTERVAL = 200;
 	@SuppressWarnings("rawtypes")
 	private Device m_device;
@@ -529,6 +530,11 @@ public class DMRProcessorImpl implements DMRProcessor {
 	}
 
 	@Override
+	public int getMaxVolume() {
+		return MAX_VOLUME;
+	}
+
+	@Override
 	public String getName() {
 		return m_device != null ? m_device.getDetails().getFriendlyName() : "NULL";
 	}
@@ -536,11 +542,6 @@ public class DMRProcessorImpl implements DMRProcessor {
 	@Override
 	public void setPlaylistProcessor(PlaylistProcessor playlistProcessor) {
 		m_playlistProcessor = playlistProcessor;
-
-	}
-
-	@Override
-	public void setURIandPlay(PlaylistItem item, boolean proxyMode) {
 
 	}
 
