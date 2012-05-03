@@ -3,9 +3,11 @@ package com.app.dlna.dmc.processor.interfaces;
 import org.teleal.cling.model.message.UpnpResponse;
 import org.teleal.cling.model.meta.Action;
 
+import com.app.dlna.dmc.processor.playlist.PlaylistItem;
+
 public interface DMRProcessor {
 
-	void setURIandPlay(String uri);
+	void setURIandPlay(PlaylistItem item);
 
 	void play();
 
@@ -18,7 +20,7 @@ public interface DMRProcessor {
 	void setVolume(int newVolume);
 
 	int getVolume();
-	
+
 	int getMaxVolume();
 
 	void addListener(DMRProcessorListner listener);

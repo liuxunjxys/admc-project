@@ -185,11 +185,10 @@ public class HomeNetworkView extends DMRListenerView {
 			m_adapter.notifyVisibleItemChanged(m_listView);
 			Toast.makeText(getContext(), "Added item to playlist", Toast.LENGTH_SHORT).show();
 			playlistProcessor.setCurrentItem(added);
-			dmrProcessor.setURIandPlay(playlistProcessor.getCurrentItem().getUrl());
+			dmrProcessor.setURIandPlay(playlistProcessor.getCurrentItem());
 		} else {
 			if (playlistProcessor.isFull()) {
 				Toast.makeText(getContext(), "Current playlist is full", Toast.LENGTH_SHORT).show();
-				dmrProcessor.setURIandPlay(object.getResources().get(0).getValue());
 			} else {
 				Toast.makeText(getContext(), "An error occurs, try again later", Toast.LENGTH_SHORT).show();
 			}

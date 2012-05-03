@@ -18,6 +18,7 @@ import com.app.dlna.dmc.gui.customview.listener.DMRListenerView;
 import com.app.dlna.dmc.processor.async.AsyncTaskWithProgressDialog;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
+import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor.PlaylistListener;
 import com.app.dlna.dmc.processor.playlist.Playlist;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 import com.app.dlna.dmc.processor.playlist.PlaylistManager;
@@ -29,6 +30,28 @@ public class PlaylistView extends DMRListenerView {
 	public static final int VM_DETAILS = 1;
 	private int m_viewMode = -1;
 	private PlaylistProcessor m_currentPlaylist = null;
+	private PlaylistListener m_playlistListener = new PlaylistListener() {
+
+		@Override
+		public void onPrev() {
+			final PlaylistItem item = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getCurrentItem();
+			if (item != null) {
+				DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
+				if (dmrProcessor != null)
+					dmrProcessor.setURIandPlay(item);
+			}
+		}
+
+		@Override
+		public void onNext() {
+			final PlaylistItem item = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getCurrentItem();
+			if (item != null) {
+				DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
+				if (dmrProcessor != null)
+					dmrProcessor.setURIandPlay(item);
+			}
+		}
+	};
 
 	public PlaylistView(Context context) {
 		super(context);
@@ -141,13 +164,12 @@ public class PlaylistView extends DMRListenerView {
 					return;
 				}
 				MainActivity.UPNP_PROCESSOR.setPlaylistProcessor(m_currentPlaylist);
-				if (dmrProcessor != null) {
-					dmrProcessor.setPlaylistProcessor(m_currentPlaylist);
-					dmrProcessor.setSeftAutoNext(true);
-				}
+				m_currentPlaylist.addListener(m_playlistListener);
+				dmrProcessor.setPlaylistProcessor(m_currentPlaylist);
+				dmrProcessor.setSeftAutoNext(true);
 
 				m_currentPlaylist.setCurrentItem((PlaylistItem) object);
-				dmrProcessor.setURIandPlay(m_currentPlaylist.getCurrentItem().getUrl());
+				dmrProcessor.setURIandPlay((PlaylistItem) object);
 			}
 
 		}
