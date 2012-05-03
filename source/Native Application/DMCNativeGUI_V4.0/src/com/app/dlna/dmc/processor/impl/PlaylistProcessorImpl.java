@@ -7,6 +7,8 @@ import org.teleal.cling.support.model.DIDLObject;
 import org.teleal.cling.support.model.item.AudioItem;
 import org.teleal.cling.support.model.item.VideoItem;
 
+import com.app.dlna.dmc.gui.MainActivity;
+import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.playlist.Playlist;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
@@ -22,7 +24,7 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 
 	public PlaylistProcessorImpl(Playlist data, int maxItem) {
 		m_playlistItems = new ArrayList<PlaylistItem>();
-		m_currentItemIdx = 0;
+		m_currentItemIdx = data.getCurrentIdx();
 		m_maxSize = maxItem;
 		m_data = data;
 		m_listeners = new ArrayList<PlaylistProcessor.PlaylistListener>();
@@ -30,6 +32,7 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 
 	@Override
 	public Playlist getData() {
+		m_data.setCurrentIdx(m_currentItemIdx);
 		return m_data;
 	}
 
@@ -136,10 +139,17 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 	@Override
 	public PlaylistItem removeItem(PlaylistItem item) {
 		synchronized (m_playlistItems) {
-			if (m_playlistItems.contains(item)) {
+			int itemIdx = -1;
+			if ((itemIdx = m_playlistItems.indexOf(item)) >= 0) {
 				m_playlistItems.remove(item);
 				long id = item.getId();
 				PlaylistManager.deletePlaylistItem(id);
+				DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
+				if (dmrProcessor != null && dmrProcessor.getCurrentTrackURI().equals(item.getUrl())) {
+					dmrProcessor.stop();
+				}
+				if (itemIdx == m_currentItemIdx)
+					m_currentItemIdx = 0;
 				return item;
 			}
 			return null;
@@ -203,6 +213,16 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 			if (!m_listeners.contains(listener))
 				m_listeners.add(listener);
 		}
+	}
+
+	@Override
+	public void saveState() {
+		PlaylistManager.savePlaylistState(getData());
+	}
+
+	@Override
+	public int getCurrentItemIndex() {
+		return m_currentItemIdx;
 	}
 
 }

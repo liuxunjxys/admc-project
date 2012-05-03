@@ -30,6 +30,8 @@ public class PlaylistManager {
 					Playlist playlist = new Playlist();
 					playlist.setId(id);
 					playlist.setName(name);
+					playlist.setCurrentIdx(cursor.getInt(cursor
+							.getColumnIndex(PlaylistSQLiteHelper.COL_CURRENT_POSITION)));
 					result.add(playlist);
 
 				} while (cursor.moveToNext());
@@ -98,6 +100,7 @@ public class PlaylistManager {
 			ContentResolver resolver = MainActivity.INSTANCE.getContentResolver();
 			ContentValues values = new ContentValues();
 			values.put(PlaylistSQLiteHelper.COL_NAME, playlist.getName());
+			values.put(PlaylistSQLiteHelper.COL_CURRENT_POSITION, playlist.getCurrentIdx());
 			Uri uri = resolver.insert(PlaylistProvider.PLAYLIST_URI, values);
 			if (uri != null) {
 				String newId = uri.getQueryParameter("newid");
@@ -141,6 +144,13 @@ public class PlaylistManager {
 	public static void clearPlaylist(long id) {
 		MainActivity.INSTANCE.getContentResolver().delete(PlaylistProvider.PLAYLIST_ITEM_URI,
 				PlaylistSQLiteHelper.COL_PLAYLIST_ID + " = ?", new String[] { String.valueOf(id) });
+	}
+
+	public static void savePlaylistState(Playlist playlist) {
+		ContentValues values = new ContentValues();
+		values.put(PlaylistSQLiteHelper.COL_CURRENT_POSITION, playlist.getCurrentIdx());
+		MainActivity.INSTANCE.getContentResolver().update(PlaylistProvider.PLAYLIST_URI, values,
+				PlaylistSQLiteHelper.COL_ID + " = ?", new String[] { String.valueOf(playlist.getId()) });
 	}
 
 }

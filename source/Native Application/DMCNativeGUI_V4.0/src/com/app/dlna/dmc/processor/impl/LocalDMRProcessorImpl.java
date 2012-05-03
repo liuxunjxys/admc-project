@@ -211,6 +211,7 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 	public void dispose() {
 		m_listeners.clear();
 		m_player.release();
+		m_player = null;
 		m_isRunning = false;
 	}
 

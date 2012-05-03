@@ -105,6 +105,10 @@ public class PlaylistProvider extends ContentProvider {
 		int count = -1;
 		switch (uriMatcher.match(uri)) {
 		case PLAYLIST: {
+			Log.i(TAG, "Update Playlist = " + values.toString());
+			SQLiteDatabase database = dbPlaylistHelper.getWritableDatabase();
+			count = database.update(PlaylistSQLiteHelper.TABLE_PLAYLISTS, values, selection, selectionArgs);
+			database.close();
 			break;
 		}
 		case PLAYLIST_ITEM: {

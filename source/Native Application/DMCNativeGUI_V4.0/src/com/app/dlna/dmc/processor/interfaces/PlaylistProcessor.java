@@ -49,5 +49,9 @@ public interface PlaylistProcessor {
 
 		void onPrev();
 	}
+	
+	void saveState();
+
+	int getCurrentItemIndex();
 
 }

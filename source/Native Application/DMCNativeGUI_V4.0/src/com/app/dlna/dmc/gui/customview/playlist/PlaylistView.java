@@ -28,10 +28,12 @@ public class PlaylistView extends DMRListenerView {
 	public static final int VM_LIST = 0;
 	public static final int VM_DETAILS = 1;
 	private int m_viewMode = -1;
+	private PlaylistProcessor m_currentPlaylist = null;
 
 	public PlaylistView(Context context) {
 		super(context);
-		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.cv_playlist_allitem, this);
+		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
+				R.layout.cv_playlist_allitem, this);
 		m_listView = (ListView) findViewById(R.id.lv_playlist);
 		m_adapter = new CustomArrayAdapter(getContext(), 0);
 		m_listView.setAdapter(m_adapter);
@@ -47,8 +49,8 @@ public class PlaylistView extends DMRListenerView {
 	public void preparePlaylist() {
 		switch (m_viewMode) {
 		case VM_DETAILS:
-			PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
-			if (playlistProcessor == null || playlistProcessor.getData() == null || playlistProcessor.getData().getName() == null) {
+			if (m_currentPlaylist == null || m_currentPlaylist.getData() == null
+					|| m_currentPlaylist.getData().getName() == null) {
 				m_viewMode = VM_LIST;
 				preparePlaylist();
 				return;
@@ -56,13 +58,13 @@ public class PlaylistView extends DMRListenerView {
 			if (m_adapter.getCount() > 0) {
 				if (m_adapter.getItem(0).getData() instanceof PlaylistItem) {
 					PlaylistItem item = (PlaylistItem) m_adapter.getItem(0).getData();
-					if (!playlistProcessor.getAllItems().contains(item))
+					if (!m_currentPlaylist.getAllItems().contains(item))
 						m_adapter.clear();
 				} else
 					m_adapter.clear();
 			}
 
-			for (PlaylistItem item : playlistProcessor.getAllItems()) {
+			for (PlaylistItem item : m_currentPlaylist.getAllItems()) {
 				if (m_adapter.getPosition(new AdapterItem(item)) < 0)
 					m_adapter.add(new AdapterItem(item));
 			}
@@ -115,34 +117,37 @@ public class PlaylistView extends DMRListenerView {
 					}
 
 					protected void onPostExecute(PlaylistProcessor playlistProcessor) {
-						MainActivity.UPNP_PROCESSOR.setPlaylistProcessor(playlistProcessor);
-						DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
-						if (dmrProcessor != null) {
-							dmrProcessor.setPlaylistProcessor(playlistProcessor);
-							dmrProcessor.setSeftAutoNext(true);
-						}
+						// MainActivity.UPNP_PROCESSOR.setPlaylistProcessor(playlistProcessor);
+						m_currentPlaylist = playlistProcessor;
+						// DMRProcessor dmrProcessor =
+						// MainActivity.UPNP_PROCESSOR.getDMRProcessor();
+						// if (dmrProcessor != null) {
+						// dmrProcessor.setPlaylistProcessor(playlistProcessor);
+						// dmrProcessor.setSeftAutoNext(true);
+						// }
 						m_viewMode = VM_DETAILS;
 						preparePlaylist();
 						super.onPostExecute(playlistProcessor);
 					};
 				}.execute(new Void[] {});
 			} else if (object instanceof PlaylistItem) {
-				PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
-				MainActivity.UPNP_PROCESSOR.getDMRProcessor().setPlaylistProcessor(playlistProcessor);
-				MainActivity.UPNP_PROCESSOR.getDMRProcessor().setSeftAutoNext(true);
-				if (playlistProcessor == null) {
+				if (m_currentPlaylist == null) {
 					Toast.makeText(getContext(), "Cannot get playlist", Toast.LENGTH_SHORT).show();
 					return;
 				}
-
 				DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
 				if (dmrProcessor == null) {
 					Toast.makeText(getContext(), "Cannot connect to renderer", Toast.LENGTH_SHORT).show();
 					return;
 				}
+				MainActivity.UPNP_PROCESSOR.setPlaylistProcessor(m_currentPlaylist);
+				if (dmrProcessor != null) {
+					dmrProcessor.setPlaylistProcessor(m_currentPlaylist);
+					dmrProcessor.setSeftAutoNext(true);
+				}
 
-				playlistProcessor.setCurrentItem((PlaylistItem) object);
-				dmrProcessor.setURIandPlay(playlistProcessor.getCurrentItem().getUrl());
+				m_currentPlaylist.setCurrentItem((PlaylistItem) object);
+				dmrProcessor.setURIandPlay(m_currentPlaylist.getCurrentItem().getUrl());
 			}
 
 		}
@@ -151,13 +156,6 @@ public class PlaylistView extends DMRListenerView {
 	public void backToListPlaylist() {
 		super.updateListView();
 		m_viewMode = VM_LIST;
-		preparePlaylist();
-	}
-
-	@Override
-	public void updateListView() {
-		super.updateListView();
-		m_viewMode = VM_DETAILS;
 		preparePlaylist();
 	}
 }
