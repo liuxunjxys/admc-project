@@ -10,8 +10,10 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import app.dlna.controller.v4.R;
 
+import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.customview.localnetwork.HomeNetworkView;
 import com.app.dlna.dmc.gui.customview.playlist.PlaylistView;
+import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 
 public class LibraryActivity extends Activity {
 	protected static final String TAG = LibraryActivity.class.getName();
@@ -41,7 +43,16 @@ public class LibraryActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		m_playlistView.updateListView();
+		m_playlistView.preparePlaylist();
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		if (MainActivity.UPNP_PROCESSOR != null && MainActivity.UPNP_PROCESSOR.getPlaylistProcessor() != null) {
+			PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
+			playlistProcessor.saveState();
+		}
 	}
 
 	private OnPageChangeListener m_onPageChangeListener = new OnPageChangeListener() {
@@ -63,7 +74,7 @@ public class LibraryActivity extends Activity {
 					m_homeNetworkView.updateListView();
 					break;
 				case 1:
-					m_playlistView.updateListView();
+					m_playlistView.preparePlaylist();
 					break;
 				case 2:
 					break;

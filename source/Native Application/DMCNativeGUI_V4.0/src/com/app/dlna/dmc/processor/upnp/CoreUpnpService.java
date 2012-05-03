@@ -319,6 +319,8 @@ public class CoreUpnpService extends Service {
 		}
 
 		public void setPlaylistProcessor(PlaylistProcessor playlistProcessor) {
+			if (m_playlistProcessor != null)
+				m_playlistProcessor.saveState();
 			m_playlistProcessor = playlistProcessor;
 		}
 
