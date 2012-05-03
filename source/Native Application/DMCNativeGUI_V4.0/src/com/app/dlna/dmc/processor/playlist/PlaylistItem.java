@@ -2,13 +2,20 @@ package com.app.dlna.dmc.processor.playlist;
 
 public class PlaylistItem {
 	public enum Type {
-		AUDIO, VIDEO, IMAGE
+		AUDIO, VIDEO, IMAGE, UNKNOW,
 	};
 
 	private long m_id;
 	private String m_url;
 	private String m_title;
 	private Type m_type;
+
+	public PlaylistItem() {
+		m_id = -1;
+		m_url = "";
+		m_title = "";
+		m_type = Type.UNKNOW;
+	}
 
 	public void setId(long id) {
 		m_id = id;

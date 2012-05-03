@@ -187,103 +187,6 @@ public class DMRProcessorImpl implements DMRProcessor {
 		new UpdateThread().start();
 	}
 
-	@SuppressWarnings({ "rawtypes" })
-	@Override
-	public void setURIandPlay(final String uri) {
-		m_autoNextPending = 5;
-		if (m_controlPoint == null || m_avtransportService == null)
-			return;
-		m_isBusy = true;
-		m_controlPoint.execute(new GetMediaInfo(m_avtransportService) {
-
-			@Override
-			public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
-				fireOnFailEvent(invocation.getAction(), operation, defaultMsg);
-				m_isBusy = false;
-			}
-
-			@Override
-			public void received(ActionInvocation invocation, MediaInfo mediaInfo) {
-				// if (mediaInfo != null && mediaInfo.getCurrentURIMetaData() !=
-				// null)
-				// Log.e(TAG, mediaInfo.getCurrentURIMetaData());
-				String current_uri = null;
-				String currentPath = null;
-				String newPath = null;
-				String currentQuery = null;
-				String newQuery = null;
-
-				try {
-					current_uri = mediaInfo.getCurrentURI();
-					if (current_uri != null) {
-						URI _uri = new URI(current_uri);
-						currentPath = _uri.getPath();
-						currentQuery = _uri.getQuery();
-					}
-					URI _uri = new URI(uri);
-					newPath = _uri.getPath();
-					newQuery = _uri.getQuery();
-				} catch (URISyntaxException e) {
-					current_uri = null;
-				}
-				if (currentPath != null
-						&& newPath != null
-						&& currentPath.equals(newPath)
-						&& (currentQuery == newQuery || (currentQuery != null && newQuery != null && currentQuery
-								.equals(newQuery)))) {
-					play();
-				} else {
-					// Log.e(TAG, "set AV uri = " + uri);
-					Stop stop = new Stop(m_avtransportService) {
-						@Override
-						public void success(ActionInvocation invocation) {
-							super.success(invocation);
-							fireUpdatePositionEvent(0, 0);
-							m_isBusy = false;
-							m_state = STOP;
-							m_controlPoint.execute(new SetAVTransportURI(m_avtransportService, uri, null) {
-								@Override
-								public void success(ActionInvocation invocation) {
-									super.success(invocation);
-									m_controlPoint.execute(new Play(m_avtransportService) {
-
-										@Override
-										public void failure(ActionInvocation invocation, UpnpResponse operation,
-												String defaultMsg) {
-											// Log.e(TAG, "Call fail");
-											fireOnFailEvent(invocation.getAction(), operation, defaultMsg);
-											m_isBusy = false;
-										}
-
-										public void success(ActionInvocation invocation) {
-											m_isBusy = false;
-											m_state = PLAYING;
-										};
-									});
-								}
-
-								@Override
-								public void failure(ActionInvocation invocation, UpnpResponse response,
-										String defaultMsg) {
-									fireOnFailEvent(invocation.getAction(), response, defaultMsg);
-									m_isBusy = false;
-								}
-							});
-						}
-
-						@Override
-						public void failure(ActionInvocation invocation, UpnpResponse response, String defaultMsg) {
-							fireOnFailEvent(invocation.getAction(), response, defaultMsg);
-							m_isBusy = false;
-							m_user_stop = false;
-						}
-					};
-					m_controlPoint.execute(stop);
-				}
-			}
-		});
-	}
-
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void play() {
@@ -451,7 +354,7 @@ public class DMRProcessorImpl implements DMRProcessor {
 						m_playlistProcessor.next();
 						final PlaylistItem item = m_playlistProcessor.getCurrentItem();
 						if (item != null) {
-							setURIandPlay(item.getUrl());
+							setURIandPlay(item);
 						}
 					}
 					m_autoNextPending = 7;
@@ -560,5 +463,103 @@ public class DMRProcessorImpl implements DMRProcessor {
 		m_isRunning = running;
 		if (m_isRunning)
 			new UpdateThread().start();
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public void setURIandPlay(PlaylistItem item) {
+		final String url = item.getUrl();
+		m_autoNextPending = 5;
+		if (m_controlPoint == null || m_avtransportService == null)
+			return;
+		m_isBusy = true;
+		m_controlPoint.execute(new GetMediaInfo(m_avtransportService) {
+
+			@Override
+			public void failure(ActionInvocation invocation, UpnpResponse operation, String defaultMsg) {
+				fireOnFailEvent(invocation.getAction(), operation, defaultMsg);
+				m_isBusy = false;
+			}
+
+			@Override
+			public void received(ActionInvocation invocation, MediaInfo mediaInfo) {
+				// if (mediaInfo != null && mediaInfo.getCurrentURIMetaData() !=
+				// null)
+				// Log.e(TAG, mediaInfo.getCurrentURIMetaData());
+				String current_uri = null;
+				String currentPath = null;
+				String newPath = null;
+				String currentQuery = null;
+				String newQuery = null;
+
+				try {
+					current_uri = mediaInfo.getCurrentURI();
+					if (current_uri != null) {
+						URI _uri = new URI(current_uri);
+						currentPath = _uri.getPath();
+						currentQuery = _uri.getQuery();
+					}
+					URI _uri = new URI(url);
+					newPath = _uri.getPath();
+					newQuery = _uri.getQuery();
+				} catch (URISyntaxException e) {
+					current_uri = null;
+				}
+				if (currentPath != null
+						&& newPath != null
+						&& currentPath.equals(newPath)
+						&& (currentQuery == newQuery || (currentQuery != null && newQuery != null && currentQuery
+								.equals(newQuery)))) {
+					play();
+				} else {
+					// Log.e(TAG, "set AV uri = " + uri);
+					Stop stop = new Stop(m_avtransportService) {
+						@Override
+						public void success(ActionInvocation invocation) {
+							super.success(invocation);
+							fireUpdatePositionEvent(0, 0);
+							m_isBusy = false;
+							m_state = STOP;
+							m_controlPoint.execute(new SetAVTransportURI(m_avtransportService, url, null) {
+								@Override
+								public void success(ActionInvocation invocation) {
+									super.success(invocation);
+									m_controlPoint.execute(new Play(m_avtransportService) {
+
+										@Override
+										public void failure(ActionInvocation invocation, UpnpResponse operation,
+												String defaultMsg) {
+											// Log.e(TAG, "Call fail");
+											fireOnFailEvent(invocation.getAction(), operation, defaultMsg);
+											m_isBusy = false;
+										}
+
+										public void success(ActionInvocation invocation) {
+											m_isBusy = false;
+											m_state = PLAYING;
+										};
+									});
+								}
+
+								@Override
+								public void failure(ActionInvocation invocation, UpnpResponse response,
+										String defaultMsg) {
+									fireOnFailEvent(invocation.getAction(), response, defaultMsg);
+									m_isBusy = false;
+								}
+							});
+						}
+
+						@Override
+						public void failure(ActionInvocation invocation, UpnpResponse response, String defaultMsg) {
+							fireOnFailEvent(invocation.getAction(), response, defaultMsg);
+							m_isBusy = false;
+							m_user_stop = false;
+						}
+					};
+					m_controlPoint.execute(stop);
+				}
+			}
+		});
 	}
 }

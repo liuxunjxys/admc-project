@@ -18,14 +18,31 @@
         android:textColor="#fff"
         android:textSize="28sp" />
 
-    <ImageView
-        android:id="@+id/image"
+    <RelativeLayout
+        android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/title"
         android:layout_centerHorizontal="true"
         android:layout_centerInParent="true"
-        android:padding="10dp"
-        android:scaleType="centerInside" />
+        android:padding="10dp" >
+
+        <com.app.dlna.dmc.gui.customview.nowplaying.VideoContent
+            android:id="@+id/surface"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center" >
+        </com.app.dlna.dmc.gui.customview.nowplaying.VideoContent>
+
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            android:scaleType="centerInside" >
+        </ImageView>
+    </RelativeLayout>
 
 </RelativeLayout>

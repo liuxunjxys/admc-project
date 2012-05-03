@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
@@ -31,14 +32,14 @@ public class TopToolbarView extends LinearLayout {
 	private CustomArrayAdapter m_playlistAdapter;
 	private CustomArrayAdapter m_playlistItemAdapter;
 	private TextView m_tv_currentPlaylistName;
-	private ImageView m_btn_fakeDropdown;
+	private ImageView m_btn_playlistItemDropdown;
 	private boolean m_flagPlaylistItem = true;
 	private boolean m_flagPlaylist = true;
 
 	public TopToolbarView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.cv_toolbar_nowplayling_top,
-				this);
+		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
+				R.layout.cv_toolbar_nowplayling_top, this);
 
 		m_tv_currentPlaylistName = (TextView) findViewById(R.id.tv_playlistName);
 
@@ -52,8 +53,8 @@ public class TopToolbarView extends LinearLayout {
 		m_spinner_playlistItem.setAdapter(m_playlistItemAdapter);
 		m_spinner_playlistItem.setOnItemSelectedListener(m_playlistItemSelected);
 
-		m_btn_fakeDropdown = (ImageView) findViewById(R.id.btn_fakeDropdown);
-		m_btn_fakeDropdown.setOnClickListener(new OnClickListener() {
+		m_btn_playlistItemDropdown = (ImageView) findViewById(R.id.btn_fakeDropdown);
+		m_btn_playlistItemDropdown.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
@@ -86,7 +87,7 @@ public class TopToolbarView extends LinearLayout {
 			playlistProcessor.setCurrentItem(position);
 			DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
 			if (dmrProcessor != null) {
-				dmrProcessor.setURIandPlay(playlistProcessor.getCurrentItem().getUrl());
+				dmrProcessor.setURIandPlay(playlistProcessor.getCurrentItem());
 			}
 			NowPlayingActivity activity = (NowPlayingActivity) getContext();
 			activity.updateItemInfo();
@@ -105,8 +106,13 @@ public class TopToolbarView extends LinearLayout {
 				m_flagPlaylist = !m_flagPlaylist;
 				return;
 			}
-			PlaylistProcessor playlistProcessor = PlaylistManager.getPlaylistProcessor((Playlist) m_playlistAdapter.getItem(
-					position).getData());
+			PlaylistProcessor playlistProcessor = PlaylistManager.getPlaylistProcessor((Playlist) m_playlistAdapter
+					.getItem(position).getData());
+			if (playlistProcessor.getAllItems().size() == 0) {
+				Toast.makeText(getContext(), "Playlist is empty", Toast.LENGTH_SHORT).show();
+				return;
+			}
+
 			MainActivity.UPNP_PROCESSOR.setPlaylistProcessor(playlistProcessor);
 			MainActivity.UPNP_PROCESSOR.getDMRProcessor().setPlaylistProcessor(playlistProcessor);
 			m_tv_currentPlaylistName.setText(MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getData().getName());
@@ -128,7 +134,8 @@ public class TopToolbarView extends LinearLayout {
 			m_playlistAdapter.add(new AdapterItem(playlist));
 		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
 		if (playlistProcessor != null) {
-			m_spinner_playlist.setSelection(m_playlistAdapter.getPosition(new AdapterItem(playlistProcessor.getData())));
+			m_spinner_playlist
+					.setSelection(m_playlistAdapter.getPosition(new AdapterItem(playlistProcessor.getData())));
 			m_tv_currentPlaylistName.setText(playlistProcessor.getData().getName());
 			updatePlaylistItemSpinner();
 			DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();

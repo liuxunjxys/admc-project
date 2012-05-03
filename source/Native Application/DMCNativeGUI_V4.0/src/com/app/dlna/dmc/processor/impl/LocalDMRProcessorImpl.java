@@ -11,15 +11,18 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnInfoListener;
 import android.media.MediaPlayer.OnPreparedListener;
+import android.util.Log;
+import android.widget.VideoView;
 
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
+import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 
 public class LocalDMRProcessorImpl implements DMRProcessor {
 	private static final int SLEEP_INTERVAL = 1000;
 	private List<DMRProcessorListner> m_listeners;
-	private MediaPlayer m_player;
-	private String m_currentURL;
+	private VideoView m_player;
+	private PlaylistItem m_currentItem;
 	private PlaylistProcessor m_playlistProcessor;
 	private AudioManager m_audioManager;
 	private int m_maxVolume;
@@ -28,6 +31,7 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 	private static final int STATE_PLAYING = 0;
 	private static final int STATE_STOPED = 1;
 	private static final int STATE_PAUSED = 2;
+	protected static final String TAG = LocalDMRProcessorImpl.class.getName();
 	private int m_currentState;
 
 	private class UpdateThread extends Thread {
@@ -61,37 +65,17 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 
 	public LocalDMRProcessorImpl(Context context) {
 		m_listeners = new ArrayList<DMRProcessor.DMRProcessorListner>();
-		m_currentURL = "";
-		m_player = new MediaPlayer();
-		m_player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+		m_currentItem = new PlaylistItem();
+		m_player = new VideoView(context);
 		m_player.setOnPreparedListener(m_preparedListener);
-		m_player.setOnInfoListener(m_infoListener);
 		m_player.setOnCompletionListener(m_completeListener);
 		m_player.setOnErrorListener(m_onErrorListener);
+		m_player.(true);
 		m_audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 		m_maxVolume = m_audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
 		m_isRunning = true;
 		m_selfAutoNext = true;
 		new UpdateThread().start();
-	}
-
-	@Override
-	public void setURIandPlay(String url) {
-		if (m_currentURL.equals(url))
-			return;
-		m_currentURL = url;
-		m_player.stop();
-		m_player.reset();
-		try {
-			m_player.setDataSource(url);
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		m_player.prepareAsync();
 	}
 
 	private OnPreparedListener m_preparedListener = new OnPreparedListener() {
@@ -101,6 +85,7 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 			mp.start();
 			m_currentState = STATE_PLAYING;
 		}
+
 	};
 
 	private OnInfoListener m_infoListener = new OnInfoListener() {
@@ -126,7 +111,12 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 
 		@Override
 		public boolean onError(MediaPlayer mp, int what, int extra) {
-			return false;
+			Log.i(TAG, "On error");
+			mp.reset();
+			fireOnStopedEvent();
+			if (m_playlistProcessor != null && m_selfAutoNext)
+				m_playlistProcessor.next();
+			return true;
 		}
 	};
 
@@ -232,7 +222,7 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 
 	@Override
 	public String getCurrentTrackURI() {
-		return m_currentURL;
+		return m_currentItem != null ? m_currentItem.getUrl() : "";
 	}
 
 	@Override
@@ -274,4 +264,51 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 		}
 	}
 
+	@Override
+	public void setURIandPlay(PlaylistItem item) {
+		String url = item.getUrl();
+		if (getCurrentTrackURI().equals(url))
+			return;
+		m_currentItem = item;
+		switch (item.getType()) {
+		case AUDIO: {
+			m_player.stop();
+			m_player.reset();
+			m_player.setDisplay(null);
+			try {
+				m_player.setDataSource(url);
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (IllegalStateException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			m_player.prepareAsync();
+			break;
+		}
+		case VIDEO: {
+			m_player.stop();
+			m_player.reset();
+			try {
+				m_player.setDataSource(url);
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (IllegalStateException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			m_player.prepareAsync();
+			break;
+		}
+		case IMAGE: {
+			stop();
+			break;
+		}
+		default:
+			break;
+		}
+
+	}
 }
