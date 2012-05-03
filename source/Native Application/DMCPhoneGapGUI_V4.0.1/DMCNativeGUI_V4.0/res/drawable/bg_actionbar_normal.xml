@@ -1,0 +1,18 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item>
+        <shape android:shape="rectangle" >
+            <stroke android:color="@color/blue" />
+
+            <solid android:color="@color/blue" />
+        </shape>
+    </item>
+    <item android:bottom="1dp">
+        <shape android:shape="rectangle" >
+            <stroke android:color="@color/custom_menu_background" />
+
+            <solid android:color="@color/custom_menu_background" />
+        </shape>
+    </item>
+
+</layer-list>
