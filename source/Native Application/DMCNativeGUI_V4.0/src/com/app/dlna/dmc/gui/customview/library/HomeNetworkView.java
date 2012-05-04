@@ -1,4 +1,4 @@
-package com.app.dlna.dmc.gui.customview.localnetwork;
+package com.app.dlna.dmc.gui.customview.library;
 
 import java.util.List;
 import java.util.Map;
@@ -52,8 +52,7 @@ public class HomeNetworkView extends DMRListenerView {
 	public HomeNetworkView(Context context) {
 		super(context);
 		m_isBrowsing = false;
-		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.cv_homenetwork,
-				this);
+		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.cv_homenetwork, this);
 		m_listView = (ListView) findViewById(R.id.lv_mediasource_browsing);
 		m_adapter = new CustomArrayAdapter(context, 0);
 		m_listView.setAdapter(m_adapter);
@@ -90,8 +89,8 @@ public class HomeNetworkView extends DMRListenerView {
 						&& !m_progressDlg.isShowing()
 						&& firstVisibleItem + visibleItemCount == totalItemCount
 						&& m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData() instanceof DIDLObject
-						&& ((DIDLObject) m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData()).getId()
-								.equals("-1")) {
+						&& ((DIDLObject) m_adapter.getItem(firstVisibleItem + visibleItemCount - 1).getData()).getId().equals(
+								"-1")) {
 					doLoadMoreItems();
 				}
 			} catch (Exception ex) {
@@ -189,6 +188,7 @@ public class HomeNetworkView extends DMRListenerView {
 		} else {
 			if (playlistProcessor.isFull()) {
 				Toast.makeText(getContext(), "Current playlist is full", Toast.LENGTH_SHORT).show();
+				// dmrProcessor.setURIandPlay(object.getResources().get(0).getValue());
 			} else {
 				Toast.makeText(getContext(), "An error occurs, try again later", Toast.LENGTH_SHORT).show();
 			}
@@ -224,8 +224,8 @@ public class HomeNetworkView extends DMRListenerView {
 		@Override
 		public void onBrowseComplete(final String objectID, final boolean haveNext, boolean havePrev,
 				final Map<String, List<? extends DIDLObject>> result) {
-			Log.i(TAG, "browse complete: object id = " + objectID + " haveNext = " + haveNext + "; havePrev ="
-					+ havePrev + "; result size = " + result.size());
+			Log.i(TAG, "browse complete: object id = " + objectID + " haveNext = " + haveNext + "; havePrev =" + havePrev
+					+ "; result size = " + result.size());
 			m_isRoot = objectID.equals("0");
 			MainActivity.INSTANCE.runOnUiThread(new Runnable() {
 

@@ -11,7 +11,7 @@ import android.widget.LinearLayout;
 import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
-import com.app.dlna.dmc.gui.customview.localnetwork.HomeNetworkView;
+import com.app.dlna.dmc.gui.customview.library.HomeNetworkView;
 import com.app.dlna.dmc.gui.customview.playlist.PlaylistView;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 

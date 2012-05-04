@@ -1,4 +1,4 @@
-package com.app.dlna.dmc.gui.customview.localnetwork;
+package com.app.dlna.dmc.gui.customview.library;
 
 import android.app.ProgressDialog;
 import android.content.Context;

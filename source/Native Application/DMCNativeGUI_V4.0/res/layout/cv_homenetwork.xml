@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <com.app.dlna.dmc.gui.customview.localnetwork.HomeNetworkToolbar
+    <com.app.dlna.dmc.gui.customview.library.HomeNetworkToolbar
         android:id="@+id/botToolbar"
         android:layout_width="fill_parent"
         android:layout_height="48dp"
