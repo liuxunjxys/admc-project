@@ -3,12 +3,12 @@ package com.app.dlna.dmc.gui.subactivity;
 import android.view.MotionEvent;
 import android.view.View;
 
-public class ActivitySwipeDetector implements View.OnTouchListener {
+public class SwipeDetector implements View.OnTouchListener {
 	private NowPlayingActivity m_activity;
 	private static final int MIN_DISTANCE = 100;
 	private float m_downX, m_upX;
 
-	public ActivitySwipeDetector(NowPlayingActivity activity) {
+	public SwipeDetector(NowPlayingActivity activity) {
 		this.m_activity = activity;
 	}
 

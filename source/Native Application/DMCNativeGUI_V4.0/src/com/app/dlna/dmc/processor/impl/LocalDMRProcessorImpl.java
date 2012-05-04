@@ -86,20 +86,6 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 		Log.i(TAG, "Call SetURIAndPlay");
 		if (m_currentItem.equals(item))
 			return;
-		// new Thread(new Runnable() {
-		//
-		// @Override
-		// public void run() {
-		// try {
-		// Thread.sleep(4000);
-		// if (m_player != null && !m_player.isPlaying()) {
-		// autoNext();
-		// }
-		// } catch (InterruptedException e) {
-		// e.printStackTrace();
-		// }
-		// }
-		// }).start();
 		m_currentItem = item;
 		if (m_player.isPlaying())
 			m_player.stop();
