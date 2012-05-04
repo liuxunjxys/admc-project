@@ -68,6 +68,7 @@ public class NowPlayingActivity extends Activity implements Callback {
 		m_viewFlipper.addView(getLayoutInflater().inflate(R.layout.cv_galery_image, null));
 
 		m_surface = (SurfaceView) findViewById(R.id.surface);
+		m_surface.setOnTouchListener(activitySwipeDetector);
 		m_holder = m_surface.getHolder();
 		m_holder.addCallback(this);
 		m_holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
@@ -148,8 +149,6 @@ public class NowPlayingActivity extends Activity implements Callback {
 			return;
 		((TextView) view.findViewById(R.id.title)).setText(item.getTitle());
 		ImageView iv = (ImageView) view.findViewById(R.id.image);
-		m_viewFlipper.setVisibility(View.GONE);
-		m_surface.setVisibility(View.GONE);
 		switch (item.getType()) {
 		case AUDIO: {
 			iv.setImageDrawable(getResources().getDrawable(R.drawable.ic_didlobject_audio_large));
@@ -262,22 +261,28 @@ public class NowPlayingActivity extends Activity implements Callback {
 
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-		Log.i(TAG, "Surface changed");
+		updateSurfaceView();
 	}
 
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
-		if (MainActivity.UPNP_PROCESSOR.getDMRProcessor() instanceof LocalDMRProcessorImpl) {
-			LocalDMRProcessorImpl localDMR = (LocalDMRProcessorImpl) MainActivity.UPNP_PROCESSOR.getDMRProcessor();
-			localDMR.getPlayer().setDisplay(m_holder);
-		}
+		updateSurfaceView();
 	}
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
+		updateSurfaceView();
+	}
+
+	private void updateSurfaceView() {
 		if (MainActivity.UPNP_PROCESSOR.getDMRProcessor() instanceof LocalDMRProcessorImpl) {
 			LocalDMRProcessorImpl localDMR = (LocalDMRProcessorImpl) MainActivity.UPNP_PROCESSOR.getDMRProcessor();
-			localDMR.getPlayer().setDisplay(null);
+			if (m_surface.getVisibility() == View.VISIBLE) {
+				localDMR.getPlayer().setDisplay(m_holder);
+			} else {
+				localDMR.getPlayer().setDisplay(null);
+			}
+
 		}
 	}
 
