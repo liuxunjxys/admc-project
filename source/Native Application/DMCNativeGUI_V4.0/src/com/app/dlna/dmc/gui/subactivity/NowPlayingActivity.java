@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -26,7 +27,6 @@ import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor.PlaylistListener;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
-import com.app.dlna.dmc.processor.playlist.PlaylistItem.Type;
 import com.app.dlna.dmc.utility.Utility;
 
 public class NowPlayingActivity extends Activity implements Callback {
@@ -215,6 +215,7 @@ public class NowPlayingActivity extends Activity implements Callback {
 						// data.url = "";
 						m_surface.setImageOverlay(new ImageOverlayData(BitmapFactory.decodeResource(getResources(),
 								R.drawable.ic_didlobject_image_large), ""));
+						updateSurfaceImage();
 					} else {
 						Log.i(TAG, "w = " + result.getWidth() + "; h = " + result.getHeight());
 						// iv.setImageBitmap(result);
@@ -223,6 +224,7 @@ public class NowPlayingActivity extends Activity implements Callback {
 						// data.bm = result;
 						// data.url = "";
 						m_surface.setImageOverlay(new ImageOverlayData(result, ""));
+						updateSurfaceImage();
 					}
 				}
 			}.execute(new String[] { item.getUrl(), "512", "512" });
@@ -232,7 +234,6 @@ public class NowPlayingActivity extends Activity implements Callback {
 			break;
 		}
 		}
-		m_surface.invalidate();
 		DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
 		if (dmrProcessor != null) {
 			dmrProcessor.setURIandPlay(item);
@@ -280,11 +281,29 @@ public class NowPlayingActivity extends Activity implements Callback {
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 		updateSurfaceView();
+		updateSurfaceImage();
+	}
+
+	private void updateSurfaceImage() {
+		Canvas canvas = null;
+		try {
+			canvas = m_holder.lockCanvas(null);
+			synchronized (m_holder) {
+				m_surface.onDraw(canvas);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (canvas != null) {
+				m_holder.unlockCanvasAndPost(canvas);
+			}
+		}
 	}
 
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
 		updateSurfaceView();
+
 	}
 
 	@Override
