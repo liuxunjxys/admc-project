@@ -238,10 +238,6 @@ public class RendererCompactView extends LinearLayout {
 		public void onErrorEvent(String error) {
 		}
 
-		@Override
-		public void onEndTrack() {
-		}
-
 		@SuppressWarnings("rawtypes")
 		@Override
 		public void onActionFail(Action actionCallback, UpnpResponse response, String cause) {

@@ -163,7 +163,10 @@ public class MainActivity extends UpnpListenerTabActivity {
 			Activity activity = getLocalActivityManager().getActivity(tabTag);
 			if (activity instanceof NowPlayingActivity) {
 				((NowPlayingActivity) activity).updateDMRControlView();
+				((NowPlayingActivity) activity).updateItemInfo();
 			}
+			MainActivity.UPNP_PROCESSOR.getDMRProcessor().setPlaylistProcessor(
+					MainActivity.UPNP_PROCESSOR.getPlaylistProcessor());
 		}
 
 		@Override

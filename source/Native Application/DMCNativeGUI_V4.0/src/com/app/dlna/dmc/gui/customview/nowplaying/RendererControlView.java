@@ -247,11 +247,6 @@ public class RendererControlView extends LinearLayout {
 			});
 		}
 
-		@Override
-		public void onEndTrack() {
-
-		}
-
 		@SuppressWarnings("rawtypes")
 		@Override
 		public void onActionFail(Action actionCallback, final UpnpResponse response, final String cause) {
