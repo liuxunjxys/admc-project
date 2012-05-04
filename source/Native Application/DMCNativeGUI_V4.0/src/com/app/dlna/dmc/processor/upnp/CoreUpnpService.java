@@ -45,7 +45,7 @@ import app.dlna.controller.v4.R;
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.processor.http.HTTPServerData;
 import com.app.dlna.dmc.processor.http.MainHttpProcessor;
-import com.app.dlna.dmc.processor.impl.DMRProcessorImpl;
+import com.app.dlna.dmc.processor.impl.RemoteDMRProcessorImpl;
 import com.app.dlna.dmc.processor.impl.DMSProcessorImpl;
 import com.app.dlna.dmc.processor.impl.LocalDMRProcessorImpl;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
@@ -279,7 +279,7 @@ public class CoreUpnpService extends Service {
 				if (m_currentDMR instanceof LocalDevice)
 					m_dmrProcessor = new LocalDMRProcessorImpl(CoreUpnpService.this);
 				else
-					m_dmrProcessor = new DMRProcessorImpl(m_currentDMR, getControlPoint());
+					m_dmrProcessor = new RemoteDMRProcessorImpl(m_currentDMR, getControlPoint());
 			} else {
 				Log.e(TAG, "GET DMR FAIL:" + uDN.toString());
 				Toast.makeText(getApplicationContext(), "Set DMR fail. Cannot get DMR info; UDN = " + uDN.toString(),

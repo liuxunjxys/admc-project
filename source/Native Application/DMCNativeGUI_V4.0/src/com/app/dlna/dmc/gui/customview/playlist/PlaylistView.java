@@ -3,6 +3,7 @@ package com.app.dlna.dmc.gui.customview.playlist;
 import java.util.List;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -28,8 +29,10 @@ public class PlaylistView extends DMRListenerView {
 	private PlaylistToolbar m_playlistToolbar;
 	public static final int VM_LIST = 0;
 	public static final int VM_DETAILS = 1;
+	protected static final String TAG = PlaylistView.class.getName();
 	private int m_viewMode = -1;
 	private PlaylistProcessor m_currentPlaylist = null;
+
 	private PlaylistListener m_playlistListener = new PlaylistListener() {
 
 		@Override
@@ -129,6 +132,7 @@ public class PlaylistView extends DMRListenerView {
 
 		@Override
 		public void onItemClick(AdapterView<?> adapter, View v, int position, long arg3) {
+			Log.i(TAG, "On ItemClick");
 			final Object object = m_adapter.getItem(position).getData();
 			if (object instanceof Playlist) {
 

@@ -33,11 +33,15 @@ import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 
-public class DMRProcessorImpl implements DMRProcessor {
+public class RemoteDMRProcessorImpl implements DMRProcessor {
+	private static final String TAG = RemoteDMRProcessorImpl.class.getName();
 	private static final int UPDATE_INTERVAL = 1000;
-	private static final String TAG = DMRProcessorImpl.class.getName();
 	private static final int MAX_VOLUME = 100;
-	protected static final long SEEK_DELAY_INTERVAL = 200;
+	private static final int PLAYING = 0;
+	private static final int PAUSE = 1;
+	private static final int STOP = 2;
+	private static final long SEEK_DELAY_INTERVAL = 200;
+	private static final int AUTO_NEXT_DELAY = 2; // second
 	@SuppressWarnings("rawtypes")
 	private Device m_device;
 	private ControlPoint m_controlPoint;
@@ -51,9 +55,6 @@ public class DMRProcessorImpl implements DMRProcessor {
 	private int m_currentVolume;
 	private boolean m_isBusy = false;
 	private int m_state = -1;
-	private static final int PLAYING = 0;
-	private static final int PAUSE = 1;
-	private static final int STOP = 2;
 	private boolean m_checkGetPositionInfo = false;
 	private boolean m_checkGetTransportInfo = false;
 	private boolean m_checkGetVolumeInfo = false;
@@ -178,7 +179,7 @@ public class DMRProcessorImpl implements DMRProcessor {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public DMRProcessorImpl(Device dmr, ControlPoint controlPoint) {
+	public RemoteDMRProcessorImpl(Device dmr, ControlPoint controlPoint) {
 		m_device = dmr;
 		m_controlPoint = controlPoint;
 		m_avtransportService = m_device.findService(new ServiceType("schemas-upnp-org", "AVTransport"));
@@ -357,7 +358,7 @@ public class DMRProcessorImpl implements DMRProcessor {
 							setURIandPlay(item);
 						}
 					}
-					m_autoNextPending = 7;
+					m_autoNextPending = AUTO_NEXT_DELAY;
 				} else {
 					--m_autoNextPending;
 				}
@@ -469,7 +470,7 @@ public class DMRProcessorImpl implements DMRProcessor {
 	@Override
 	public void setURIandPlay(PlaylistItem item) {
 		final String url = item.getUrl();
-		m_autoNextPending = 5;
+		m_autoNextPending = AUTO_NEXT_DELAY;
 		if (m_controlPoint == null || m_avtransportService == null)
 			return;
 		m_isBusy = true;

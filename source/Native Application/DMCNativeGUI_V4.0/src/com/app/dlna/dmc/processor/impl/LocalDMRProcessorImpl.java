@@ -82,6 +82,7 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 
 	@Override
 	public void setURIandPlay(PlaylistItem item) {
+		Log.i(TAG, "Call SetURIAndPlay");
 		if (m_currentItem.equals(item))
 			return;
 		m_currentItem = item;
@@ -90,6 +91,7 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 		m_player.reset();
 		try {
 			m_player.setDataSource(m_currentItem.getUrl());
+			m_player.prepareAsync();
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 		} catch (IllegalStateException e) {
@@ -97,7 +99,6 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		m_player.prepareAsync();
 	}
 
 	private OnPreparedListener m_preparedListener = new OnPreparedListener() {

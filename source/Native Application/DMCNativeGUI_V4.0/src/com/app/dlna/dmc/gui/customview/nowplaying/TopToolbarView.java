@@ -85,10 +85,11 @@ public class TopToolbarView extends LinearLayout {
 			if (playlistProcessor == null)
 				return;
 			playlistProcessor.setCurrentItem(position);
-			DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
-			if (dmrProcessor != null) {
-				dmrProcessor.setURIandPlay(playlistProcessor.getCurrentItem());
-			}
+			// DMRProcessor dmrProcessor =
+			// MainActivity.UPNP_PROCESSOR.getDMRProcessor();
+			// if (dmrProcessor != null) {
+			// dmrProcessor.setURIandPlay(playlistProcessor.getCurrentItem());
+			// }
 			NowPlayingActivity activity = (NowPlayingActivity) getContext();
 			activity.updateItemInfo();
 		}
