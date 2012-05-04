@@ -338,25 +338,16 @@ public class RemoteDMRProcessorImpl implements DMRProcessor {
 	}
 
 	private void fireOnEndTrackEvent() {
-		Log.i(TAG, "fireOnEndTrackEvent");
+		Log.i(TAG, "fireOnEndTrackEvent, m_autoNextPending = " + m_autoNextPending);
 		if (m_isBusy)
 			return;
 		synchronized (m_listeners) {
-			if (m_listeners.size() > 0) {
-				// Log.i(TAG, "fire auto next with ");
-				for (DMRProcessorListner listener : m_listeners) {
-					listener.onEndTrack();
-				}
-			}
 			if (m_seftAutoNext) {
 				// Log.i(TAG, "seft next");
 				if (m_autoNextPending == 0) {
 					if (m_playlistProcessor != null) {
+						Log.i(TAG, "Auto next");
 						m_playlistProcessor.next();
-						final PlaylistItem item = m_playlistProcessor.getCurrentItem();
-						if (item != null) {
-							setURIandPlay(item);
-						}
 					}
 					m_autoNextPending = AUTO_NEXT_DELAY;
 				} else {

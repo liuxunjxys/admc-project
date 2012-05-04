@@ -15,6 +15,7 @@ import android.util.Log;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
+import com.app.dlna.dmc.processor.playlist.PlaylistItem.Type;
 
 public class LocalDMRProcessorImpl implements DMRProcessor {
 	private static final int SLEEP_INTERVAL = 1000;
@@ -85,20 +86,36 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 		Log.i(TAG, "Call SetURIAndPlay");
 		if (m_currentItem.equals(item))
 			return;
+		// new Thread(new Runnable() {
+		//
+		// @Override
+		// public void run() {
+		// try {
+		// Thread.sleep(4000);
+		// if (m_player != null && !m_player.isPlaying()) {
+		// autoNext();
+		// }
+		// } catch (InterruptedException e) {
+		// e.printStackTrace();
+		// }
+		// }
+		// }).start();
 		m_currentItem = item;
 		if (m_player.isPlaying())
 			m_player.stop();
 		m_player.reset();
-		try {
-			m_player.setDataSource(m_currentItem.getUrl());
-			m_player.prepareAsync();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		if (m_currentItem.getType() != Type.IMAGE)
+			try {
+				m_player.setDataSource(m_currentItem.getUrl());
+				m_player.prepareAsync();
+
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (IllegalStateException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 	}
 
 	private OnPreparedListener m_preparedListener = new OnPreparedListener() {
@@ -126,11 +143,7 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 
 		@Override
 		public boolean onError(MediaPlayer mp, int what, int extra) {
-			Log.i(TAG, "On error");
-			mp.reset();
-			fireOnStopedEvent();
-			if (m_playlistProcessor != null && m_selfAutoNext)
-				m_playlistProcessor.next();
+			autoNext();
 			return true;
 		}
 	};
@@ -281,6 +294,13 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 
 	public MediaPlayer getPlayer() {
 		return m_player;
+	}
+
+	private void autoNext() {
+		m_player.reset();
+		fireOnStopedEvent();
+		if (m_playlistProcessor != null && m_selfAutoNext)
+			m_playlistProcessor.next();
 	}
 
 }

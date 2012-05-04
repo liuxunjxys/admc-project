@@ -19,6 +19,7 @@ import org.teleal.cling.support.model.item.VideoItem;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -90,11 +91,37 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 		final AdapterItem object = getItem(position);
 
 		final ViewHolder holder = (ViewHolder) convertView.getTag();
+		holder.name.setTextColor(Color.BLACK);
+		holder.desc.setVisibility(View.GONE);
 		holder.action.setTag(new Integer(position));
+		holder.action.setVisibility(View.GONE);
 		if (object.getData() instanceof Playlist) {
 			initPlaylist((Playlist) object.getData(), holder, position);
-		} else if (object.getData() instanceof PlaylistItem)
-			initPlaylistItem((PlaylistItem) object.getData(), holder, position, false);
+		} else if (object.getData() instanceof PlaylistItem) {
+			PlaylistItem _object = (PlaylistItem) object.getData();
+			holder.name.setText(_object.getTitle());
+			switch (_object.getType()) {
+			case AUDIO:
+				holder.icon.setImageResource(R.drawable.ic_didlobject_audio);
+				break;
+			case VIDEO:
+				holder.icon.setImageResource(R.drawable.ic_didlobject_video);
+				break;
+			case IMAGE:
+				holder.icon.setImageResource(R.drawable.ic_didlobject_image);
+				break;
+			default:
+				holder.icon.setImageResource(R.drawable.ic_didlobject_unknow);
+				break;
+			}
+			if (_object.getUrl().equals(MainActivity.UPNP_PROCESSOR.getDMRProcessor().getCurrentTrackURI())) {
+				holder.playing.setVisibility(View.VISIBLE);
+			} else {
+				holder.playing.setVisibility(View.GONE);
+			}
+		}
+
+		convertView.setBackgroundDrawable(null);
 		return convertView;
 	}
 
@@ -104,7 +131,8 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 		holder.desc.setText("");
 		holder.icon.setImageResource(R.drawable.ic_playlist);
 		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
-		if (playlistProcessor != null && playlistProcessor.getData() != null && playlistProcessor.getData().equals(data)) {
+		if (playlistProcessor != null && playlistProcessor.getData() != null
+				&& playlistProcessor.getData().equals(data)) {
 			holder.playing.setVisibility(View.VISIBLE);
 		} else {
 			holder.playing.setVisibility(View.GONE);
@@ -156,7 +184,8 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 					final RemoteDevice remoteDevice = (RemoteDevice) device;
 
 					String urlString = remoteDevice.getIdentity().getDescriptorURL().getProtocol() + "://"
-							+ remoteDevice.getIdentity().getDescriptorURL().getAuthority() + icons[0].getUri().toString();
+							+ remoteDevice.getIdentity().getDescriptorURL().getAuthority()
+							+ icons[0].getUri().toString();
 					URL url = new URL(urlString);
 					final Bitmap icon = BitmapFactory.decodeStream(url.openConnection().getInputStream());
 					m_cacheDMSIcon.put(udn, icon);
@@ -211,8 +240,8 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 			} else if (object instanceof VideoItem) {
 				holder.icon.setImageResource(R.drawable.ic_didlobject_video);
 			} else if (object instanceof ImageItem) {
-				Utility.loadImageItemThumbnail(holder.icon, object.getResources().get(0).getValue(), Cache.getBitmapCache(),
-						MAX_SIZE);
+				Utility.loadImageItemThumbnail(holder.icon, object.getResources().get(0).getValue(),
+						Cache.getBitmapCache(), MAX_SIZE);
 			} else {
 				holder.icon.setImageResource(R.drawable.ic_didlobject_unknow);
 			}
@@ -222,7 +251,8 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 			}
 			if (object instanceof Item) {
 				holder.action.setVisibility(View.VISIBLE);
-				if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().containsUrl(object.getResources().get(0).getValue())) {
+				if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().containsUrl(
+						object.getResources().get(0).getValue())) {
 					holder.action.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_remove));
 				} else {
 					holder.action.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_add));
@@ -339,7 +369,8 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 			} else if (item instanceof DIDLObject) {
 				final DIDLObject object = (DIDLObject) item;
 				if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor() != null)
-					if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().containsUrl(object.getResources().get(0).getValue())) {
+					if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().containsUrl(
+							object.getResources().get(0).getValue())) {
 						if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().removeDIDLObject(object) != null)
 							updateSingleView(v, position);
 					} else {

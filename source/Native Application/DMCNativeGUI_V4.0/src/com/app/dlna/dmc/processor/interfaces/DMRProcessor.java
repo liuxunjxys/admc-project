@@ -48,8 +48,6 @@ public interface DMRProcessor {
 
 		void onPlaying();
 
-		void onEndTrack();
-
 		void onErrorEvent(String error);
 
 		@SuppressWarnings("rawtypes")

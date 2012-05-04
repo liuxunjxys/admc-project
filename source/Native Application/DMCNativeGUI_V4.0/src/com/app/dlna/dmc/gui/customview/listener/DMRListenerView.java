@@ -65,11 +65,6 @@ public class DMRListenerView extends LinearLayout {
 			MainActivity.UPNP_PROCESSOR.refreshDevicesList();
 		}
 
-		@Override
-		public void onEndTrack() {
-
-		}
-
 		@SuppressWarnings("rawtypes")
 		@Override
 		public void onActionFail(Action actionCallback, UpnpResponse response, String cause) {
