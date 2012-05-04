@@ -37,7 +37,7 @@ public class MultiContentSurfaceView extends SurfaceView {
 	}
 
 	@Override
-	protected void onDraw(Canvas canvas) {
+	public void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 		Log.i(TAG, "On Draw");
 		if (m_imageOverlay != null && m_imageOverlay.bm != null) {
