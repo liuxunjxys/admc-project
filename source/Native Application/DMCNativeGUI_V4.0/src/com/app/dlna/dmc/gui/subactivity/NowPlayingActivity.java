@@ -12,9 +12,12 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.ViewFlipper;
 import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
@@ -32,17 +35,16 @@ public class NowPlayingActivity extends Activity implements Callback {
 	protected String TAG = NowPlayingActivity.class.getName();
 	private RendererControlView m_rendererControl;
 	private TopToolbarView m_topToolbar;
-	// private ViewFlipper m_viewFlipper;
+	private ViewFlipper m_viewFlipper;
 	private ProgressDialog m_progressDialog;
-	// private Animation m_animFlipInNext;
-	// private Animation m_animFlipOutNext;
-	// private Animation m_animFlipInPrevious;
-	// private Animation m_animFlipOutPrevious;
+	private Animation m_animFlipInNext;
+	private Animation m_animFlipOutNext;
+	private Animation m_animFlipInPrevious;
+	private Animation m_animFlipOutPrevious;
 	// private boolean m_waiting;
 	private SurfaceView m_surface;
 	private SurfaceHolder m_holder;
 	private ImageView m_image;
-	private TextView m_title;
 	private LinearLayout m_content;
 
 	@Override
@@ -56,17 +58,25 @@ public class NowPlayingActivity extends Activity implements Callback {
 		m_progressDialog.setTitle("Loading image");
 		m_progressDialog.setCancelable(true);
 
-		SwipeDetector swipeDetector = new SwipeDetector(this);
+		m_swipeDetector = new SwipeDetector(this);
 		m_image = (ImageView) findViewById(R.id.image);
-		m_image.setOnTouchListener(swipeDetector);
+		m_image.setOnTouchListener(m_swipeDetector);
 		m_surface = (SurfaceView) findViewById(R.id.surface);
-		m_surface.setOnTouchListener(swipeDetector);
+		m_surface.setOnTouchListener(m_swipeDetector);
 		m_holder = m_surface.getHolder();
 		m_holder.addCallback(this);
 		m_holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-		m_title = (TextView) findViewById(R.id.title);
 		m_content = (LinearLayout) findViewById(R.id.content);
-		// MainActivity.INSTANCE.hideRendererCompactView();
+
+		m_animFlipInNext = AnimationUtils.loadAnimation(this, R.anim.flipinnext);
+		m_animFlipOutNext = AnimationUtils.loadAnimation(this, R.anim.flipoutnext);
+		m_animFlipInPrevious = AnimationUtils.loadAnimation(this, R.anim.flipinprevious);
+		m_animFlipOutPrevious = AnimationUtils.loadAnimation(this, R.anim.flipoutprevious);
+		m_viewFlipper = (ViewFlipper) findViewById(R.id.viewFlipper);
+		m_viewFlipper.setOnTouchListener(m_swipeDetector);
+		m_viewFlipper.addView(getLayoutInflater().inflate(R.layout.cv_tv_title, null));
+		m_viewFlipper.addView(getLayoutInflater().inflate(R.layout.cv_tv_title, null));
+
 	}
 
 	private PlaylistListener m_playlistListener = new PlaylistListener() {
@@ -77,6 +87,9 @@ public class NowPlayingActivity extends Activity implements Callback {
 
 				@Override
 				public void run() {
+					m_viewFlipper.setInAnimation(m_animFlipInPrevious);
+					m_viewFlipper.setOutAnimation(m_animFlipOutPrevious);
+					m_viewFlipper.showPrevious();
 					updateItemInfo();
 				}
 			});
@@ -88,30 +101,16 @@ public class NowPlayingActivity extends Activity implements Callback {
 
 				@Override
 				public void run() {
+					m_viewFlipper.setInAnimation(m_animFlipInNext);
+					m_viewFlipper.setOutAnimation(m_animFlipOutNext);
+					m_viewFlipper.showNext();
 					updateItemInfo();
 				}
 			});
 
 		}
 	};
-
-	// private AnimationListener m_animationListner = new AnimationListener() {
-	//
-	// @Override
-	// public void onAnimationStart(Animation animation) {
-	// m_waiting = true;
-	// }
-	//
-	// @Override
-	// public void onAnimationRepeat(Animation animation) {
-	//
-	// }
-	//
-	// @Override
-	// public void onAnimationEnd(Animation animation) {
-	// m_waiting = false;
-	// }
-	// };
+	private SwipeDetector m_swipeDetector;
 
 	public void doNext() {
 		MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().next();
@@ -127,7 +126,7 @@ public class NowPlayingActivity extends Activity implements Callback {
 		PlaylistItem item = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getCurrentItem();
 		if (item == null)
 			return;
-		m_title.setText(item.getTitle());
+		((TextView)m_viewFlipper.getCurrentView()).setText(item.getTitle());
 		switch (item.getType()) {
 		case AUDIO: {
 			m_image.setVisibility(View.VISIBLE);

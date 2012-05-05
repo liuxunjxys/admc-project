@@ -200,11 +200,11 @@ public final class R {
         public static final int textView1=0x7f0b0026;
         public static final int textView3=0x7f0b0028;
         public static final int textView5=0x7f0b002a;
-        public static final int title=0x7f0b0009;
         public static final int topToolbar=0x7f0b0008;
         public static final int tv_current=0x7f0b001b;
         public static final int tv_max=0x7f0b001c;
         public static final int tv_playlistName=0x7f0b0022;
+        public static final int viewFlipper=0x7f0b0009;
         public static final int viewPager=0x7f0b0001;
         public static final int viewPagerStrip=0x7f0b0003;
         public static final int volume=0x7f0b001d;
@@ -222,11 +222,12 @@ public final class R {
         public static final int cv_toolbar_nowplayling_renderer_control=0x7f030009;
         public static final int cv_toolbar_nowplayling_top=0x7f03000a;
         public static final int cv_toolbar_playlist=0x7f03000b;
-        public static final int dl_devicedetails=0x7f03000c;
-        public static final int download_notification=0x7f03000d;
-        public static final int gvitem_renderer_compact=0x7f03000e;
-        public static final int lvitem_generic_item=0x7f03000f;
-        public static final int lvitem_loadmoreitem=0x7f030010;
+        public static final int cv_tv_title=0x7f03000c;
+        public static final int dl_devicedetails=0x7f03000d;
+        public static final int download_notification=0x7f03000e;
+        public static final int gvitem_renderer_compact=0x7f03000f;
+        public static final int lvitem_generic_item=0x7f030010;
+        public static final int lvitem_loadmoreitem=0x7f030011;
     }
     public static final class menu {
         public static final int main=0x7f0a0000;
