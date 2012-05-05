@@ -11,13 +11,14 @@
         android:layout_height="48dp"
         android:gravity="center"
         android:orientation="horizontal"
-        android:weightSum="4" >
+        android:weightSum="6" >
 
         <ImageView
             android:id="@+id/btn_prev"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
+            android:padding="2dp"
             android:scaleType="centerInside"
             android:src="@drawable/ic_btn_media_previous" />
 
@@ -26,6 +27,7 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
+            android:padding="2dp"
             android:scaleType="centerInside"
             android:src="@drawable/ic_btn_media_play" />
 
@@ -34,6 +36,7 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
+            android:padding="2dp"
             android:scaleType="centerInside"
             android:src="@drawable/ic_btn_media_stop" />
 
@@ -42,8 +45,41 @@
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
+            android:padding="2dp"
             android:scaleType="centerInside"
             android:src="@drawable/ic_btn_media_next" />
+
+        <ImageView
+            android:id="@+id/btn_fakeDropdown"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:padding="2dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_btn_playlist" />
+
+        <ImageView
+            android:id="@+id/tv_playlistName"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:padding="2dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_btn_change_playlist_normal" />
+
+        <Spinner
+            android:id="@+id/playlistItem"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="#000" />
+
+        <Spinner
+            android:id="@+id/spinner_playlist"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="#000"
+            android:lines="1"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
     </LinearLayout>
 
     <RelativeLayout
