@@ -1,12 +1,17 @@
 package com.app.dlna.dmc.gui;
 
 import java.io.UnsupportedEncodingException;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.teleal.cling.model.meta.Device;
 import org.teleal.cling.model.types.UDN;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -51,6 +56,7 @@ import com.app.dlna.dmc.processor.localdevice.service.LocalContentDirectoryServi
 import com.app.dlna.dmc.processor.nfc.NFCUtils;
 import com.app.dlna.dmc.processor.receiver.SDCardReceiver;
 import com.app.dlna.dmc.processor.systemservice.RestartService;
+import com.app.dlna.dmc.processor.upnp.CoreUpnpService;
 
 public class MainActivity extends UpnpListenerTabActivity {
 	private static final String TAG = MainActivity.class.getName();
@@ -69,6 +75,16 @@ public class MainActivity extends UpnpListenerTabActivity {
 	private boolean m_waitToWriteTAG = false;
 	private RendererCompactView m_rendererCompactView;
 	private ImageView btn_toggleRendererView;
+	
+	private static final int SIZE = 2;
+	public ThreadPoolExecutor EXEC = new ThreadPoolExecutor(SIZE, SIZE, 8, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(),
+			new RejectedExecutionHandler() {
+
+				@Override
+				public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+					
+				}
+			});
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -125,8 +141,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 		@Override
 		public void onTabChanged(String tabId) {
 			setTabTextColor();
-//			if (m_rendererCompactView.isShown())
-//				hideRendererCompactView();
+			// if (m_rendererCompactView.isShown())
+			// hideRendererCompactView();
 		}
 	};
 
@@ -169,8 +185,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 				((NowPlayingActivity) activity).updateDMRControlView();
 				((NowPlayingActivity) activity).updateItemInfo();
 			}
-			MainActivity.UPNP_PROCESSOR.getDMRProcessor().setPlaylistProcessor(
-					MainActivity.UPNP_PROCESSOR.getPlaylistProcessor());
+			MainActivity.UPNP_PROCESSOR.getDMRProcessor()
+					.setPlaylistProcessor(MainActivity.UPNP_PROCESSOR.getPlaylistProcessor());
 		}
 
 		@Override
@@ -229,6 +245,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						MainActivity.this.finish();
+						((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE))
+								.cancel(CoreUpnpService.NOTIFICATION);
 					}
 				}).setCancelable(false).create().show();
 	}
@@ -273,8 +291,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 			public void run() {
 				if (m_routerProgressDialog != null)
 					m_routerProgressDialog.dismiss();
-				new AlertDialog.Builder(MainActivity.this).setTitle("Network error").setMessage(cause)
-						.setCancelable(false).setPositiveButton("OK", new OnClickListener() {
+				new AlertDialog.Builder(MainActivity.this).setTitle("Network error").setMessage(cause).setCancelable(false)
+						.setPositiveButton("OK", new OnClickListener() {
 
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
@@ -439,8 +457,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 					tv.setTag(i);
 					tv.setOnClickListener(customMenuItemClick);
 					tv.setTextSize(20);
-					tv.setBackgroundDrawable(MainActivity.this.getResources().getDrawable(
-							R.drawable.bg_actionbar_normal));
+					tv.setBackgroundDrawable(MainActivity.this.getResources().getDrawable(R.drawable.bg_view_with_bottom_line));
 					m_ll_menu.addView(tv);
 				}
 			}
@@ -464,8 +481,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 						String textEncoding = (buffer[0] & 0200) == 0 ? "UTF-8" : "UTF-16";
 						int languageCodeLength = buffer[0] & 0077;
 						try {
-							String text = new String(buffer, languageCodeLength + 1, buffer.length - languageCodeLength
-									- 1, textEncoding);
+							String text = new String(buffer, languageCodeLength + 1, buffer.length - languageCodeLength - 1,
+									textEncoding);
 							String deviceUDN = "";
 							if (text.startsWith("uuid:"))
 								deviceUDN = text.substring(5);
@@ -547,8 +564,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 			@Override
 			public void onAnimationEnd(Animation animation) {
 				if (btn_toggleRendererView != null)
-					btn_toggleRendererView
-							.setImageDrawable(getResources().getDrawable(R.drawable.ic_btn_navigate_down));
+					btn_toggleRendererView.setImageDrawable(getResources().getDrawable(R.drawable.ic_btn_navigate_down));
 			}
 		});
 		m_rendererCompactView.startAnimation(animation);

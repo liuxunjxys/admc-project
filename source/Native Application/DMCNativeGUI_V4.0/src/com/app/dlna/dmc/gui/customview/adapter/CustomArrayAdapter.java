@@ -240,6 +240,7 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 			} else if (object instanceof VideoItem) {
 				holder.icon.setImageResource(R.drawable.ic_didlobject_video);
 			} else if (object instanceof ImageItem) {
+				holder.icon.setImageResource(R.drawable.ic_didlobject_image);
 				Utility.loadImageItemThumbnail(holder.icon, object.getResources().get(0).getValue(),
 						Cache.getBitmapCache(), MAX_SIZE);
 			} else {
@@ -279,6 +280,7 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 			holder.icon.setImageResource(R.drawable.ic_didlobject_video);
 			break;
 		case IMAGE:
+			holder.icon.setImageResource(R.drawable.ic_didlobject_image);
 			Utility.loadImageItemThumbnail(holder.icon, object.getUrl(), Cache.getBitmapCache(), MAX_SIZE);
 			break;
 		default:

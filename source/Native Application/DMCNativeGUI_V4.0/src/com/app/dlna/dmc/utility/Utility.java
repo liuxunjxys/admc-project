@@ -78,55 +78,54 @@ public class Utility {
 		return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
 	}
 
-	public static void loadImageItemThumbnail(final ImageView image, final String imageUrl,
-			final Map<String, Bitmap> m_cacheImageItem, final int size) {
-		new Thread(new Runnable() {
+	public static void loadImageItemThumbnail(final ImageView image, final String imageUrl, final Map<String, Bitmap> cache,
+			final int size) {
+		image.setTag(imageUrl);
+		MainActivity.INSTANCE.EXEC.execute(new Runnable() {
 
 			@Override
 			public void run() {
 				try {
-					if (m_cacheImageItem == null) {
+					if (cache == null) {
 						final Bitmap bm = getBitmapFromURL(imageUrl, size);
 						MainActivity.INSTANCE.runOnUiThread(new Runnable() {
 
 							@Override
 							public void run() {
-								try {
-									image.setImageBitmap(bm);
-								} catch (Exception ex) {
-									ex.printStackTrace();
-								}
+								if (image.getTag() instanceof String && ((String) image.getTag()).equals(imageUrl))
+									try {
+										image.setImageBitmap(bm);
+									} catch (Exception ex) {
+										image.setImageResource(R.drawable.ic_didlobject_image);
+									}
 							}
 						});
 					} else {
-						if (m_cacheImageItem.containsKey(imageUrl)) {
+						if (cache.containsKey(imageUrl)) {
 							MainActivity.INSTANCE.runOnUiThread(new Runnable() {
 
 								@Override
 								public void run() {
 									try {
-										synchronized (m_cacheImageItem) {
-											image.setImageBitmap(m_cacheImageItem.get(imageUrl));
-										}
+										image.setImageBitmap(cache.get(imageUrl));
 									} catch (Exception ex) {
-										ex.printStackTrace();
+										image.setImageResource(R.drawable.ic_didlobject_image);
 									}
 								}
 							});
 						} else {
 							final Bitmap bm = getBitmapFromURL(imageUrl, size);
-							synchronized (m_cacheImageItem) {
-								m_cacheImageItem.put(imageUrl, bm);
-							}
+							cache.put(imageUrl, bm);
 							MainActivity.INSTANCE.runOnUiThread(new Runnable() {
 
 								@Override
 								public void run() {
-									try {
-										image.setImageBitmap(bm);
-									} catch (Exception ex) {
-										ex.printStackTrace();
-									}
+									if (image.getTag() instanceof String && ((String) image.getTag()).equals(imageUrl))
+										try {
+											image.setImageBitmap(bm);
+										} catch (Exception ex) {
+											image.setImageResource(R.drawable.ic_didlobject_image);
+										}
 								}
 							});
 						}
@@ -154,7 +153,7 @@ public class Utility {
 					e.printStackTrace();
 				}
 			}
-		}).start();
+		});
 	}
 
 	public static Bitmap getBitmapFromURL(final String imageUrl, int size) throws IOException, MalformedURLException {
@@ -171,7 +170,6 @@ public class Utility {
 
 		BitmapFactory.Options o2 = new BitmapFactory.Options();
 		o2.inSampleSize = scale;
-
 
 		return BitmapFactory.decodeByteArray(buffer, 0, buffer.length, o2);
 	}
