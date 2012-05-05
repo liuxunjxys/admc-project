@@ -371,6 +371,8 @@ public class RemoteDMRProcessorImpl implements DMRProcessor {
 		synchronized (m_listeners) {
 			m_listeners.clear();
 		}
+		// TODO: must check preferent here
+		stop();
 	}
 
 	public void seek(String position) {

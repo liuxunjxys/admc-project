@@ -13,6 +13,7 @@ import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import app.dlna.controller.v4.R;
 
@@ -42,6 +43,7 @@ public class NowPlayingActivity extends Activity implements Callback {
 	private SurfaceHolder m_holder;
 	private ImageView m_image;
 	private TextView m_title;
+	private LinearLayout m_content;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +65,8 @@ public class NowPlayingActivity extends Activity implements Callback {
 		m_holder.addCallback(this);
 		m_holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		m_title = (TextView) findViewById(R.id.title);
+		m_content = (LinearLayout) findViewById(R.id.content);
+		// MainActivity.INSTANCE.hideRendererCompactView();
 	}
 
 	private PlaylistListener m_playlistListener = new PlaylistListener() {
@@ -229,6 +233,7 @@ public class NowPlayingActivity extends Activity implements Callback {
 
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+		Log.i(TAG, "widht = " + width + ", height = " + height);
 		updateSurfaceView();
 	}
 
@@ -249,6 +254,7 @@ public class NowPlayingActivity extends Activity implements Callback {
 				LocalDMRProcessorImpl localDMR = (LocalDMRProcessorImpl) MainActivity.UPNP_PROCESSOR.getDMRProcessor();
 				if (m_surface.getVisibility() == View.VISIBLE) {
 					localDMR.getPlayer().setDisplay(m_holder);
+					localDMR.getPlayer().setSufaceDimension(m_content.getWidth(), m_content.getHeight());
 				} else {
 					localDMR.getPlayer().setDisplay(null);
 				}

@@ -44,30 +44,30 @@
         android:layout_centerHorizontal="true"
         android:paddingLeft="5dp"
         android:paddingRight="5dp" >
-    </ViewFlipper>
-    -->
+    </ViewFlipper>    -->
 
-    <ImageView
-        android:id="@+id/image"
+    <LinearLayout
+        android:id="@+id/content"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_above="@id/rendererControlView"
         android:layout_below="@id/title"
         android:layout_centerHorizontal="true"
         android:paddingLeft="5dp"
-        android:paddingRight="5dp"
-        android:scaleType="centerInside" >
-    </ImageView>
+        android:paddingRight="5dp" android:gravity="center">
 
-    <SurfaceView
-        android:id="@+id/surface"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_above="@id/rendererControlView"
-        android:layout_below="@id/title"
-        android:layout_centerHorizontal="true"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp" >
-    </SurfaceView>
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:scaleType="centerInside" >
+        </ImageView>
+
+        <SurfaceView
+            android:id="@+id/surface"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+        </SurfaceView>
+    </LinearLayout>
 
 </RelativeLayout>

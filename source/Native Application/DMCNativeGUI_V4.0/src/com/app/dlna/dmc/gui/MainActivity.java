@@ -68,6 +68,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 	private String[][] m_techLists;
 	private boolean m_waitToWriteTAG = false;
 	private RendererCompactView m_rendererCompactView;
+	private ImageView btn_toggleRendererView;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -124,6 +125,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 		@Override
 		public void onTabChanged(String tabId) {
 			setTabTextColor();
+//			if (m_rendererCompactView.isShown())
+//				hideRendererCompactView();
 		}
 	};
 
@@ -153,6 +156,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 		m_rendererCompactView = (RendererCompactView) findViewById(R.id.cv_compact_dmr);
 		m_rendererCompactView.initComponent();
 		m_rendererCompactView.setOnDMRChangeListener(m_onDMRChanged);
+		btn_toggleRendererView = (ImageView) findViewById(R.id.btn_toggleShowHide);
 	}
 
 	private OnDMRChangeListener m_onDMRChanged = new OnDMRChangeListener() {
@@ -542,6 +546,9 @@ public class MainActivity extends UpnpListenerTabActivity {
 
 			@Override
 			public void onAnimationEnd(Animation animation) {
+				if (btn_toggleRendererView != null)
+					btn_toggleRendererView
+							.setImageDrawable(getResources().getDrawable(R.drawable.ic_btn_navigate_down));
 			}
 		});
 		m_rendererCompactView.startAnimation(animation);
@@ -564,6 +571,8 @@ public class MainActivity extends UpnpListenerTabActivity {
 			@Override
 			public void onAnimationEnd(Animation animation) {
 				m_rendererCompactView.setVisibility(View.GONE);
+				if (btn_toggleRendererView != null)
+					btn_toggleRendererView.setImageDrawable(getResources().getDrawable(R.drawable.ic_btn_navigate_up));
 			}
 		});
 		m_rendererCompactView.startAnimation(animation);
@@ -574,12 +583,9 @@ public class MainActivity extends UpnpListenerTabActivity {
 	}
 
 	public void onShowHideClick(View view) {
-		if (isCompactRendererShowing()) {
+		if (isCompactRendererShowing())
 			hideRendererCompactView();
-			((ImageView) view).setImageDrawable(getResources().getDrawable(R.drawable.ic_btn_navigate_up));
-		} else {
+		else
 			showRendererCompactView();
-			((ImageView) view).setImageDrawable(getResources().getDrawable(R.drawable.ic_btn_navigate_down));
-		}
 	}
 }

@@ -12,6 +12,7 @@ import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.util.Log;
 
+import com.app.dlna.dmc.gui.customview.nowplaying.LocalMediaPlayer;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
@@ -20,7 +21,7 @@ import com.app.dlna.dmc.processor.playlist.PlaylistItem.Type;
 public class LocalDMRProcessorImpl implements DMRProcessor {
 	private static final int SLEEP_INTERVAL = 1000;
 	private List<DMRProcessorListner> m_listeners;
-	private MediaPlayer m_player;
+	private LocalMediaPlayer m_player;
 	private PlaylistItem m_currentItem;
 	private PlaylistProcessor m_playlistProcessor;
 	private AudioManager m_audioManager;
@@ -69,7 +70,7 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 	public LocalDMRProcessorImpl(Context context) {
 		m_listeners = new ArrayList<DMRProcessor.DMRProcessorListner>();
 		m_currentItem = new PlaylistItem();
-		m_player = new MediaPlayer();
+		m_player = new LocalMediaPlayer();
 		m_player.setOnPreparedListener(m_preparedListener);
 		m_player.setOnCompletionListener(m_completeListener);
 		m_player.setOnErrorListener(m_onErrorListener);
@@ -108,6 +109,7 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 
 		@Override
 		public void onPrepared(MediaPlayer mp) {
+			((LocalMediaPlayer) mp).scaleContent();
 			mp.start();
 			m_currentState = STATE_PLAYING;
 		}
@@ -278,7 +280,7 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 		}
 	}
 
-	public MediaPlayer getPlayer() {
+	public LocalMediaPlayer getPlayer() {
 		return m_player;
 	}
 
