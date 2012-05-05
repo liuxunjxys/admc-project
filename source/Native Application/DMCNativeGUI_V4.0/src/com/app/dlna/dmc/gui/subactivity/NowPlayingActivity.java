@@ -13,6 +13,7 @@ import android.view.SurfaceHolder.Callback;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -69,9 +70,14 @@ public class NowPlayingActivity extends Activity implements Callback {
 		m_content = (LinearLayout) findViewById(R.id.content);
 
 		m_animFlipInNext = AnimationUtils.loadAnimation(this, R.anim.flipinnext);
+		m_animFlipInNext.setAnimationListener(m_animationListner);
 		m_animFlipOutNext = AnimationUtils.loadAnimation(this, R.anim.flipoutnext);
+		m_animFlipOutNext.setAnimationListener(m_animationListner);
 		m_animFlipInPrevious = AnimationUtils.loadAnimation(this, R.anim.flipinprevious);
+		m_animFlipInPrevious.setAnimationListener(m_animationListner);
 		m_animFlipOutPrevious = AnimationUtils.loadAnimation(this, R.anim.flipoutprevious);
+		m_animFlipOutPrevious.setAnimationListener(m_animationListner);
+
 		m_viewFlipper = (ViewFlipper) findViewById(R.id.viewFlipper);
 		m_viewFlipper.setOnTouchListener(m_swipeDetector);
 		m_viewFlipper.addView(getLayoutInflater().inflate(R.layout.cv_tv_title, null));
@@ -110,6 +116,25 @@ public class NowPlayingActivity extends Activity implements Callback {
 
 		}
 	};
+
+	private AnimationListener m_animationListner = new AnimationListener() {
+
+		@Override
+		public void onAnimationStart(Animation animation) {
+		}
+
+		@Override
+		public void onAnimationRepeat(Animation animation) {
+
+		}
+
+		@Override
+		public void onAnimationEnd(Animation animation) {
+			PlaylistItem item = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getCurrentItem();
+			if (item != null)
+				((TextView) m_viewFlipper.getCurrentView()).setText(item.getTitle());
+		}
+	};
 	private SwipeDetector m_swipeDetector;
 
 	public void doNext() {
@@ -126,7 +151,7 @@ public class NowPlayingActivity extends Activity implements Callback {
 		PlaylistItem item = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getCurrentItem();
 		if (item == null)
 			return;
-		((TextView)m_viewFlipper.getCurrentView()).setText(item.getTitle());
+		((TextView) m_viewFlipper.getCurrentView()).setText(item.getTitle());
 		switch (item.getType()) {
 		case AUDIO: {
 			m_image.setVisibility(View.VISIBLE);

@@ -6,10 +6,11 @@
         android:duration="@string/anim_duration"
         android:fromXDelta="-100%"
         android:toXDelta="0%" />
-
+    <!--
     <alpha
         android:duration="@string/anim_duration"
         android:fromAlpha="0"
-        android:toAlpha="1" />
+        android:toAlpha="1" />
+    -->
 
 </set>
