@@ -23,7 +23,6 @@ import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.customview.nowplaying.RendererControlView;
-import com.app.dlna.dmc.gui.customview.nowplaying.TopToolbarView;
 import com.app.dlna.dmc.processor.async.AsyncTaskWithProgressDialog;
 import com.app.dlna.dmc.processor.impl.LocalDMRProcessorImpl;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
@@ -35,14 +34,12 @@ import com.app.dlna.dmc.utility.Utility;
 public class NowPlayingActivity extends Activity implements Callback {
 	protected String TAG = NowPlayingActivity.class.getName();
 	private RendererControlView m_rendererControl;
-	private TopToolbarView m_topToolbar;
 	private ViewFlipper m_viewFlipper;
 	private ProgressDialog m_progressDialog;
 	private Animation m_animFlipInNext;
 	private Animation m_animFlipOutNext;
 	private Animation m_animFlipInPrevious;
 	private Animation m_animFlipOutPrevious;
-	// private boolean m_waiting;
 	private SurfaceView m_surface;
 	private SurfaceHolder m_holder;
 	private ImageView m_image;
@@ -53,7 +50,6 @@ public class NowPlayingActivity extends Activity implements Callback {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_nowplaying);
 		m_rendererControl = (RendererControlView) findViewById(R.id.rendererControlView);
-		m_topToolbar = (TopToolbarView) findViewById(R.id.topToolbar);
 
 		m_progressDialog = new ProgressDialog(NowPlayingActivity.this);
 		m_progressDialog.setTitle("Loading image");
@@ -214,7 +210,7 @@ public class NowPlayingActivity extends Activity implements Callback {
 		if (dmrProcessor != null) {
 			dmrProcessor.setURIandPlay(item);
 		}
-		m_topToolbar.setCurrentSpinnerSelected(item);
+		m_rendererControl.setCurrentSpinnerSelected(item);
 		updateSurfaceView();
 	}
 
@@ -233,7 +229,7 @@ public class NowPlayingActivity extends Activity implements Callback {
 		m_rendererControl.connectToDMR();
 		updatePlaylist();
 		updateItemInfo();
-		m_topToolbar.updateToolbar();
+		m_rendererControl.updateToolbar();
 	}
 
 	public void updatePlaylist() {

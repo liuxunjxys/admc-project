@@ -3,20 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <com.app.dlna.dmc.gui.customview.nowplaying.TopToolbarView
-        android:id="@+id/topToolbar"
-        android:layout_width="fill_parent"
-        android:layout_height="48dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_margin="5dp" >
-    </com.app.dlna.dmc.gui.customview.nowplaying.TopToolbarView>
 
     <ViewFlipper
         android:id="@+id/viewFlipper"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/topToolbar"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:gravity="center"
         android:lines="1" />
