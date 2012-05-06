@@ -176,6 +176,11 @@ public class PlaylistView extends DMRListenerView {
 	}
 
 	public PlaylistProcessor getCurrentPlaylistProcessor() {
+		if (m_currentPlaylist == null) {
+			Playlist unsaved = new Playlist();
+			unsaved.setId(1);
+			m_currentPlaylist = PlaylistManager.getPlaylistProcessor(unsaved);
+		}
 		return m_currentPlaylist;
 	}
 }
