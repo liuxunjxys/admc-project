@@ -7,19 +7,20 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.view.inputmethod.InputMethodManager;
 import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.customview.library.HomeNetworkView;
 import com.app.dlna.dmc.gui.customview.playlist.PlaylistView;
+import com.app.dlna.dmc.gui.customview.youtube.YoutubeView;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 
 public class LibraryActivity extends Activity {
 	protected static final String TAG = LibraryActivity.class.getName();
 	private ViewPager m_pager;
 	private HomeNetworkView m_homeNetworkView;
-	private View m_internet;
+	private YoutubeView m_youtubeView;
 	private PlaylistView m_playlistView;
 	private String[] m_pagerTitle;
 
@@ -28,7 +29,7 @@ public class LibraryActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		m_homeNetworkView = new HomeNetworkView(this);
-		m_internet = new LinearLayout(this);
+		m_youtubeView = new YoutubeView(this);
 		m_playlistView = new PlaylistView(this);
 
 		setContentView(R.layout.activity_library);
@@ -68,6 +69,8 @@ public class LibraryActivity extends Activity {
 
 		@Override
 		public void onPageScrollStateChanged(int state) {
+			((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(m_youtubeView.getWindowToken(),
+					0);
 			if (state == 0)
 				switch (m_pager.getCurrentItem()) {
 				case 0:
@@ -102,8 +105,8 @@ public class LibraryActivity extends Activity {
 				m_playlistView.backToListPlaylist();
 				return m_playlistView;
 			} else if (position == 2) {
-				((ViewPager) container).addView(m_internet);
-				return m_internet;
+				((ViewPager) container).addView(m_youtubeView);
+				return m_youtubeView;
 			}
 			return null;
 		}
