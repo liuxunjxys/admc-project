@@ -75,7 +75,7 @@ public class PlaylistToolbar extends LinearLayout {
 
 				@Override
 				protected Void doInBackground(Void... params) {
-					PlaylistManager.clearPlaylist(MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getData().getId());
+					PlaylistManager.clearPlaylist(m_playlistView.getCurrentPlaylistProcessor().getData().getId());
 					return null;
 				}
 
@@ -91,8 +91,8 @@ public class PlaylistToolbar extends LinearLayout {
 
 		@Override
 		public void onClick(View v) {
-			PlaylistProcessor processor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
-			if (processor.getData().getId() != -1) {
+			PlaylistProcessor processor = m_playlistView.getCurrentPlaylistProcessor();
+			if (processor.getData().getId() != 1) {
 				confirmDelete();
 			}
 		}
@@ -138,7 +138,7 @@ public class PlaylistToolbar extends LinearLayout {
 	}
 
 	private void confirmDelete() {
-		final PlaylistProcessor processor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
+		final PlaylistProcessor processor = m_playlistView.getCurrentPlaylistProcessor();
 		AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
 		alert.setTitle("Confirm Delete");
 		alert.setMessage("Are you sure to delete \"" + processor.getData().getName() + "\"?");
@@ -183,7 +183,7 @@ public class PlaylistToolbar extends LinearLayout {
 			break;
 		case PlaylistView.VM_DETAILS:
 			this.setVisibility(View.VISIBLE);
-			PlaylistProcessor processor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
+			PlaylistProcessor processor = m_playlistView.getCurrentPlaylistProcessor();
 			if (processor.getData().getId() == 1) {
 				// Unsaved playlist
 				m_btn_remove.setVisibility(View.GONE);

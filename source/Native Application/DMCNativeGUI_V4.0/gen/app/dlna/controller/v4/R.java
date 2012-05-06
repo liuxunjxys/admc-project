@@ -154,7 +154,7 @@ public final class R {
         public static final int ic_volume=0x7f02006a;
     }
     public static final class id {
-        public static final int action=0x7f0b0035;
+        public static final int action=0x7f0b0034;
         public static final int botToolbar=0x7f0b000c;
         public static final int btn_back=0x7f0b0011;
         public static final int btn_clear=0x7f0b0022;
@@ -176,7 +176,7 @@ public final class R {
         public static final int content=0x7f0b0009;
         public static final int contentName=0x7f0b0030;
         public static final int cv_compact_dmr=0x7f0b0003;
-        public static final int desc=0x7f0b0034;
+        public static final int desc=0x7f0b0035;
         public static final int deviceName=0x7f0b0025;
         public static final int deviceType=0x7f0b0027;
         public static final int deviceUDN=0x7f0b0029;

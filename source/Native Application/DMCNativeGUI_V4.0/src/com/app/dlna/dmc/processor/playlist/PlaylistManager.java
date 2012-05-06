@@ -30,8 +30,7 @@ public class PlaylistManager {
 					Playlist playlist = new Playlist();
 					playlist.setId(id);
 					playlist.setName(name);
-					playlist.setCurrentIdx(cursor.getInt(cursor
-							.getColumnIndex(PlaylistSQLiteHelper.COL_CURRENT_POSITION)));
+					playlist.setCurrentIdx(cursor.getInt(cursor.getColumnIndex(PlaylistSQLiteHelper.COL_CURRENT_POSITION)));
 					result.add(playlist);
 
 				} while (cursor.moveToNext());
@@ -87,8 +86,13 @@ public class PlaylistManager {
 			values.put(PlaylistSQLiteHelper.COL_URL, playlistItem.getUrl());
 			values.put(PlaylistSQLiteHelper.COL_TYPE, playlistItem.getType().toString());
 			values.put(PlaylistSQLiteHelper.COL_PLAYLIST_ID, playlist_id);
-			return null != MainActivity.INSTANCE.getContentResolver()
-					.insert(PlaylistProvider.PLAYLIST_ITEM_URI, values);
+			ContentResolver contentResolver = MainActivity.INSTANCE.getContentResolver();
+			Uri uri = contentResolver.insert(PlaylistProvider.PLAYLIST_ITEM_URI, values);
+			if (uri == null)
+				return false;
+			String newId = uri.getQueryParameter("newid");
+			playlistItem.setId(Long.valueOf(newId));
+			return true;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			return false;
@@ -106,8 +110,8 @@ public class PlaylistManager {
 				String newId = uri.getQueryParameter("newid");
 				ContentValues updateValues = new ContentValues();
 				updateValues.put(PlaylistSQLiteHelper.COL_PLAYLIST_ID, newId);
-				resolver.update(PlaylistProvider.PLAYLIST_ITEM_URI, updateValues, PlaylistSQLiteHelper.COL_PLAYLIST_ID
-						+ " = ?", new String[] { "1" });
+				resolver.update(PlaylistProvider.PLAYLIST_ITEM_URI, updateValues, PlaylistSQLiteHelper.COL_PLAYLIST_ID + " = ?",
+						new String[] { "1" });
 				return true;
 			}
 			return false;
