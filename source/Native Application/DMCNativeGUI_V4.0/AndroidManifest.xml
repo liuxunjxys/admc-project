@@ -40,7 +40,7 @@
         <activity
             android:name="com.app.dlna.dmc.gui.subactivity.NowPlayingActivity"
             android:label="@string/app_name"
-            android:windowSoftInputMode="adjustPan" >
+            android:windowSoftInputMode="stateHidden" >
         </activity>
 
         <service

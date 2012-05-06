@@ -38,6 +38,7 @@ import com.app.dlna.dmc.processor.cache.Cache;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.playlist.Playlist;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
+import com.app.dlna.dmc.processor.youtube.YoutubeItem;
 import com.app.dlna.dmc.utility.Utility;
 
 public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
@@ -62,37 +63,6 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 			BM_AUDIO = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_didlobject_audio);
 		if (BM_UNKNOW == null)
 			BM_UNKNOW = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_didlobject_unknow);
-	}
-
-	@SuppressWarnings("rawtypes")
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-		if (convertView == null || convertView instanceof ProgressBar) {
-			convertView = m_inflater.inflate(R.layout.lvitem_generic_item, null, false);
-		}
-		if (convertView.getTag() == null) {
-			setViewHolder(convertView);
-		}
-		final AdapterItem object = getItem(position);
-
-		final ViewHolder holder = (ViewHolder) convertView.getTag();
-		holder.action.setTag(new Integer(position));
-		if (object.getData() instanceof Device)
-			initDeviceItem((Device) object.getData(), holder);
-		else if (object.getData() instanceof DIDLObject) {
-			DIDLObject didlObject = (DIDLObject) object.getData();
-			if (didlObject.getId().equals("-1")) {
-				return m_inflater.inflate(R.layout.lvitem_loadmoreitem, null);
-			} else {
-				initDIDLObject(didlObject, holder);
-			}
-		} else if (object.getData() instanceof PlaylistItem) {
-			initPlaylistItem((PlaylistItem) object.getData(), holder, position, true);
-		} else if (object.getData() instanceof Playlist) {
-			initPlaylist((Playlist) object.getData(), holder, position);
-		}
-
-		return convertView;
 	}
 
 	@Override
@@ -138,6 +108,56 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 
 		convertView.setBackgroundDrawable(null);
 		return convertView;
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
+		if (convertView == null || convertView instanceof ProgressBar) {
+			convertView = m_inflater.inflate(R.layout.lvitem_generic_item, null, false);
+		}
+		if (convertView.getTag() == null) {
+			setViewHolder(convertView);
+		}
+		final AdapterItem object = getItem(position);
+
+		final ViewHolder holder = (ViewHolder) convertView.getTag();
+		holder.action.setTag(new Integer(position));
+		if (object.getData() instanceof Device)
+			initDeviceItem((Device) object.getData(), holder);
+		else if (object.getData() instanceof DIDLObject) {
+			DIDLObject didlObject = (DIDLObject) object.getData();
+			if (didlObject.getId().equals("-1")) {
+				return m_inflater.inflate(R.layout.lvitem_loadmoreitem, null);
+			} else {
+				initDIDLObject(didlObject, holder);
+			}
+		} else if (object.getData() instanceof PlaylistItem) {
+			initPlaylistItem((PlaylistItem) object.getData(), holder, position, true);
+		} else if (object.getData() instanceof Playlist) {
+			initPlaylist((Playlist) object.getData(), holder, position);
+		} else if (object.getData() instanceof YoutubeItem) {
+			initYoutubeItem((YoutubeItem) object.getData(), holder);
+		}
+
+		return convertView;
+	}
+
+	private void initYoutubeItem(YoutubeItem data, ViewHolder holder) {
+		holder.name.setText(data.getTitle());
+		holder.desc.setText(data.getDuration());
+		holder.playing.setVisibility(View.GONE);
+		holder.action.setVisibility(View.GONE);
+		HashMap<String, Bitmap> cache = Cache.getBitmapCache();
+		String imageUrl = data.getThumbnail();
+		holder.icon.setTag(imageUrl);
+		if (cache.containsKey(imageUrl) && cache.get(imageUrl) != null) {
+			holder.icon.setImageBitmap(cache.get(imageUrl));
+		} else {
+			holder.icon.setImageBitmap(BM_VIDEO);
+			cache.put(imageUrl, BM_VIDEO);
+			Utility.loadImageItemThumbnail(holder.icon, imageUrl, Cache.getBitmapCache(), MAX_SIZE);
+		}
 	}
 
 	private void initPlaylist(Playlist data, ViewHolder holder, int position) {

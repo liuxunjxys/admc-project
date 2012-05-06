@@ -9,9 +9,9 @@
     </item>
     <item android:bottom="1dp">
         <shape android:shape="rectangle" >
-            <stroke android:color="@color/custom_menu_background" />
+            <stroke android:color="#000000" />
 
-            <solid android:color="@color/custom_menu_background" />
+            <solid android:color="#000000" />
         </shape>
     </item>
 
