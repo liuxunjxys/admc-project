@@ -33,6 +33,7 @@ import com.app.dlna.dmc.gui.customview.adapter.CustomArrayAdapter;
 import com.app.dlna.dmc.gui.customview.listener.DMRListenerView;
 import com.app.dlna.dmc.gui.dialog.DeviceDetailsDialog;
 import com.app.dlna.dmc.gui.dialog.DeviceDetailsDialog.DeviceDetailsListener;
+import com.app.dlna.dmc.gui.subactivity.LibraryActivity;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMSProcessor.DMSProcessorListner;
@@ -177,23 +178,25 @@ public class HomeNetworkView extends DMRListenerView {
 	}
 
 	private void addToPlaylistAndPlay(DIDLObject object) {
-		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
-		DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
-		PlaylistItem added = playlistProcessor.addDIDLObject(object);
-		if (added != null) {
-			m_adapter.notifyVisibleItemChanged(m_listView);
-			Toast.makeText(getContext(), "Added item to playlist", Toast.LENGTH_SHORT).show();
-			playlistProcessor.setCurrentItem(added);
-			dmrProcessor.setURIandPlay(playlistProcessor.getCurrentItem());
-		} else {
-			if (playlistProcessor.isFull()) {
-				Toast.makeText(getContext(), "Current playlist is full", Toast.LENGTH_SHORT).show();
-				// dmrProcessor.setURIandPlay(object.getResources().get(0).getValue());
+		if (getContext() instanceof LibraryActivity) {
+			LibraryActivity activity = (LibraryActivity) getContext();
+			PlaylistProcessor playlistProcessor = activity.getPlaylistView().getCurrentPlaylistProcessor();
+			DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
+			PlaylistItem added = playlistProcessor.addDIDLObject(object);
+			if (added != null) {
+				m_adapter.notifyVisibleItemChanged(m_listView);
+				Toast.makeText(getContext(), "Added item to playlist", Toast.LENGTH_SHORT).show();
+				playlistProcessor.setCurrentItem(added);
+				dmrProcessor.setURIandPlay(playlistProcessor.getCurrentItem());
 			} else {
-				Toast.makeText(getContext(), "An error occurs, try again later", Toast.LENGTH_SHORT).show();
+				if (playlistProcessor.isFull()) {
+					Toast.makeText(getContext(), "Current playlist is full", Toast.LENGTH_SHORT).show();
+					// dmrProcessor.setURIandPlay(object.getResources().get(0).getValue());
+				} else {
+					Toast.makeText(getContext(), "An error occurs, try again later", Toast.LENGTH_SHORT).show();
+				}
 			}
 		}
-
 	}
 
 	private DMSProcessorListner m_browseListener = new DMSProcessorListner() {

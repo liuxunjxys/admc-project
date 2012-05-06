@@ -140,7 +140,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 
 		@Override
 		public void onTabChanged(String tabId) {
-			setTabTextColor();
+			updateTab();
 			// if (m_rendererCompactView.isShown())
 			// hideRendererCompactView();
 		}
@@ -224,14 +224,14 @@ public class MainActivity extends UpnpListenerTabActivity {
 		m_tabHost.setCurrentTab(DEFAULT_TAB_INDEX);
 		m_tabHost.setOnTabChangedListener(changeListener);
 		m_tabHost.refreshDrawableState();
-		setTabTextColor();
+		updateTab();
 	}
 
-	private void setTabTextColor() {
+	private void updateTab() {
 		for (int i = 0; i < m_tabHost.getTabWidget().getChildCount(); ++i) {
 			View view = m_tabHost.getTabWidget().getChildAt(i);
 			if (view instanceof TextView)
-				((TextView) view).setTextColor(getResources().getColor(R.color.blue));
+				((TextView) view).setTextColor(getResources().getColor(android.R.color.white));
 		}
 	}
 

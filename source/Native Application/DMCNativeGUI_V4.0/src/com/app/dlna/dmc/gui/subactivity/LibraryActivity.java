@@ -124,4 +124,8 @@ public class LibraryActivity extends Activity {
 		}
 	};
 
+	public PlaylistView getPlaylistView() {
+		return m_playlistView;
+	}
+
 }

@@ -29,9 +29,11 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
+import com.app.dlna.dmc.gui.subactivity.LibraryActivity;
 import com.app.dlna.dmc.processor.cache.Cache;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.playlist.Playlist;
@@ -275,12 +277,16 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 			}
 			if (object instanceof Item) {
 				holder.action.setVisibility(View.VISIBLE);
-
-				if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().containsUrl(objectUrl)) {
-					holder.action.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_remove));
-				} else {
-					holder.action.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_add));
+				if (getContext() instanceof LibraryActivity) {
+					LibraryActivity activity = (LibraryActivity) getContext();
+					PlaylistProcessor playlistProcessor = activity.getPlaylistView().getCurrentPlaylistProcessor();
+					if (playlistProcessor.containsUrl(objectUrl)) {
+						holder.action.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_remove));
+					} else {
+						holder.action.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_add));
+					}
 				}
+
 				if (objectUrl.equals(MainActivity.UPNP_PROCESSOR.getDMRProcessor().getCurrentTrackURI())) {
 					holder.playing.setVisibility(View.VISIBLE);
 				} else {
@@ -396,21 +402,27 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 				return;
 			int position = (Integer) v.getTag();
 			Object item = getItem(position).getData();
-			PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
-			if (playlistProcessor != null)
-				if (item instanceof PlaylistItem) {
-					playlistProcessor.removeItem((PlaylistItem) item);
-					remove(getItem(position));
-				} else if (item instanceof DIDLObject) {
-					final DIDLObject object = (DIDLObject) item;
-					if (playlistProcessor.containsUrl(object.getResources().get(0).getValue())) {
-						if (playlistProcessor.removeDIDLObject(object) != null)
-							updateSingleView(v, position);
-					} else {
-						if (playlistProcessor.addDIDLObject(object) != null)
-							updateSingleView(v, position);
+			if (getContext() instanceof LibraryActivity) {
+				LibraryActivity activity = (LibraryActivity) getContext();
+				PlaylistProcessor playlistProcessor = activity.getPlaylistView().getCurrentPlaylistProcessor();
+				if (playlistProcessor != null) {
+					if (item instanceof PlaylistItem) {
+						playlistProcessor.removeItem((PlaylistItem) item);
+						remove(getItem(position));
+					} else if (item instanceof DIDLObject) {
+						final DIDLObject object = (DIDLObject) item;
+						if (playlistProcessor.containsUrl(object.getResources().get(0).getValue())) {
+							if (playlistProcessor.removeDIDLObject(object) != null)
+								updateSingleView(v, position);
+						} else {
+							if (playlistProcessor.addDIDLObject(object) != null)
+								updateSingleView(v, position);
+						}
 					}
+				} else {
+					Toast.makeText(getContext(), "Please chose a playlist to add", Toast.LENGTH_SHORT).show();
 				}
+			}
 
 		}
 	};
