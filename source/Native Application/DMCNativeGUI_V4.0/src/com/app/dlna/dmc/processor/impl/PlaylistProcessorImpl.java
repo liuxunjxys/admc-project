@@ -127,8 +127,8 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 				return null;
 			if (m_playlistItems.contains(item))
 				return item;
-			m_playlistItems.add(item);
 			PlaylistManager.createPlaylistItem(item, m_data.getId());
+			m_playlistItems.add(item);
 			if (m_playlistItems.size() == 1) {
 				m_currentItemIdx = 0;
 			}
@@ -141,9 +141,9 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 		synchronized (m_playlistItems) {
 			int itemIdx = -1;
 			if ((itemIdx = m_playlistItems.indexOf(item)) >= 0) {
-				m_playlistItems.remove(item);
-				long id = item.getId();
+				long id = m_playlistItems.get(itemIdx).getId();
 				PlaylistManager.deletePlaylistItem(id);
+				m_playlistItems.remove(item);
 				DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
 				if (dmrProcessor != null && dmrProcessor.getCurrentTrackURI().equals(item.getUrl())) {
 					dmrProcessor.stop();

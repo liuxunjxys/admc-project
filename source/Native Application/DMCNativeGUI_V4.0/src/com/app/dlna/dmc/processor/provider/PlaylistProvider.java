@@ -36,8 +36,10 @@ public class PlaylistProvider extends ContentProvider {
 			return deleted;
 		}
 		case PLAYLIST_ITEM: {
+			Log.i(TAG,"Delete item, id = " + selectionArgs[0]);
 			SQLiteDatabase database = dbPlaylistHelper.getWritableDatabase();
 			int deleted = database.delete(PlaylistSQLiteHelper.TABLE_PLAYLIST_ITEMS, selection, selectionArgs);
+			Log.i(TAG, "Delete item count = " + deleted);
 			database.close();
 			return deleted;
 		}

@@ -15,7 +15,9 @@ import org.apache.commons.io.IOUtils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
@@ -80,56 +82,41 @@ public class Utility {
 
 	public static void loadImageItemThumbnail(final ImageView image, final String imageUrl, final Map<String, Bitmap> cache,
 			final int size) {
-		image.setTag(imageUrl);
 		MainActivity.INSTANCE.EXEC.execute(new Runnable() {
 
 			@Override
 			public void run() {
 				try {
-					if (cache == null) {
-						final Bitmap bm = getBitmapFromURL(imageUrl, size);
-						MainActivity.INSTANCE.runOnUiThread(new Runnable() {
+					final Bitmap bm = getBitmapFromURL(imageUrl, size);
+					cache.put(imageUrl, bm);
+					MainActivity.INSTANCE.runOnUiThread(new Runnable() {
 
-							@Override
-							public void run() {
-								if (image.getTag() instanceof String && ((String) image.getTag()).equals(imageUrl))
-									try {
-										image.setImageBitmap(bm);
-									} catch (Exception ex) {
-										image.setImageResource(R.drawable.ic_didlobject_image);
+						@SuppressWarnings("rawtypes")
+						@Override
+						public void run() {
+							if (image.getTag() instanceof String && ((String) image.getTag()).equals(imageUrl))
+								try {
+									image.setImageBitmap(bm);
+									if (image.getParent().getParent() instanceof ListView) {
+										ListView list = (ListView) image.getParent().getParent();
+										((ArrayAdapter) list.getAdapter()).notifyDataSetChanged();
 									}
-							}
-						});
-					} else {
-						if (cache.containsKey(imageUrl)) {
-							MainActivity.INSTANCE.runOnUiThread(new Runnable() {
-
-								@Override
-								public void run() {
-									try {
-										image.setImageBitmap(cache.get(imageUrl));
-									} catch (Exception ex) {
-										image.setImageResource(R.drawable.ic_didlobject_image);
-									}
+								} catch (Exception ex) {
+									image.setImageResource(R.drawable.ic_didlobject_image);
 								}
-							});
-						} else {
-							final Bitmap bm = getBitmapFromURL(imageUrl, size);
-							cache.put(imageUrl, bm);
-							MainActivity.INSTANCE.runOnUiThread(new Runnable() {
-
-								@Override
-								public void run() {
-									if (image.getTag() instanceof String && ((String) image.getTag()).equals(imageUrl))
-										try {
-											image.setImageBitmap(bm);
-										} catch (Exception ex) {
-											image.setImageResource(R.drawable.ic_didlobject_image);
-										}
-								}
-							});
 						}
-					}
+					});
+					// MainActivity.INSTANCE.runOnUiThread(new Runnable() {
+					//
+					// @Override
+					// public void run() {
+					// if (image.getParent().getParent() instanceof ListView) {
+					// ListView list = (ListView) image.getParent().getParent();
+					// ((ArrayAdapter)
+					// list.getAdapter()).notifyDataSetChanged();
+					// }
+					// }
+					// });
 
 				} catch (MalformedURLException e) {
 					MainActivity.INSTANCE.runOnUiThread(new Runnable() {
