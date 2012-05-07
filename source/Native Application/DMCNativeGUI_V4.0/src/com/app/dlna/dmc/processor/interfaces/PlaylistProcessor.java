@@ -6,6 +6,7 @@ import org.teleal.cling.support.model.DIDLObject;
 
 import com.app.dlna.dmc.processor.playlist.Playlist;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
+import com.app.dlna.dmc.processor.youtube.YoutubeItem;
 
 public interface PlaylistProcessor {
 	void next();
@@ -53,5 +54,7 @@ public interface PlaylistProcessor {
 	void saveState();
 
 	int getCurrentItemIndex();
+
+	PlaylistItem addYoutubeItem(YoutubeItem result);
 
 }

@@ -14,6 +14,7 @@ import com.app.dlna.dmc.processor.playlist.Playlist;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem.Type;
 import com.app.dlna.dmc.processor.playlist.PlaylistManager;
+import com.app.dlna.dmc.processor.youtube.YoutubeItem;
 
 public class PlaylistProcessorImpl implements PlaylistProcessor {
 	private List<PlaylistItem> m_playlistItems;
@@ -48,7 +49,7 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 
 	@Override
 	public boolean isFull() {
-		return m_playlistItems.size() >= m_maxSize ? true : false;
+		return m_playlistItems.size() >= m_maxSize;
 	}
 
 	@Override
@@ -223,6 +224,19 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 	@Override
 	public int getCurrentItemIndex() {
 		return m_currentItemIdx;
+	}
+
+	@Override
+	public PlaylistItem addYoutubeItem(YoutubeItem result) {
+		return addItem(createPlaylistItem(result));
+	}
+
+	private PlaylistItem createPlaylistItem(YoutubeItem object) {
+		PlaylistItem item = new PlaylistItem();
+		item.setTitle(object.getTitle());
+		item.setUrl(object.getDirectLink());
+		item.setType(Type.VIDEO);
+		return item;
 	}
 
 }

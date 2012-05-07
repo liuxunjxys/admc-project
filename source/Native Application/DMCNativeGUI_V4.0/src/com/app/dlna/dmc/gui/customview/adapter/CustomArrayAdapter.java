@@ -38,7 +38,6 @@ import com.app.dlna.dmc.processor.cache.Cache;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.playlist.Playlist;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
-import com.app.dlna.dmc.processor.youtube.YoutubeItem;
 import com.app.dlna.dmc.utility.Utility;
 
 public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {

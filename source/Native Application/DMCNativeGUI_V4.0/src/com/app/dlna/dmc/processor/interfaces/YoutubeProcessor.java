@@ -8,14 +8,14 @@ public interface YoutubeProcessor {
 
 	void executeQuery(String query, IYoutubeProcessorListener callback);
 
-	void getDirectLink(String link, IYoutubeProcessorListener callback);
+	void getDirectLink(YoutubeItem item, IYoutubeProcessorListener callback);
 
 	void registURL(String link, IYoutubeProcessorListener callback);
 
 	public interface IYoutubeProcessorListener {
 		void onStartPorcess();
 
-		void onGetDirectLinkComplete(String result);
+		void onGetDirectLinkComplete(YoutubeItem result);
 
 		void onFail(Exception ex);
 

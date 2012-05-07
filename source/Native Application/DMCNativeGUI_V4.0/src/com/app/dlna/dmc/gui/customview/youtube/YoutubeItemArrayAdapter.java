@@ -28,7 +28,7 @@ public class YoutubeItemArrayAdapter extends ArrayAdapter<YoutubeItem> {
 		super(context, textViewResourceId);
 		m_inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		if (BM_VIDEO == null)
-			BM_VIDEO = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_didlobject_video);
+			BM_VIDEO = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_youtube);
 	}
 
 	@Override
