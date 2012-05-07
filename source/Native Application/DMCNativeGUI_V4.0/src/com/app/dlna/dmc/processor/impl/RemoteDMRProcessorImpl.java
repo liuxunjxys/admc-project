@@ -41,7 +41,7 @@ public class RemoteDMRProcessorImpl implements DMRProcessor {
 	private static final int PAUSE = 1;
 	private static final int STOP = 2;
 	private static final long SEEK_DELAY_INTERVAL = 200;
-	private static final int AUTO_NEXT_DELAY = 2; // second
+	private static final int AUTO_NEXT_DELAY = 10; // second
 	@SuppressWarnings("rawtypes")
 	private Device m_device;
 	private ControlPoint m_controlPoint;
@@ -463,6 +463,7 @@ public class RemoteDMRProcessorImpl implements DMRProcessor {
 	@Override
 	public void setURIandPlay(PlaylistItem item) {
 		final String url = item.getUrl();
+		Log.i(TAG,"url = " + item.getUrl());
 		m_autoNextPending = AUTO_NEXT_DELAY;
 		if (m_controlPoint == null || m_avtransportService == null)
 			return;

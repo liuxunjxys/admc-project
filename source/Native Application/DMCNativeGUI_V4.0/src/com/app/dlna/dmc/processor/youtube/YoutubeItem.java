@@ -6,6 +6,8 @@ public class YoutubeItem {
 	private long duration;
 	private String thumbnail;
 	private String author;
+	private String htmlLink;
+	private String directLink;
 
 	public String getTitle() {
 		return title;
@@ -42,8 +44,24 @@ public class YoutubeItem {
 	public String getAuthor() {
 		return author;
 	}
-	
-	public void setAuthor(String author){
+
+	public void setAuthor(String author) {
 		this.author = author;
+	}
+
+	public void setHTMLLink(String htmlLink) {
+		this.htmlLink = htmlLink;
+	}
+
+	public String getHTMLLink() {
+		return htmlLink;
+	}
+
+	public void setDirectLink(String directLink) {
+		this.directLink = directLink;
+	}
+
+	public String getDirectLink() {
+		return this.directLink;
 	}
 }

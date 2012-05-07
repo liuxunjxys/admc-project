@@ -3,10 +3,12 @@ package com.app.dlna.dmc.utility;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.text.DecimalFormat;
 import java.util.Map;
@@ -15,6 +17,7 @@ import org.apache.commons.io.IOUtils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -67,7 +70,8 @@ public class Utility {
 		long hour = seconds / 3600;
 		long minute = (seconds - hour * 3600) / 60;
 		long second = seconds - hour * 3600 - minute * 60;
-		sb.append(String.format("%02d", hour) + ":" + String.format("%02d", minute) + ":" + String.format("%02d", second));
+		sb.append(String.format("%02d", hour) + ":" + String.format("%02d", minute) + ":"
+				+ String.format("%02d", second));
 
 		return sb.toString();
 	}
@@ -80,8 +84,8 @@ public class Utility {
 		return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
 	}
 
-	public static void loadImageItemThumbnail(final ImageView image, final String imageUrl, final Map<String, Bitmap> cache,
-			final int size) {
+	public static void loadImageItemThumbnail(final ImageView image, final String imageUrl,
+			final Map<String, Bitmap> cache, final int size) {
 		MainActivity.INSTANCE.EXEC.execute(new Runnable() {
 
 			@Override
@@ -159,5 +163,13 @@ public class Utility {
 		o2.inSampleSize = scale;
 
 		return BitmapFactory.decodeByteArray(buffer, 0, buffer.length, o2);
+	}
+
+	public static String decodeYoutubeUrl(String directLink) throws UnsupportedEncodingException {
+		String tmp = URLDecoder.decode(directLink, "UTF-8");
+		Log.i(TAG, "input = " + directLink);
+		directLink = tmp.split(" ")[0];
+		Log.i(TAG, "direct = " + directLink);
+		return directLink;
 	}
 }
