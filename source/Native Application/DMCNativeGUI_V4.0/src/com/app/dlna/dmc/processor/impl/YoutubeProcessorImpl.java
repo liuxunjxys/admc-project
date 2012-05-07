@@ -172,10 +172,13 @@ public class YoutubeProcessorImpl implements YoutubeProcessor {
 						YoutubeItem youtubeItem = new YoutubeItem();
 						youtubeItem.setId(mediaGroup.getJSONObject("yt$videoid").getString("$t"));
 						youtubeItem.setTitle(mediaGroup.getJSONObject("media$title").getString("$t"));
-						youtubeItem.setDuration(mediaGroup.getJSONObject("yt$duration").getString("seconds"));
+						youtubeItem.setDuration(Long.valueOf(mediaGroup.getJSONObject("yt$duration").getString(
+								"seconds")));
 						JSONArray thumbs = mediaGroup.getJSONArray("media$thumbnail");
 						if (thumbs.length() > 0)
 							youtubeItem.setThumbnail(thumbs.getJSONObject(0).getString("url"));
+						youtubeItem.setAuthor(entries.getJSONObject(i).getJSONArray("author").getJSONObject(0)
+								.getJSONObject("name").getString("$t"));
 						youtubeItems.add(youtubeItem);
 					}
 					callback.onSearchComplete(youtubeItems);

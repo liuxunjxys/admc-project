@@ -136,29 +136,35 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 			initPlaylistItem((PlaylistItem) object.getData(), holder, position, true);
 		} else if (object.getData() instanceof Playlist) {
 			initPlaylist((Playlist) object.getData(), holder, position);
-		} else if (object.getData() instanceof YoutubeItem) {
-			initYoutubeItem((YoutubeItem) object.getData(), holder);
 		}
+		// } else if (object.getData() instanceof YoutubeItem) {
+		// initYoutubeItem((YoutubeItem) object.getData(), holder);
+		// }
 
 		return convertView;
 	}
 
-	private void initYoutubeItem(YoutubeItem data, ViewHolder holder) {
-		holder.name.setText(data.getTitle());
-		holder.desc.setText(data.getDuration());
-		holder.playing.setVisibility(View.GONE);
-		holder.action.setVisibility(View.GONE);
-		HashMap<String, Bitmap> cache = Cache.getBitmapCache();
-		String imageUrl = data.getThumbnail();
-		holder.icon.setTag(imageUrl);
-		if (cache.containsKey(imageUrl) && cache.get(imageUrl) != null) {
-			holder.icon.setImageBitmap(cache.get(imageUrl));
-		} else {
-			holder.icon.setImageBitmap(BM_VIDEO);
-			cache.put(imageUrl, BM_VIDEO);
-			Utility.loadImageItemThumbnail(holder.icon, imageUrl, Cache.getBitmapCache(), MAX_SIZE);
-		}
-	}
+	// private void initYoutubeItem(YoutubeItem data, ViewHolder holder) {
+	// holder.name.setText(data.getTitle());
+	// holder.name.setTextSize(15);
+	// holder.name.setSingleLine(false);
+	// holder.name.setMaxLines(2);
+	// holder.desc.setText(Utility.getTimeString(data.getDuration()));
+	// holder.desc.setTextSize(11);
+	// holder.playing.setVisibility(View.GONE);
+	// holder.action.setVisibility(View.GONE);
+	// HashMap<String, Bitmap> cache = Cache.getBitmapCache();
+	// String imageUrl = data.getThumbnail();
+	// holder.icon.setTag(imageUrl);
+	// if (cache.containsKey(imageUrl) && cache.get(imageUrl) != null) {
+	// holder.icon.setImageBitmap(cache.get(imageUrl));
+	// } else {
+	// holder.icon.setImageBitmap(BM_VIDEO);
+	// cache.put(imageUrl, BM_VIDEO);
+	// Utility.loadImageItemThumbnail(holder.icon, imageUrl,
+	// Cache.getBitmapCache(), MAX_SIZE);
+	// }
+	// }
 
 	private void initPlaylist(Playlist data, ViewHolder holder, int position) {
 		holder.action.setVisibility(View.GONE);
@@ -166,7 +172,8 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 		holder.desc.setText("");
 		holder.icon.setImageResource(R.drawable.ic_playlist);
 		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
-		if (playlistProcessor != null && playlistProcessor.getData() != null && playlistProcessor.getData().equals(data)) {
+		if (playlistProcessor != null && playlistProcessor.getData() != null
+				&& playlistProcessor.getData().equals(data)) {
 			holder.playing.setVisibility(View.VISIBLE);
 		} else {
 			holder.playing.setVisibility(View.GONE);
@@ -218,7 +225,8 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 					final RemoteDevice remoteDevice = (RemoteDevice) device;
 
 					String urlString = remoteDevice.getIdentity().getDescriptorURL().getProtocol() + "://"
-							+ remoteDevice.getIdentity().getDescriptorURL().getAuthority() + icons[0].getUri().toString();
+							+ remoteDevice.getIdentity().getDescriptorURL().getAuthority()
+							+ icons[0].getUri().toString();
 					URL url = new URL(urlString);
 					final Bitmap icon = BitmapFactory.decodeStream(url.openConnection().getInputStream());
 					m_cacheDMSIcon.put(udn, icon);
@@ -301,7 +309,8 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 					LibraryActivity activity = (LibraryActivity) getContext();
 					PlaylistProcessor playlistProcessor = activity.getPlaylistView().getCurrentPlaylistProcessor();
 					if (playlistProcessor.containsUrl(objectUrl)) {
-						holder.action.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_remove));
+						holder.action.setImageDrawable(getContext().getResources()
+								.getDrawable(R.drawable.ic_btn_remove));
 					} else {
 						holder.action.setImageDrawable(getContext().getResources().getDrawable(R.drawable.ic_btn_add));
 					}

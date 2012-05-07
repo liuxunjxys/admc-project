@@ -3,8 +3,9 @@ package com.app.dlna.dmc.processor.youtube;
 public class YoutubeItem {
 	private String id;
 	private String title;
-	private String duration;
+	private long duration;
 	private String thumbnail;
+	private String author;
 
 	public String getTitle() {
 		return title;
@@ -14,11 +15,11 @@ public class YoutubeItem {
 		this.title = title;
 	}
 
-	public String getDuration() {
+	public long getDuration() {
 		return duration;
 	}
 
-	public void setDuration(String duration) {
+	public void setDuration(long duration) {
 		this.duration = duration;
 	}
 
@@ -36,5 +37,13 @@ public class YoutubeItem {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public String getAuthor() {
+		return author;
+	}
+	
+	public void setAuthor(String author){
+		this.author = author;
 	}
 }
