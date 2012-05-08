@@ -193,8 +193,10 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 	@Override
 	public void stop() {
 		try {
-			m_player.seekTo(0);
-			m_player.pause();
+			if (m_player.isPlaying()) {
+				m_player.seekTo(0);
+				m_player.pause();
+			}
 			m_currentState = STATE_STOPED;
 		} catch (Exception e) {
 			e.printStackTrace();

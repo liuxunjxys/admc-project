@@ -112,8 +112,6 @@ public class RendererControlView extends LinearLayout {
 		if (dmrProcessor == null)
 			return;
 		dmrProcessor.addListener(m_dmrListener);
-		dmrProcessor.setRunning(true);
-
 	}
 
 	public void disconnectToDMR() {
@@ -311,12 +309,12 @@ public class RendererControlView extends LinearLayout {
 
 		@Override
 		public void onCheckURLStart() {
-			
+
 		}
 
 		@Override
 		public void onCheckURLEnd() {
-			
+
 		}
 
 	};
