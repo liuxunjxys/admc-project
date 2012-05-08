@@ -110,18 +110,6 @@ public class Utility {
 								}
 						}
 					});
-					// MainActivity.INSTANCE.runOnUiThread(new Runnable() {
-					//
-					// @Override
-					// public void run() {
-					// if (image.getParent().getParent() instanceof ListView) {
-					// ListView list = (ListView) image.getParent().getParent();
-					// ((ArrayAdapter)
-					// list.getAdapter()).notifyDataSetChanged();
-					// }
-					// }
-					// });
-
 				} catch (MalformedURLException e) {
 					MainActivity.INSTANCE.runOnUiThread(new Runnable() {
 

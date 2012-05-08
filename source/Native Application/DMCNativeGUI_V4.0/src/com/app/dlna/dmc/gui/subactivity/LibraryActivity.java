@@ -130,5 +130,13 @@ public class LibraryActivity extends Activity {
 	public PlaylistView getPlaylistView() {
 		return m_playlistView;
 	}
+	
+	public HomeNetworkView getHomeNetworkView(){
+		return m_homeNetworkView;
+	}
+	
+	public YoutubeView getYoutubeView(){
+		return m_youtubeView;
+	}
 
 }
