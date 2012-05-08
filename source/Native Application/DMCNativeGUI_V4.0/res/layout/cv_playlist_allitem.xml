@@ -18,8 +18,7 @@
         android:layout_above="@id/botToolbar"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:divider="#000"
-        android:dividerHeight="1dp" >
+        style="@style/generic_listview">
     </ListView>
 
 </RelativeLayout>

@@ -8,12 +8,25 @@ import java.net.Socket;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import android.util.Log;
 
 public class MainHttpProcessor extends Thread {
-	private static final String TAG = "HttpThreadLog";
+	private static final String TAG = MainHttpProcessor.class.getName();
 	private ServerSocket m_server;
+	private static final int SIZE = 4;
+	private ThreadPoolExecutor m_executor = new ThreadPoolExecutor(SIZE, SIZE, 8, TimeUnit.SECONDS,
+			new LinkedBlockingQueue<Runnable>(), new RejectedExecutionHandler() {
+
+				@Override
+				public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+
+				}
+			});
 
 	public MainHttpProcessor() {
 		HTTPServerData.RUNNING = true;
@@ -27,19 +40,22 @@ public class MainHttpProcessor extends Thread {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		try {
+			m_executor.shutdownNow();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	@Override
 	public void run() {
-		Log.i(TAG, "Start HTTP Thread");
+		// Log.i(TAG, "Start HTTP Thread");
 		try {
 			m_server = new ServerSocket(HTTPServerData.PORT);
-			// HTTPServerData.PORT = m_server.getLocalPort();
-			Log.e(TAG, "Host = " + HTTPServerData.HOST + " PORT = " + String.valueOf(HTTPServerData.PORT));
 			while (HTTPServerData.RUNNING) {
 				final Socket client = m_server.accept();
-				Log.i(TAG, "Client Connected");
-				new Thread(new Runnable() {
+				// Log.i(TAG, "Client Connected");
+				m_executor.execute(new Runnable() {
 
 					@Override
 					public void run() {
@@ -50,9 +66,9 @@ public class MainHttpProcessor extends Thread {
 							String request = null;
 							String requesttype = null;
 							long range = 0;
-							Log.i(TAG, "<--START HEADER-->");
+							// Log.i(TAG, "<--START HEADER-->");
 							while ((line = br.readLine()) != null && (line.length() != 0)) {
-								Log.i(TAG, line);
+								// Log.i(TAG, line);
 								rawrequest.add(line);
 								if (line.contains("GET")) {
 									requesttype = "GET";
@@ -65,7 +81,7 @@ public class MainHttpProcessor extends Thread {
 									range = Long.valueOf(strrange);
 								}
 							}
-							Log.i(TAG, "<--END HEADER-->");
+							// Log.i(TAG, "<--END HEADER-->");
 							String filename = null;
 							if (request != null) {
 								Log.d(TAG, "Request = " + request);
@@ -94,7 +110,7 @@ public class MainHttpProcessor extends Thread {
 						return request;
 					}
 
-				}).start();
+				});
 			}
 			m_server.close();
 

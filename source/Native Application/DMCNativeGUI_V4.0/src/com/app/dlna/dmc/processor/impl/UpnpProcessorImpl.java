@@ -84,7 +84,7 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener, CoreU
 
 	public void unbindUpnpService() {
 		try {
-			Log.e(TAG, "Unbind to service");
+			Log.i(TAG, "Unbind to service");
 			if (m_serviceConnection != null) {
 				try {
 					m_activity.getApplicationContext().unbindService(m_serviceConnection);
@@ -102,11 +102,9 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener, CoreU
 
 	public void searchAll() {
 		if (m_upnpService != null) {
-			Log.e(TAG, "Search invoke");
+			// Log.e(TAG, "Search invoke");
 			m_upnpService.getRegistry().removeAllRemoteDevices();
 			m_upnpService.getControlPoint().search();
-		} else {
-			Log.e(TAG, "Upnp Service = null");
 		}
 	}
 
@@ -206,13 +204,13 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener, CoreU
 
 	@Override
 	public void localDeviceAdded(Registry registry, LocalDevice device) {
-		Log.e(TAG, "Local Device Add:" + device.toString());
+		// Log.e(TAG, "Local Device Add:" + device.toString());
 		fireDeviceAddedEvent(device);
 	}
 
 	@Override
 	public void localDeviceRemoved(Registry registry, LocalDevice device) {
-		Log.e(TAG, "Local Device Removed:" + device.toString());
+		// Log.e(TAG, "Local Device Removed:" + device.toString());
 		fireDeviceRemovedEvent(device);
 	}
 
@@ -263,9 +261,6 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener, CoreU
 	public Collection<Device> getDMSList() {
 		if (m_upnpService != null)
 			return m_upnpService.getRegistry().getDevices(new DeviceType("schemas-upnp-org", "MediaServer"));
-		else {
-			Log.e(TAG, "Upnp Service = null");
-		}
 		return new ArrayList<Device>();
 	}
 
@@ -274,9 +269,6 @@ public class UpnpProcessorImpl implements UpnpProcessor, RegistryListener, CoreU
 	public Collection<Device> getDMRList() {
 		if (m_upnpService != null)
 			return m_upnpService.getRegistry().getDevices(new DeviceType("schemas-upnp-org", "MediaRenderer"));
-		else {
-			Log.e(TAG, "Upnp Service = null");
-		}
 		return new ArrayList<Device>();
 	}
 
