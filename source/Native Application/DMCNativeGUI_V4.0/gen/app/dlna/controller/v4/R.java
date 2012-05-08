@@ -155,9 +155,11 @@ public final class R {
         public static final int ic_tab_nowplaying=0x7f02006b;
         public static final int ic_tab_playlist=0x7f02006c;
         public static final int ic_volume=0x7f02006d;
+        public static final int ic_youtube=0x7f02006e;
     }
     public static final class id {
         public static final int action=0x7f0b0037;
+        public static final int author=0x7f0b003a;
         public static final int botToolbar=0x7f0b000c;
         public static final int btn_back=0x7f0b0011;
         public static final int btn_clear=0x7f0b0022;
@@ -196,8 +198,8 @@ public final class R {
         public static final int ll_floatMenu=0x7f0b0006;
         public static final int lv_mediasource_browsing=0x7f0b000d;
         public static final int lv_playlist=0x7f0b000e;
-        public static final int menu_refresh=0x7f0b003a;
-        public static final int menu_settings=0x7f0b003b;
+        public static final int menu_refresh=0x7f0b003b;
+        public static final int menu_settings=0x7f0b003c;
         public static final int name=0x7f0b0036;
         public static final int playing=0x7f0b0039;
         public static final int playlistItem=0x7f0b001a;
@@ -236,6 +238,7 @@ public final class R {
         public static final int gvitem_renderer_compact=0x7f03000e;
         public static final int lvitem_generic_item=0x7f03000f;
         public static final int lvitem_loadmoreitem=0x7f030010;
+        public static final int lvitem_youtube=0x7f030011;
     }
     public static final class menu {
         public static final int main=0x7f0a0000;
