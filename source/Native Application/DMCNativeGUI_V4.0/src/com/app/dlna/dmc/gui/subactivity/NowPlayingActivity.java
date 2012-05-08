@@ -226,9 +226,9 @@ public class NowPlayingActivity extends Activity implements Callback {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		m_rendererControl.connectToDMR();
 		updatePlaylist();
 		updateItemInfo();
+		m_rendererControl.connectToDMR();
 		m_rendererControl.updateToolbar();
 	}
 
