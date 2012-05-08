@@ -249,6 +249,16 @@ public class RendererCompactView extends LinearLayout {
 				}
 			});
 		}
+
+		@Override
+		public void onCheckURLStart() {
+			
+		}
+
+		@Override
+		public void onCheckURLEnd() {
+			
+		}
 	};
 
 	@SuppressWarnings("rawtypes")

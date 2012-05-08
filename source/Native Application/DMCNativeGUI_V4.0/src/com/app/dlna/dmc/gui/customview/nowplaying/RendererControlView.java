@@ -309,6 +309,16 @@ public class RendererControlView extends LinearLayout {
 			});
 		}
 
+		@Override
+		public void onCheckURLStart() {
+			
+		}
+
+		@Override
+		public void onCheckURLEnd() {
+			
+		}
+
 	};
 
 	private OnItemSelectedListener m_playlistItemSelected = new OnItemSelectedListener() {

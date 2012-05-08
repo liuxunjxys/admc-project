@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -25,6 +26,7 @@ import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.processor.http.HTTPServerData;
+import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 
 public class Utility {
 	public static final String TAG = Utility.class.getName();
@@ -155,9 +157,49 @@ public class Utility {
 
 	public static String decodeYoutubeUrl(String directLink) throws UnsupportedEncodingException {
 		String tmp = URLDecoder.decode(directLink, "UTF-8");
-		Log.i(TAG, "input = " + directLink);
 		directLink = tmp.split(" ")[0];
-		Log.i(TAG, "direct = " + directLink);
 		return directLink;
+	}
+
+	public static CheckResult checkItemURL(PlaylistItem item) {
+		CheckResult result = new CheckResult(item, false);
+		try {
+			Log.i(TAG, "check url = " + item.getUrl());
+			HttpURLConnection connection = (HttpURLConnection) new URL(item.getUrl()).openConnection();
+			connection.setConnectTimeout(3000);
+			connection.setRequestMethod("HEAD");
+			result.setReachable(connection.getResponseCode() == HttpURLConnection.HTTP_OK);
+		} catch (Exception ex) {
+			Log.w(TAG, "check fail, url = " + item.getUrl());
+		}
+
+		return result;
+	}
+
+	public static class CheckResult {
+		private PlaylistItem item;
+		private boolean reachable;
+
+		public CheckResult(PlaylistItem item, boolean reachable) {
+			this.item = item;
+			this.reachable = reachable;
+		}
+
+		public PlaylistItem getItem() {
+			return item;
+		}
+
+		public void setItem(PlaylistItem item) {
+			this.item = item;
+		}
+
+		public boolean isReachable() {
+			return reachable;
+		}
+
+		public void setReachable(boolean reachable) {
+			this.reachable = reachable;
+		}
+
 	}
 }
