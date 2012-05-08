@@ -17,6 +17,8 @@ import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem.Type;
+import com.app.dlna.dmc.utility.Utility;
+import com.app.dlna.dmc.utility.Utility.CheckResult;
 
 public class LocalDMRProcessorImpl implements DMRProcessor {
 	private static final int SLEEP_INTERVAL = 1000;
@@ -83,27 +85,60 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 	}
 
 	@Override
-	public void setURIandPlay(PlaylistItem item) {
+	public void setURIandPlay(final PlaylistItem item) {
 		Log.i(TAG, "Call SetURIAndPlay");
 		if (m_currentItem.equals(item))
 			return;
 		m_currentItem = item;
-		if (m_player.isPlaying())
-			m_player.stop();
-		m_player.reset();
-		if (m_currentItem.getType() != Type.IMAGE)
-			try {
-				m_player.setDataSource(m_currentItem.getUrl());
-				m_player.prepareAsync();
+		stop();
+		new Thread(new Runnable() {
 
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (IllegalStateException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
+			@Override
+			public void run() {
+				CheckResult result = Utility.checkItemURL(item);
+				if (result.getItem().equals(m_currentItem)) {
+					if (result.isReachable())
+						synchronized (m_currentItem) {
+							if (m_player.isPlaying())
+								m_player.stop();
+							m_player.reset();
+							if (m_currentItem.getType() != Type.IMAGE)
+								try {
+									m_player.setDataSource(m_currentItem.getUrl());
+									m_player.prepareAsync();
+
+								} catch (IllegalArgumentException e) {
+									e.printStackTrace();
+								} catch (IllegalStateException e) {
+									e.printStackTrace();
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+						}
+					else {
+						Log.w(TAG, "item unreachable, Url = " + item.getUrl());
+						autoNext();
+					}
+				}
 			}
+		}).start();
 	}
+
+	// private void fireOnCheckURLStart() {
+	// synchronized (m_listeners) {
+	// for (DMRProcessorListner listener : m_listeners) {
+	// listener.onCheckURLStart();
+	// }
+	// }
+	// }
+	//
+	// private void fireOnCheckURLEnd() {
+	// synchronized (m_listeners) {
+	// for (DMRProcessorListner listener : m_listeners) {
+	// listener.onCheckURLEnd();
+	// }
+	// }
+	// }
 
 	private OnPreparedListener m_preparedListener = new OnPreparedListener() {
 

@@ -3,7 +3,9 @@ package com.app.dlna.dmc.gui.customview.listener;
 import org.teleal.cling.model.message.UpnpResponse;
 import org.teleal.cling.model.meta.Action;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
@@ -16,9 +18,14 @@ public class DMRListenerView extends LinearLayout {
 	protected ListView m_listView;
 	protected CustomArrayAdapter m_adapter;
 	protected String m_currentURI = "";
+	protected ProgressDialog m_pdlg;
 
 	public DMRListenerView(Context context) {
 		super(context);
+		m_pdlg = new ProgressDialog(getContext());
+		m_pdlg.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		m_pdlg.setMessage("Check item url...");
+		m_pdlg.setCancelable(false);
 	}
 
 	DMRProcessorListner m_dmrListner = new DMRProcessorListner() {
@@ -71,6 +78,27 @@ public class DMRListenerView extends LinearLayout {
 			MainActivity.UPNP_PROCESSOR.refreshDevicesList();
 		}
 
+		@Override
+		public void onCheckURLStart() {
+			MainActivity.INSTANCE.runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					m_pdlg.show();
+				}
+			});
+		}
+
+		@Override
+		public void onCheckURLEnd() {
+			MainActivity.INSTANCE.runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					m_pdlg.dismiss();
+				}
+			});
+		}
 	};
 
 	public void updateListView() {

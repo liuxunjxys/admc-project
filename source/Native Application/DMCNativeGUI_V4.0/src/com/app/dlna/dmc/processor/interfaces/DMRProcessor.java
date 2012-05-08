@@ -49,6 +49,10 @@ public interface DMRProcessor {
 		void onPlaying();
 
 		void onErrorEvent(String error);
+		
+		void onCheckURLStart();
+		
+		void onCheckURLEnd();
 
 		@SuppressWarnings("rawtypes")
 		void onActionFail(Action actionCallback, UpnpResponse response, final String cause);
