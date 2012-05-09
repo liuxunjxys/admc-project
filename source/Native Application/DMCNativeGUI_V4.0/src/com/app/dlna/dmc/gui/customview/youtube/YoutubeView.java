@@ -61,7 +61,7 @@ public class YoutubeView extends LinearLayout {
 		@Override
 		public void onClick(View v) {
 			String query = m_ed_query.getText().toString();
-			m_youtubeProcessor.executeQuery(query, m_youtubeListener);
+			m_youtubeProcessor.executeQueryAsync(query, m_youtubeListener);
 		}
 	};
 
@@ -69,7 +69,7 @@ public class YoutubeView extends LinearLayout {
 
 		@Override
 		public void onItemClick(AdapterView<?> adapter, View view, int position, long arg3) {
-			m_youtubeProcessor.getDirectLink(m_adapter.getItem(position), m_youtubeListener);
+			m_youtubeProcessor.getDirectLinkAsync(m_adapter.getItem(position), m_youtubeListener);
 		}
 	};
 	private OnItemLongClickListener m_itemLongClick = new OnItemLongClickListener() {

@@ -6,11 +6,13 @@ import com.app.dlna.dmc.processor.youtube.YoutubeItem;
 
 public interface YoutubeProcessor {
 
-	void executeQuery(String query, IYoutubeProcessorListener callback);
+	void executeQueryAsync(String query, IYoutubeProcessorListener callback);
 
-	void getDirectLink(YoutubeItem item, IYoutubeProcessorListener callback);
+	void getDirectLinkAsync(YoutubeItem item, IYoutubeProcessorListener callback);
 
-	void registURL(String link, IYoutubeProcessorListener callback);
+	void registURLAsync(String link, IYoutubeProcessorListener callback);
+	
+	String getDirectLink(String id);
 
 	public interface IYoutubeProcessorListener {
 		void onStartPorcess();

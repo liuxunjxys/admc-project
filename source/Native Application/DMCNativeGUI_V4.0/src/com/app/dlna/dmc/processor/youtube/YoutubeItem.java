@@ -9,6 +9,14 @@ public class YoutubeItem {
 	private String htmlLink;
 	private String directLink;
 
+	public YoutubeItem() {
+
+	}
+
+	public YoutubeItem(String id) {
+		this.id = id;
+	}
+
 	public String getTitle() {
 		return title;
 	}
