@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,8 +26,9 @@ public class YoutubeItemArrayAdapter extends ArrayAdapter<YoutubeItem> {
 	public YoutubeItemArrayAdapter(Context context, int textViewResourceId) {
 		super(context, textViewResourceId);
 		m_inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//		if (BM_VIDEO == null)
-//			BM_VIDEO = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_youtube);
+		// if (BM_VIDEO == null)
+		// BM_VIDEO = BitmapFactory.decodeResource(context.getResources(),
+		// R.drawable.ic_youtube);
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class YoutubeItemArrayAdapter extends ArrayAdapter<YoutubeItem> {
 		if (cache.containsKey(imageUrl) && cache.get(imageUrl) != null) {
 			holder.icon.setImageBitmap(cache.get(imageUrl));
 		} else {
-//			holder.icon.setImageBitmap(BM_VIDEO);
+			// holder.icon.setImageBitmap(BM_VIDEO);
 			cache.put(imageUrl, BM_VIDEO);
 			Utility.loadImageItemThumbnail(holder.icon, imageUrl, Cache.getBitmapCache(), IMAGE_SIZE);
 		}

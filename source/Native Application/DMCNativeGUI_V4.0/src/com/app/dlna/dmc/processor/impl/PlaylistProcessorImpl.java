@@ -239,4 +239,11 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 		return item;
 	}
 
+	@Override
+	public void updateItemList() {
+		synchronized (m_playlistItems) {
+			m_playlistItems = PlaylistManager.getAllPlaylistItem(getData().getId());
+		}
+	}
+
 }

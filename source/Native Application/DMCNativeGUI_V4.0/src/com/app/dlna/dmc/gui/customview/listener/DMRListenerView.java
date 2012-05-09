@@ -43,7 +43,11 @@ public class DMRListenerView extends LinearLayout {
 
 						@Override
 						public void run() {
-							m_adapter.updateSingleView(m_listView, position);
+							try {
+								m_adapter.updateSingleView(m_listView, position);
+							} catch (Exception e) {
+								
+							}
 						}
 					});
 				}

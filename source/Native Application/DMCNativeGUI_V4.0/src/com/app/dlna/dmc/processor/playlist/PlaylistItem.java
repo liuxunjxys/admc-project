@@ -2,7 +2,7 @@ package com.app.dlna.dmc.processor.playlist;
 
 public class PlaylistItem {
 	public enum Type {
-		AUDIO, VIDEO, IMAGE, UNKNOW,
+		LOCAL, YOUTUBE, AUDIO, VIDEO, IMAGE, UNKNOW,
 	};
 
 	private long m_id;
