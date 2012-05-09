@@ -1,9 +1,17 @@
 package com.app.dlna.dmc.processor.playlist;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import com.app.dlna.dmc.processor.http.HTTPServerData;
+
 public class PlaylistItem {
 	public enum Type {
-		LOCAL, YOUTUBE, AUDIO, VIDEO, IMAGE, UNKNOW,
-	};
+		VIDEO_LOCAL, AUDIO_LOCAL, IMAGE_LOCAL, YOUTUBE, AUDIO_REMOTE, VIDEO_REMOTE, IMAGE_REMOTE, UNKNOW,
+
+	}
+
+	private static final String TAG = PlaylistItem.class.getName();;
 
 	private long m_id;
 	private String m_url;
@@ -26,6 +34,19 @@ public class PlaylistItem {
 	}
 
 	public String getUrl() {
+		if (m_type == Type.IMAGE_LOCAL || m_type == Type.VIDEO_LOCAL || m_type == Type.AUDIO_LOCAL) {
+			String current;
+			try {
+				URI uri = URI.create(m_url);
+				current = new URI("http", HTTPServerData.HOST + ":" + HTTPServerData.PORT, uri.getPath(), null, null)
+						.toString();
+				return current;
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			}
+		}
 		return m_url;
 	}
 
@@ -54,10 +75,8 @@ public class PlaylistItem {
 		if (!(o instanceof PlaylistItem))
 			return false;
 		PlaylistItem other = (PlaylistItem) o;
-		if (other.getUrl().equals(this.m_url) && other.getType().equals(this.m_type)
-				&& other.getTitle().equals(this.m_title))
-			return true;
-		return false;
+		return other.getUrl().equals(this.getUrl()) && other.m_type.equals(this.m_type)
+				&& other.m_title.equals(this.m_title);
 	}
 
 }

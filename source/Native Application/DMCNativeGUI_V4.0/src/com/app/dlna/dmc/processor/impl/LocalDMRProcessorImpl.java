@@ -100,6 +100,7 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 
 						@Override
 						public void onStartPorcess() {
+							Log.d(TAG, "Get direct-link from YoutubeVideo, id = " + item.getUrl());
 						}
 
 						@Override
@@ -108,6 +109,9 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 
 						@Override
 						public void onGetDirectLinkComplete(YoutubeItem result) {
+							Log.d(TAG,
+									"Get direct-link complete from id = " + result.getId() + "; link = "
+											+ result.getDirectLink());
 							if (m_player == null)
 								return;
 							if (result.getId().equals(m_currentItem.getUrl()))
@@ -134,9 +138,22 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 						}
 					});
 			break;
-		case IMAGE:
+		case IMAGE_LOCAL:
+		case IMAGE_REMOTE:
 		case UNKNOW:
 			break;
+		// case VIDEO_LOCAL:
+		// case AUDIO_LOCAL:
+		// URL url;
+		// try {
+		// url = new URL(item.getUrl());
+		// item.setUrl("http://" + HTTPServerData.HOST + ":" +
+		// HTTPServerData.PORT + "/" + url.getFile());
+		// } catch (MalformedURLException e1) {
+		// e1.printStackTrace();
+		// }
+		// case AUDIO_REMOTE:
+		// case VIDEO_REMOTE:
 		default:
 			new Thread(new Runnable() {
 
@@ -151,7 +168,8 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 								if (m_player.isPlaying())
 									m_player.stop();
 								m_player.reset();
-								if (m_currentItem.getType() != Type.IMAGE)
+								Type itemType = m_currentItem.getType();
+								if (itemType != Type.IMAGE_LOCAL && itemType != Type.IMAGE_REMOTE)
 									try {
 										m_player.setDataSource(m_currentItem.getUrl());
 										m_player.prepareAsync();

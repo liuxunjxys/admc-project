@@ -3,9 +3,12 @@ package com.app.dlna.dmc.processor.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.teleal.cling.model.meta.LocalDevice;
 import org.teleal.cling.support.model.DIDLObject;
 import org.teleal.cling.support.model.item.AudioItem;
 import org.teleal.cling.support.model.item.VideoItem;
+
+import android.util.Log;
 
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
@@ -17,6 +20,7 @@ import com.app.dlna.dmc.processor.playlist.PlaylistManager;
 import com.app.dlna.dmc.processor.youtube.YoutubeItem;
 
 public class PlaylistProcessorImpl implements PlaylistProcessor {
+	private static final String TAG = PlaylistProcessorImpl.class.getName();
 	private List<PlaylistItem> m_playlistItems;
 	private int m_currentItemIdx;
 	private int m_maxSize;
@@ -184,13 +188,24 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 	private PlaylistItem createPlaylistItem(DIDLObject object) {
 		PlaylistItem item = new PlaylistItem();
 		item.setTitle(object.getTitle());
+		boolean isLocal = MainActivity.UPNP_PROCESSOR.getCurrentDMS() instanceof LocalDevice;
 		item.setUrl(object.getResources().get(0).getValue());
+		Log.i(TAG, "PlaylistItem url = " + object.getResources().get(0).getValue());
 		if (object instanceof AudioItem) {
-			item.setType(Type.AUDIO);
+			if (isLocal) {
+				item.setType(Type.AUDIO_LOCAL);
+			} else
+				item.setType(Type.AUDIO_REMOTE);
 		} else if (object instanceof VideoItem) {
-			item.setType(Type.VIDEO);
+			if (isLocal) {
+				item.setType(Type.VIDEO_LOCAL);
+			} else
+				item.setType(Type.VIDEO_REMOTE);
 		} else {
-			item.setType(Type.IMAGE);
+			if (isLocal) {
+				item.setType(Type.IMAGE_LOCAL);
+			} else
+				item.setType(Type.IMAGE_REMOTE);
 		}
 		return item;
 	}

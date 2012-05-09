@@ -18,8 +18,8 @@ import android.util.Log;
 public class MainHttpProcessor extends Thread {
 	private static final String TAG = MainHttpProcessor.class.getName();
 	private ServerSocket m_server;
-	private static final int SIZE = 4;
-	private ThreadPoolExecutor m_executor = new ThreadPoolExecutor(SIZE, SIZE, 8, TimeUnit.SECONDS,
+	private static final int SIZE = 6;
+	private ThreadPoolExecutor m_executor = new ThreadPoolExecutor(SIZE, SIZE, 0, TimeUnit.SECONDS,
 			new LinkedBlockingQueue<Runnable>(), new RejectedExecutionHandler() {
 
 				@Override
@@ -90,8 +90,8 @@ public class MainHttpProcessor extends Thread {
 									HTTPHelper.handleProxyDataRequest(client, rawrequest,
 											HTTPLinkManager.LINK_MAP.get(request));
 								} else {
-									Log.d(TAG, "Play-to mode");
 									filename = URLDecoder.decode(request, "ASCII");
+									Log.d(TAG, "Play-to mode, file name = " + filename);
 									if (filename != null && filename.length() != 0) {
 										HTTPHelper.handleClientRequest(client, requesttype, range, filename);
 									}
