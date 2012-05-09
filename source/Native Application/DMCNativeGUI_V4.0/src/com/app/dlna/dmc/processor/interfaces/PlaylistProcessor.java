@@ -57,4 +57,6 @@ public interface PlaylistProcessor {
 
 	PlaylistItem addYoutubeItem(YoutubeItem result);
 
+	void updateItemList();
+
 }

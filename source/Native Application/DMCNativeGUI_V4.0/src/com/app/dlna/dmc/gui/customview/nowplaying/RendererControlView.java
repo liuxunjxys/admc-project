@@ -395,6 +395,7 @@ public class RendererControlView extends LinearLayout {
 		m_playlistItemAdapter.clear();
 		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
 		if (playlistProcessor != null) {
+			playlistProcessor.updateItemList();
 			for (PlaylistItem item : playlistProcessor.getAllItems())
 				m_playlistItemAdapter.add(new AdapterItem(item));
 			setCurrentSpinnerSelected(playlistProcessor.getCurrentItem());

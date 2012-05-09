@@ -96,6 +96,8 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 			@Override
 			public void run() {
 				CheckResult result = Utility.checkItemURL(item);
+				if (m_player == null)
+					return;
 				if (result.getItem().equals(m_currentItem)) {
 					if (result.isReachable())
 						synchronized (m_currentItem) {

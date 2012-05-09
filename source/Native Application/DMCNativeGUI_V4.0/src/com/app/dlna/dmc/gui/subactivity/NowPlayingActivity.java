@@ -44,6 +44,7 @@ public class NowPlayingActivity extends Activity implements Callback {
 	private SurfaceHolder m_holder;
 	private ImageView m_image;
 	private LinearLayout m_content;
+	private boolean m_isPausing;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -226,6 +227,7 @@ public class NowPlayingActivity extends Activity implements Callback {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		m_isPausing = false;
 		updatePlaylist();
 		updateItemInfo();
 		m_rendererControl.connectToDMR();
@@ -241,10 +243,15 @@ public class NowPlayingActivity extends Activity implements Callback {
 	@Override
 	protected void onPause() {
 		super.onPause();
+		m_isPausing = true;
 		m_rendererControl.disconnectToDMR();
 		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
 		if (playlistProcessor != null)
 			playlistProcessor.removeListener(m_playlistListener);
+		if (MainActivity.UPNP_PROCESSOR.getDMRProcessor() instanceof LocalDMRProcessorImpl) {
+			LocalDMRProcessorImpl localDMR = (LocalDMRProcessorImpl) MainActivity.UPNP_PROCESSOR.getDMRProcessor();
+			localDMR.getPlayer().setDisplay(null);
+		}
 	}
 
 	public void updateDMRControlView() {
@@ -269,9 +276,14 @@ public class NowPlayingActivity extends Activity implements Callback {
 	}
 
 	private void updateSurfaceView() {
+		Log.i(TAG, "Update surface view");
 		try {
 			if (MainActivity.UPNP_PROCESSOR.getDMRProcessor() instanceof LocalDMRProcessorImpl) {
 				LocalDMRProcessorImpl localDMR = (LocalDMRProcessorImpl) MainActivity.UPNP_PROCESSOR.getDMRProcessor();
+				if (m_isPausing) {
+					localDMR.getPlayer().setDisplay(null);
+					return;
+				}
 				if (m_surface.getVisibility() == View.VISIBLE) {
 					localDMR.getPlayer().setDisplay(m_holder);
 					localDMR.getPlayer().setSufaceDimension(m_content.getWidth(), m_content.getHeight());

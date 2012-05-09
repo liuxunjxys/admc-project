@@ -27,6 +27,9 @@ public class YoutubeProcessorImpl implements YoutubeProcessor {
 	private static final String QUERY_VIDEO_INFO = "http://www.youtube.com/get_video_info?video_id={id}";
 	private static final String QUERY_HTML = "http://www.youtube.com/watch?v={id}";
 	private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/14.0.835.202 Safari/535.1";
+	private static final int VQ_NORMAL = 0; // Video Quality Normal 480
+	private static final int VQ_HD = 1;// Video Quality HD 720
+	private static final int VIDEO_QUALITY = 0;
 
 	@Override
 	public void getDirectLink(final YoutubeItem item, final IYoutubeProcessorListener callback) {
@@ -85,12 +88,31 @@ public class YoutubeProcessorImpl implements YoutubeProcessor {
 						medium = Utility.decodeYoutubeUrl(medium);
 						other = Utility.decodeYoutubeUrl(other);
 
-						if (!hd720.isEmpty())
-							directLink = hd720;
-						else if (!medium.isEmpty())
+						switch (VIDEO_QUALITY) {
+						case VQ_NORMAL:
 							directLink = medium;
-						else if (!other.isEmpty())
-							directLink = other;
+							if (directLink.isEmpty())
+								directLink = other;
+							if (directLink.isEmpty())
+								directLink = hd720;
+							break;
+						case VQ_HD:
+							directLink = hd720;
+							if (directLink.isEmpty())
+								directLink = medium;
+							if (directLink.isEmpty())
+								directLink = other;
+							break;
+						default:
+							break;
+						}
+
+						// if (!hd720.isEmpty())
+						// directLink = hd720;
+						// else if (!medium.isEmpty())
+						// directLink = medium;
+						// else if (!other.isEmpty())
+						// directLink = other;
 					}
 					item.setDirectLink(directLink);
 					callback.onGetDirectLinkComplete(item);
