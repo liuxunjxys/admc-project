@@ -88,13 +88,16 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 			PlaylistItem _object = (PlaylistItem) object.getData();
 			holder.name.setText(_object.getTitle());
 			switch (_object.getType()) {
-			case AUDIO:
+			case AUDIO_REMOTE:
+			case AUDIO_LOCAL:
 				holder.icon.setImageBitmap(BM_AUDIO);
 				break;
-			case VIDEO:
+			case VIDEO_REMOTE:
+			case VIDEO_LOCAL:
 				holder.icon.setImageBitmap(BM_VIDEO);
 				break;
-			case IMAGE:
+			case IMAGE_REMOTE:
+			case IMAGE_LOCAL:
 				holder.icon.setImageBitmap(BM_IMAGE);
 				break;
 			case YOUTUBE:
@@ -336,13 +339,16 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 		holder.name.setText(object.getTitle());
 		String imageUrl = object.getUrl();
 		switch (object.getType()) {
-		case AUDIO:
+		case AUDIO_LOCAL:
+		case AUDIO_REMOTE:
 			holder.icon.setImageBitmap(BM_AUDIO);
 			break;
-		case VIDEO:
+		case VIDEO_LOCAL:
+		case VIDEO_REMOTE:
 			holder.icon.setImageBitmap(BM_VIDEO);
 			break;
-		case IMAGE: {
+		case IMAGE_LOCAL:
+		case IMAGE_REMOTE: {
 			HashMap<String, Bitmap> cache = Cache.getBitmapCache();
 			holder.icon.setTag(imageUrl);
 			if (cache.containsKey(imageUrl) && cache.get(imageUrl) != null) {

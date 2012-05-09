@@ -63,7 +63,7 @@ public class NowPlayingActivity extends Activity implements Callback {
 		m_surface.setOnTouchListener(m_swipeDetector);
 		m_holder = m_surface.getHolder();
 		m_holder.addCallback(this);
-		m_holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
 		m_content = (LinearLayout) findViewById(R.id.content);
 
 		m_animFlipInNext = AnimationUtils.loadAnimation(this, R.anim.flipinnext);
@@ -150,13 +150,15 @@ public class NowPlayingActivity extends Activity implements Callback {
 			return;
 		((TextView) m_viewFlipper.getCurrentView()).setText(item.getTitle());
 		switch (item.getType()) {
-		case AUDIO: {
+		case AUDIO_LOCAL:
+		case AUDIO_REMOTE: {
 			m_image.setVisibility(View.VISIBLE);
 			m_image.setImageDrawable(getResources().getDrawable(R.drawable.ic_didlobject_audio_large));
 			m_surface.setVisibility(View.GONE);
 			break;
 		}
-		case VIDEO: {
+		case VIDEO_LOCAL:
+		case VIDEO_REMOTE: {
 			if (MainActivity.UPNP_PROCESSOR.getDMRProcessor() instanceof LocalDMRProcessorImpl) {
 				m_surface.setVisibility(View.VISIBLE);
 				m_image.setVisibility(View.GONE);
@@ -167,7 +169,8 @@ public class NowPlayingActivity extends Activity implements Callback {
 			}
 			break;
 		}
-		case IMAGE: {
+		case IMAGE_LOCAL:
+		case IMAGE_REMOTE: {
 			new AsyncTaskWithProgressDialog<String, Void, Bitmap>("Loading image") {
 
 				protected void onPreExecute() {

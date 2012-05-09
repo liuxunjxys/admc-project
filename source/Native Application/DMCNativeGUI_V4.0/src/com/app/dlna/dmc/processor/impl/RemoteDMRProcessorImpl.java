@@ -482,6 +482,7 @@ public class RemoteDMRProcessorImpl implements DMRProcessor {
 
 						@Override
 						public void onStartPorcess() {
+							Log.d(TAG, "Get direct-link from YoutubeVideo, id = " + item.getUrl());
 						}
 
 						@Override
@@ -490,6 +491,9 @@ public class RemoteDMRProcessorImpl implements DMRProcessor {
 
 						@Override
 						public void onGetDirectLinkComplete(YoutubeItem result) {
+							Log.d(TAG,
+									"Get direct-link complete from id = " + result.getId() + "; link = "
+											+ result.getDirectLink());
 							if (result.getId().equals(m_currentItem.getUrl()))
 								synchronized (m_currentItem) {
 									setUriAndPlay(result.getDirectLink());
@@ -502,6 +506,17 @@ public class RemoteDMRProcessorImpl implements DMRProcessor {
 						}
 					});
 			break;
+//		case VIDEO_LOCAL:
+//		case AUDIO_LOCAL:
+//		case IMAGE_LOCAL: {
+//			URL itemUrl;
+//			try {
+//				itemUrl = new URL(item.getUrl());
+//				item.setUrl("http://" + HTTPServerData.HOST + ":" + HTTPServerData.PORT + "/" + itemUrl.getFile());
+//			} catch (MalformedURLException e1) {
+//				e1.printStackTrace();
+//			}
+//		}
 		default:
 			new Thread(new Runnable() {
 

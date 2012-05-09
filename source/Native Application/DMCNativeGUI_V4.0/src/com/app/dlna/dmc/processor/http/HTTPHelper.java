@@ -109,7 +109,7 @@ public class HTTPHelper {
 				bw.flush();
 			}
 
-			if (requesttype.compareTo("GET") == 0) {
+			if (requesttype.equals("GET")) {
 
 				DataInputStream dis = new DataInputStream(new FileInputStream(filename));
 				dis.skip(range);
@@ -131,6 +131,7 @@ public class HTTPHelper {
 			}
 
 		} catch (IOException e) {
+			e.printStackTrace();
 			System.out.println("Client close connection");
 		}
 	}
