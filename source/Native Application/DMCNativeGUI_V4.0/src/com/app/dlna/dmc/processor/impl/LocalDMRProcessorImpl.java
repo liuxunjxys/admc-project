@@ -15,8 +15,10 @@ import android.util.Log;
 import com.app.dlna.dmc.gui.customview.nowplaying.LocalMediaPlayer;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
+import com.app.dlna.dmc.processor.interfaces.YoutubeProcessor.IYoutubeProcessorListener;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem.Type;
+import com.app.dlna.dmc.processor.youtube.YoutubeItem;
 import com.app.dlna.dmc.utility.Utility;
 import com.app.dlna.dmc.utility.Utility.CheckResult;
 
@@ -91,39 +93,86 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 			return;
 		m_currentItem = item;
 		stop();
-		new Thread(new Runnable() {
+		switch (m_currentItem.getType()) {
+		case YOUTUBE:
+			new YoutubeProcessorImpl().getDirectLinkAsync(new YoutubeItem(item.getUrl()),
+					new IYoutubeProcessorListener() {
 
-			@Override
-			public void run() {
-				CheckResult result = Utility.checkItemURL(item);
-				if (m_player == null)
-					return;
-				if (result.getItem().equals(m_currentItem)) {
-					if (result.isReachable())
-						synchronized (m_currentItem) {
-							if (m_player.isPlaying())
-								m_player.stop();
-							m_player.reset();
-							if (m_currentItem.getType() != Type.IMAGE)
-								try {
-									m_player.setDataSource(m_currentItem.getUrl());
-									m_player.prepareAsync();
+						@Override
+						public void onStartPorcess() {
+						}
 
-								} catch (IllegalArgumentException e) {
-									e.printStackTrace();
-								} catch (IllegalStateException e) {
-									e.printStackTrace();
-								} catch (IOException e) {
-									e.printStackTrace();
+						@Override
+						public void onSearchComplete(List<YoutubeItem> result) {
+						}
+
+						@Override
+						public void onGetDirectLinkComplete(YoutubeItem result) {
+							if (m_player == null)
+								return;
+							if (result.getId().equals(m_currentItem.getUrl()))
+								synchronized (m_currentItem) {
+									if (m_player.isPlaying())
+										m_player.stop();
+									m_player.reset();
+									try {
+										m_player.setDataSource(result.getDirectLink());
+										m_player.prepareAsync();
+									} catch (IllegalArgumentException e) {
+										e.printStackTrace();
+									} catch (IllegalStateException e) {
+										e.printStackTrace();
+									} catch (IOException e) {
+										e.printStackTrace();
+									}
 								}
 						}
-					else {
-						Log.w(TAG, "item unreachable, Url = " + item.getUrl());
-						autoNext();
+
+						@Override
+						public void onFail(Exception ex) {
+
+						}
+					});
+			break;
+		case IMAGE:
+		case UNKNOW:
+			break;
+		default:
+			new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					CheckResult result = Utility.checkItemURL(item);
+					if (m_player == null)
+						return;
+					if (result.getItem().equals(m_currentItem)) {
+						if (result.isReachable())
+							synchronized (m_currentItem) {
+								if (m_player.isPlaying())
+									m_player.stop();
+								m_player.reset();
+								if (m_currentItem.getType() != Type.IMAGE)
+									try {
+										m_player.setDataSource(m_currentItem.getUrl());
+										m_player.prepareAsync();
+
+									} catch (IllegalArgumentException e) {
+										e.printStackTrace();
+									} catch (IllegalStateException e) {
+										e.printStackTrace();
+									} catch (IOException e) {
+										e.printStackTrace();
+									}
+							}
+						else {
+							Log.w(TAG, "item unreachable, Url = " + item.getUrl());
+							autoNext();
+						}
 					}
 				}
-			}
-		}).start();
+			}).start();
+			break;
+		}
 	}
 
 	// private void fireOnCheckURLStart() {

@@ -234,8 +234,8 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 	private PlaylistItem createPlaylistItem(YoutubeItem object) {
 		PlaylistItem item = new PlaylistItem();
 		item.setTitle(object.getTitle());
-		item.setUrl(object.getDirectLink());
-		item.setType(Type.VIDEO);
+		item.setUrl(object.getId());
+		item.setType(Type.YOUTUBE);
 		return item;
 	}
 

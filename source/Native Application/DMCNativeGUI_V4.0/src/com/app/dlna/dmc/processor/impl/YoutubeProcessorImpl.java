@@ -15,6 +15,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.util.Log;
+
 import com.app.dlna.dmc.processor.interfaces.YoutubeProcessor;
 import com.app.dlna.dmc.processor.youtube.YoutubeItem;
 import com.app.dlna.dmc.utility.Utility;
@@ -30,9 +32,10 @@ public class YoutubeProcessorImpl implements YoutubeProcessor {
 	private static final int VQ_NORMAL = 0; // Video Quality Normal 480
 	private static final int VQ_HD = 1;// Video Quality HD 720
 	private static final int VIDEO_QUALITY = 0;
+	private static final String TAG = YoutubeProcessorImpl.class.getName();
 
 	@Override
-	public void getDirectLink(final YoutubeItem item, final IYoutubeProcessorListener callback) {
+	public void getDirectLinkAsync(final YoutubeItem item, final IYoutubeProcessorListener callback) {
 		new Thread(new Runnable() {
 
 			@Override
@@ -127,7 +130,7 @@ public class YoutubeProcessorImpl implements YoutubeProcessor {
 	}
 
 	@Override
-	public void registURL(String link, final IYoutubeProcessorListener callback) {
+	public void registURLAsync(String link, final IYoutubeProcessorListener callback) {
 		// callback.onStartPorcess();
 		// getDirectLink(link, new IYoutubeProcessorListener() {
 		//
@@ -167,7 +170,7 @@ public class YoutubeProcessorImpl implements YoutubeProcessor {
 	}
 
 	@Override
-	public void executeQuery(final String query, final IYoutubeProcessorListener callback) {
+	public void executeQueryAsync(final String query, final IYoutubeProcessorListener callback) {
 		callback.onStartPorcess();
 
 		new Thread(new Runnable() {
@@ -207,4 +210,81 @@ public class YoutubeProcessorImpl implements YoutubeProcessor {
 
 	}
 
+	@Override
+	public String getDirectLink(String id) {
+		String directLink = "";
+		try {
+			URL url = new URL(QUERY_VIDEO_INFO.replace("{id}", id));
+			String toDecode = IOUtils.toString(url);
+			String[] splitToParam = toDecode.split("&");
+			String urls = "";
+			for (String str : splitToParam) {
+				if (str.contains("url_encoded_fmt_stream_map")) {
+					urls = str;
+				}
+			}
+			if (urls.isEmpty()) {
+				URL htmlUrl = new URL(QUERY_HTML.replace("{id}", id));
+				HttpGet httpGet = new HttpGet(htmlUrl.toURI());
+				httpGet.setHeader("User-Agent", USER_AGENT);
+				HttpClient client = new DefaultHttpClient();
+				HttpResponse response = client.execute(httpGet);
+				String html = IOUtils.toString(response.getEntity().getContent());
+				Pattern pattern = Pattern.compile(REGEX);
+				Matcher matcher = pattern.matcher(html);
+				while (matcher.find()) {
+					String str = matcher.group();
+					if (!str.contains("crossdomain.xml")) {
+						directLink = str.replace("\\u0026", "&").replace("\\", "")
+								.replace("generate_204", "videoplayback").replace("yt.preload.start(\"", "")
+								.replace("\")", "");
+						directLink = Utility.decodeYoutubeUrl(directLink);
+						break;
+					}
+				}
+			} else {
+				String hd720 = "";
+				String medium = "";
+				String other = "";
+				String decoded = URLDecoder.decode(urls, "UTF-8");
+				for (String str : decoded.split("url=")) {
+					if (str.contains("mp4")) {
+						if (str.contains("hd720")) {
+							hd720 = str;
+						} else if (str.contains("medium")) {
+							medium = str;
+						} else {
+							other = str;
+						}
+					}
+				}
+				hd720 = Utility.decodeYoutubeUrl(hd720);
+				medium = Utility.decodeYoutubeUrl(medium);
+				other = Utility.decodeYoutubeUrl(other);
+
+				switch (VIDEO_QUALITY) {
+				case VQ_NORMAL:
+					directLink = medium;
+					if (directLink.isEmpty())
+						directLink = other;
+					if (directLink.isEmpty())
+						directLink = hd720;
+					break;
+				case VQ_HD:
+					directLink = hd720;
+					if (directLink.isEmpty())
+						directLink = medium;
+					if (directLink.isEmpty())
+						directLink = other;
+					break;
+				default:
+					break;
+				}
+
+			}
+		} catch (Exception e) {
+			Log.e(TAG, "Get direct link fail, Youtube ID = " + id + "; cause = " + e.getMessage());
+		}
+		return directLink;
+	}
 }

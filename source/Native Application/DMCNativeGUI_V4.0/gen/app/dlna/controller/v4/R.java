@@ -151,12 +151,13 @@ public final class R {
         public static final int ic_launcher_32x32=0x7f020067;
         public static final int ic_playlist=0x7f020068;
         public static final int ic_playlist_mark=0x7f020069;
-        public static final int ic_scanning_sdcard=0x7f02006a;
-        public static final int ic_tab_mediasource=0x7f02006b;
-        public static final int ic_tab_nowplaying=0x7f02006c;
-        public static final int ic_tab_playlist=0x7f02006d;
-        public static final int ic_volume=0x7f02006e;
-        public static final int ic_youtube=0x7f02006f;
+        public static final int ic_playlist_youtube=0x7f02006a;
+        public static final int ic_scanning_sdcard=0x7f02006b;
+        public static final int ic_tab_mediasource=0x7f02006c;
+        public static final int ic_tab_nowplaying=0x7f02006d;
+        public static final int ic_tab_playlist=0x7f02006e;
+        public static final int ic_volume=0x7f02006f;
+        public static final int ic_youtube=0x7f020070;
     }
     public static final class id {
         public static final int action=0x7f0b0037;

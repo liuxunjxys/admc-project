@@ -47,6 +47,7 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 	private static Bitmap BM_IMAGE;
 	private static Bitmap BM_VIDEO;
 	private static Bitmap BM_AUDIO;
+	private static Bitmap BM_YOUTUBE;
 	private static Bitmap BM_UNKNOW;
 
 	public CustomArrayAdapter(Context context, int textViewResourceId) {
@@ -62,6 +63,8 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 			BM_AUDIO = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_didlobject_audio);
 		if (BM_UNKNOW == null)
 			BM_UNKNOW = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_didlobject_unknow);
+		if (BM_YOUTUBE == null)
+			BM_YOUTUBE = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_playlist_youtube);
 	}
 
 	@Override
@@ -93,6 +96,9 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 				break;
 			case IMAGE:
 				holder.icon.setImageBitmap(BM_IMAGE);
+				break;
+			case YOUTUBE:
+				holder.icon.setImageBitmap(BM_YOUTUBE);
 				break;
 			default:
 				holder.icon.setImageBitmap(BM_UNKNOW);
@@ -348,6 +354,9 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 			}
 			break;
 		}
+		case YOUTUBE:
+			holder.icon.setImageBitmap(BM_YOUTUBE);
+			break;
 		default:
 			holder.icon.setImageBitmap(BM_UNKNOW);
 			break;
