@@ -537,7 +537,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 	};
 
 	public void waitToWriteTAG(String text) {
-		if (m_nfcAdapter.isEnabled()) {
+		if (m_nfcAdapter != null && m_nfcAdapter.isEnabled()) {
 			m_messageToWrite = text;
 			m_waitToWriteTAG = true;
 			m_nfcProgressDialog.show();
