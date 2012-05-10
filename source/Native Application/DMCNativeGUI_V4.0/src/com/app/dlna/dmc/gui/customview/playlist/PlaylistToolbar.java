@@ -114,17 +114,34 @@ public class PlaylistToolbar extends LinearLayout {
 					final Playlist playlist = new Playlist();
 					playlist.setName(value);
 
-					new AsyncTaskWithProgressDialog<Void, Void, Void>("Create Playlist") {
+					new AsyncTaskWithProgressDialog<Void, Void, Boolean>("Create Playlist") {
 
 						@Override
-						protected Void doInBackground(Void... params) {
-							PlaylistManager.createPlaylist(playlist);
-							return null;
+						protected Boolean doInBackground(Void... params) {
+							return Boolean.valueOf(PlaylistManager.createPlaylist(playlist));
 						}
 
-						protected void onPostExecute(Void result) {
+						protected void onPostExecute(Boolean result) {
 							super.onPostExecute(result);
-							m_playlistView.backToListPlaylist();
+							if (result) {
+								new AsyncTaskWithProgressDialog<Void, Void, PlaylistProcessor>("") {
+
+									@Override
+									protected PlaylistProcessor doInBackground(Void... params) {
+										return PlaylistManager.getPlaylistProcessor(playlist);
+									}
+
+									protected void onPostExecute(PlaylistProcessor result) {
+										super.onPostExecute(result);
+										MainActivity.UPNP_PROCESSOR.setPlaylistProcessor(result);
+										m_playlistView.backToListPlaylist();
+									};
+
+								}.execute(new Void[] {});
+
+							} else {
+								Toast.makeText(getContext(), "Create playlist fail", Toast.LENGTH_SHORT).show();
+							}
 						};
 					}.execute(new Void[] {});
 

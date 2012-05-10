@@ -108,6 +108,7 @@ public class PlaylistManager {
 			Uri uri = resolver.insert(PlaylistProvider.PLAYLIST_URI, values);
 			if (uri != null) {
 				String newId = uri.getQueryParameter("newid");
+				playlist.setId(Long.valueOf(newId));
 				ContentValues updateValues = new ContentValues();
 				updateValues.put(PlaylistSQLiteHelper.COL_PLAYLIST_ID, newId);
 				resolver.update(PlaylistProvider.PLAYLIST_ITEM_URI, updateValues, PlaylistSQLiteHelper.COL_PLAYLIST_ID + " = ?",
