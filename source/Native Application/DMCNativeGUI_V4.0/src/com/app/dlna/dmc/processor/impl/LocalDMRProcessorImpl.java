@@ -134,7 +134,7 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 
 						@Override
 						public void onFail(Exception ex) {
-
+							ex.printStackTrace();
 						}
 					});
 			break;
@@ -213,7 +213,6 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 
 		@Override
 		public void onPrepared(MediaPlayer mp) {
-			((LocalMediaPlayer) mp).scaleContent();
 			mp.start();
 			m_currentState = STATE_PLAYING;
 		}
@@ -274,6 +273,7 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 
 	@Override
 	public void seek(String position) {
+		Log.e(TAG, " seek call");
 		try {
 			String[] elements = position.split(":");
 			long miliSec = new Integer(elements[0]) * 3600 + new Integer(elements[1]) * 60 + new Integer(elements[2]);
