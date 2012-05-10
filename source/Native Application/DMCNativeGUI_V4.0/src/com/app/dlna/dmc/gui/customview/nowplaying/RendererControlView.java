@@ -1,19 +1,22 @@
 package com.app.dlna.dmc.gui.customview.nowplaying;
 
+import java.util.List;
+
 import org.teleal.cling.model.message.UpnpResponse;
 import org.teleal.cling.model.meta.Action;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import app.dlna.controller.v4.R;
@@ -22,6 +25,7 @@ import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.customview.adapter.AdapterItem;
 import com.app.dlna.dmc.gui.customview.adapter.CustomArrayAdapter;
 import com.app.dlna.dmc.gui.subactivity.NowPlayingActivity;
+import com.app.dlna.dmc.processor.async.AsyncTaskWithProgressDialog;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor.DMRProcessorListner;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
@@ -36,21 +40,16 @@ public class RendererControlView extends LinearLayout {
 	private static final int STATE_PLAYING = 0;
 	private static final int STATE__PAUSE = 1;
 	private static final int STATE_STOP = 2;
+	protected static final String TAG = RendererControlView.class.getName();
 	private TextView m_tv_current;
 	private TextView m_tv_max;
 	private ImageView m_btn_playPause, m_btn_stop, m_btn_next, m_btn_prev;
 	private SeekBar m_sb_duration;
 	private SeekBar m_sb_volume;
 	private boolean m_isSeeking = false;
-
-	private Spinner m_spinner_playlist;
-	private Spinner m_spinner_playlistItem;
+	private AlertDialog m_alertDialog;
 	private CustomArrayAdapter m_playlistAdapter;
 	private CustomArrayAdapter m_playlistItemAdapter;
-	private ImageView m_tv_currentPlaylistName;
-	private ImageView m_btn_playlistItemDropdown;
-	private boolean m_flagPlaylistItem = true;
-	private boolean m_flagPlaylist = true;
 
 	public RendererControlView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -74,38 +73,140 @@ public class RendererControlView extends LinearLayout {
 		m_sb_duration.setOnSeekBarChangeListener(onSeekListener);
 		m_sb_volume.setOnSeekBarChangeListener(onSeekListener);
 
-		m_tv_currentPlaylistName = (ImageView) findViewById(R.id.tv_playlistName);
-
-		m_spinner_playlist = (Spinner) findViewById(R.id.spinner_playlist);
 		m_playlistAdapter = new CustomArrayAdapter(MainActivity.INSTANCE, 0);
-		m_spinner_playlist.setAdapter(m_playlistAdapter);
-		m_spinner_playlist.setOnItemSelectedListener(m_playlistSelected);
+		m_playlistAdapter.setDropDownMode(true);
 
-		m_spinner_playlistItem = (Spinner) findViewById(R.id.playlistItem);
 		m_playlistItemAdapter = new CustomArrayAdapter(MainActivity.INSTANCE, 0);
-		m_spinner_playlistItem.setAdapter(m_playlistItemAdapter);
-		m_spinner_playlistItem.setOnItemSelectedListener(m_playlistItemSelected);
+		m_playlistItemAdapter.setDropDownMode(true);
 
-		m_btn_playlistItemDropdown = (ImageView) findViewById(R.id.btn_fakeDropdown);
-		m_btn_playlistItemDropdown.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				m_spinner_playlistItem.performClick();
-			}
-		});
-
-		m_tv_currentPlaylistName.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				m_spinner_playlist.performClick();
-			}
-		});
-
-		updateToolbar();
-
+		((ImageView) findViewById(R.id.btn_fakeDropdown)).setOnClickListener(onShowPlaylistItems);
+		((ImageView) findViewById(R.id.tv_playlistName)).setOnClickListener(onShowPlaylists);
 	}
+
+	OnClickListener onShowPlaylists = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			new AsyncTaskWithProgressDialog<Void, Void, List<Playlist>>("Loading all playlists...") {
+
+				@Override
+				protected List<Playlist> doInBackground(Void... params) {
+					return PlaylistManager.getAllPlaylist();
+				}
+
+				protected void onPostExecute(List<Playlist> result) {
+					super.onPostExecute(result);
+					ListView listView = new ListView(getContext());
+					listView.setBackgroundColor(android.R.color.white);
+					listView.setOnItemClickListener(onPlaylistClick);
+					listView.setAdapter(m_playlistAdapter);
+					m_playlistAdapter.clear();
+
+					for (Playlist playlist : result) {
+						m_playlistAdapter.add(new AdapterItem(playlist));
+					}
+
+					m_alertDialog = new AlertDialog.Builder(getContext()).setView(listView)
+							.setNegativeButton("Close", null).create();
+					m_alertDialog.show();
+				};
+
+			}.execute(new Void[] {});
+
+		}
+	};
+
+	OnItemClickListener onPlaylistClick = new OnItemClickListener() {
+
+		@Override
+		public void onItemClick(AdapterView<?> arg0, View view, final int position, long arg3) {
+			if (m_playlistAdapter.getItem(position).getData()
+					.equals(MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getData()))
+				dismissSelectDialog();
+			else
+				new AsyncTaskWithProgressDialog<Void, Void, PlaylistProcessor>("Loading playlist") {
+
+					@Override
+					protected PlaylistProcessor doInBackground(Void... params) {
+						return PlaylistManager.getPlaylistProcessor((Playlist) m_playlistAdapter.getItem(position)
+								.getData());
+					}
+
+					protected void onPostExecute(PlaylistProcessor result) {
+						super.onPostExecute(result);
+						if (result.getAllItems().size() > 0) {
+							MainActivity.UPNP_PROCESSOR.setPlaylistProcessor(result);
+							DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
+							NowPlayingActivity activity = (NowPlayingActivity) getContext();
+							activity.updateItemInfo();
+							activity.updatePlaylist();
+							if (dmrProcessor != null) {
+								dmrProcessor.setPlaylistProcessor(result);
+							}
+							dismissSelectDialog();
+						} else {
+							Toast.makeText(getContext(), "Playlist is empty", Toast.LENGTH_SHORT).show();
+						}
+					}
+
+				}.execute(new Void[] {});
+		}
+	};
+
+	private void dismissSelectDialog() {
+		if (m_alertDialog != null)
+			m_alertDialog.dismiss();
+	};
+
+	OnClickListener onShowPlaylistItems = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			new AsyncTaskWithProgressDialog<Void, Void, List<PlaylistItem>>("Loading all playlists...") {
+
+				@Override
+				protected List<PlaylistItem> doInBackground(Void... params) {
+					return PlaylistManager.getPlaylistProcessor(
+							MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getData()).getAllItems();
+				}
+
+				protected void onPostExecute(java.util.List<PlaylistItem> result) {
+					super.onPostExecute(result);
+					if (result.size() == 0) {
+						Toast.makeText(getContext(), "Current playlist is empty", Toast.LENGTH_SHORT).show();
+						return;
+					}
+					ListView listView = new ListView(getContext());
+					listView.setBackgroundColor(android.R.color.white);
+					listView.setOnItemClickListener(new OnItemClickListener() {
+
+						@Override
+						public void onItemClick(AdapterView<?> arg0, View view, int position, long arg3) {
+							PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
+							PlaylistItem item = (PlaylistItem) m_playlistItemAdapter.getItem(position).getData();
+							playlistProcessor.setCurrentItem(item);
+							NowPlayingActivity activity = (NowPlayingActivity) getContext();
+							activity.updateItemInfo();
+							if (m_alertDialog != null)
+								m_alertDialog.dismiss();
+						}
+
+					});
+					listView.setAdapter(m_playlistItemAdapter);
+					m_playlistItemAdapter.clear();
+
+					for (PlaylistItem playlistItem : result) {
+						m_playlistItemAdapter.add(new AdapterItem(playlistItem));
+					}
+
+					m_alertDialog = new AlertDialog.Builder(getContext()).setView(listView)
+							.setNegativeButton("Close", null).create();
+					m_alertDialog.show();
+				};
+
+			}.execute(new Void[] {});
+		}
+	};
 
 	public void connectToDMR() {
 		DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
@@ -156,40 +257,19 @@ public class RendererControlView extends LinearLayout {
 
 		@Override
 		public void onClick(View v) {
-			// doNext();
 			NowPlayingActivity nowplaying = (NowPlayingActivity) RendererControlView.this.getContext();
 			nowplaying.doNext();
 		}
 	};
 
-	// private void doNext() {
-	// if (RendererControlView.this.getContext() instanceof NowPlayingActivity)
-	// {
-	// NowPlayingActivity nowplaying = (NowPlayingActivity)
-	// RendererControlView.this.getContext();
-	// nowplaying.doNext();
-	// }
-	// }
-
 	private OnClickListener onPrevClick = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
-			// doPrev();
 			NowPlayingActivity nowplaying = (NowPlayingActivity) RendererControlView.this.getContext();
 			nowplaying.doPrev();
 		}
 	};
-
-	// private void doPrev() {
-	// if (RendererControlView.this.getContext() instanceof NowPlayingActivity)
-	// {
-	// NowPlayingActivity nowplaying = (NowPlayingActivity)
-	// RendererControlView.this.getContext();
-	// nowplaying.doPrev();
-	// }
-	// }
-
 	private OnSeekBarChangeListener onSeekListener = new OnSeekBarChangeListener() {
 
 		@Override
@@ -318,96 +398,4 @@ public class RendererControlView extends LinearLayout {
 		}
 
 	};
-
-	private OnItemSelectedListener m_playlistItemSelected = new OnItemSelectedListener() {
-
-		@Override
-		public void onItemSelected(AdapterView<?> adapter, View view, int position, long arg3) {
-			if (m_flagPlaylistItem) {
-				m_flagPlaylistItem = !m_flagPlaylistItem;
-				return;
-			}
-			PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
-			if (playlistProcessor == null)
-				return;
-			playlistProcessor.setCurrentItem(position);
-			// DMRProcessor dmrProcessor =
-			// MainActivity.UPNP_PROCESSOR.getDMRProcessor();
-			// if (dmrProcessor != null) {
-			// dmrProcessor.setURIandPlay(playlistProcessor.getCurrentItem());
-			// }
-			NowPlayingActivity activity = (NowPlayingActivity) getContext();
-			activity.updateItemInfo();
-		}
-
-		@Override
-		public void onNothingSelected(AdapterView<?> arg0) {
-		}
-	};
-
-	private OnItemSelectedListener m_playlistSelected = new OnItemSelectedListener() {
-
-		@Override
-		public void onItemSelected(AdapterView<?> adapter, View view, int position, long arg3) {
-			if (m_flagPlaylist) {
-				m_flagPlaylist = !m_flagPlaylist;
-				return;
-			}
-			PlaylistProcessor playlistProcessor = PlaylistManager.getPlaylistProcessor((Playlist) m_playlistAdapter
-					.getItem(position).getData());
-			if (playlistProcessor.getAllItems().size() == 0) {
-				Toast.makeText(getContext(), "Playlist is empty", Toast.LENGTH_SHORT).show();
-				return;
-			}
-
-			MainActivity.UPNP_PROCESSOR.setPlaylistProcessor(playlistProcessor);
-			MainActivity.UPNP_PROCESSOR.getDMRProcessor().setPlaylistProcessor(playlistProcessor);
-			// m_tv_currentPlaylistName.setText(MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getData().getName());
-			updatePlaylistItemSpinner();
-			NowPlayingActivity activity = (NowPlayingActivity) getContext();
-			activity.updatePlaylist();
-			activity.updateItemInfo();
-		}
-
-		@Override
-		public void onNothingSelected(AdapterView<?> arg0) {
-		}
-
-	};
-
-	public void updateToolbar() {
-		m_playlistAdapter.clear();
-		for (Playlist playlist : PlaylistManager.getAllPlaylist())
-			m_playlistAdapter.add(new AdapterItem(playlist));
-		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
-		if (playlistProcessor != null) {
-			m_spinner_playlist
-					.setSelection(m_playlistAdapter.getPosition(new AdapterItem(playlistProcessor.getData())));
-			// m_tv_currentPlaylistName.setText(playlistProcessor.getData().getName());
-			updatePlaylistItemSpinner();
-			DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
-			if (dmrProcessor != null)
-				dmrProcessor.setPlaylistProcessor(playlistProcessor);
-		}
-	}
-
-	public void updatePlaylistItemSpinner() {
-		m_playlistItemAdapter.clear();
-		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
-		if (playlistProcessor != null) {
-			playlistProcessor.updateItemList();
-			for (PlaylistItem item : playlistProcessor.getAllItems())
-				m_playlistItemAdapter.add(new AdapterItem(item));
-			setCurrentSpinnerSelected(playlistProcessor.getCurrentItem());
-		}
-
-	}
-
-	public void setCurrentSpinnerSelected(PlaylistItem item) {
-		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
-		if (playlistProcessor.getAllItems().size() > 0)
-			m_spinner_playlistItem.setSelection(m_playlistItemAdapter.getPosition(new AdapterItem(playlistProcessor
-					.getCurrentItem())));
-	}
-
 }

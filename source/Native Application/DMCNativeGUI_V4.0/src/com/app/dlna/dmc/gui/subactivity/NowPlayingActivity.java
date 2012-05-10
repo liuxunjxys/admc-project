@@ -214,18 +214,8 @@ public class NowPlayingActivity extends Activity implements Callback {
 		if (dmrProcessor != null) {
 			dmrProcessor.setURIandPlay(item);
 		}
-		m_rendererControl.setCurrentSpinnerSelected(item);
 		updateSurfaceView();
 	}
-
-	// private void updateCurrentPlaylistItem() {
-	// final PlaylistItem item =
-	// MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getCurrentItem();
-	// if (item != null) {
-	// if (MainActivity.UPNP_PROCESSOR.getDMRProcessor() != null)
-	// MainActivity.UPNP_PROCESSOR.getDMRProcessor().setURIandPlay(item.getUrl());
-	// }
-	// }
 
 	@Override
 	protected void onResume() {
@@ -234,7 +224,6 @@ public class NowPlayingActivity extends Activity implements Callback {
 		updatePlaylist();
 		updateItemInfo();
 		m_rendererControl.connectToDMR();
-		m_rendererControl.updateToolbar();
 	}
 
 	public void updatePlaylist() {
