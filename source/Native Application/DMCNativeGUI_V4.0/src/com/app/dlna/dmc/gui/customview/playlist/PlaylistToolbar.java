@@ -14,6 +14,7 @@ import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
 import com.app.dlna.dmc.gui.customview.library.HomeNetworkView;
+import com.app.dlna.dmc.gui.subactivity.LibraryActivity;
 import com.app.dlna.dmc.processor.async.AsyncTaskWithProgressDialog;
 import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor;
 import com.app.dlna.dmc.processor.playlist.Playlist;
@@ -29,7 +30,8 @@ public class PlaylistToolbar extends LinearLayout {
 
 	public PlaylistToolbar(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.cv_toolbar_playlist, this);
+		((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(
+				R.layout.cv_toolbar_playlist, this);
 		m_btn_back = (ImageView) findViewById(R.id.btn_back);
 		m_btn_back.setOnClickListener(m_backClick);
 		m_btn_save = (ImageView) findViewById(R.id.btn_save);
@@ -63,8 +65,12 @@ public class PlaylistToolbar extends LinearLayout {
 
 		@Override
 		public void onClick(View v) {
-			if (MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getData().getId() == 1)
+			PlaylistProcessor currentPlaylistProcessor = ((LibraryActivity) getContext()).getPlaylistView()
+					.getCurrentPlaylistProcessor();
+			if (currentPlaylistProcessor.getData().getId() == 1 && currentPlaylistProcessor.getAllItems().size() > 0)
 				createSaveDialog();
+			else
+				Toast.makeText(getContext(), "Playlist is empty", Toast.LENGTH_SHORT).show();
 		}
 	};
 	private OnClickListener m_clearClick = new OnClickListener() {
@@ -111,40 +117,7 @@ public class PlaylistToolbar extends LinearLayout {
 			public void onClick(DialogInterface dialog, int whichButton) {
 				String value = input.getText().toString();
 				if (value != null && value.trim().length() != 0) {
-					final Playlist playlist = new Playlist();
-					playlist.setName(value);
-
-					new AsyncTaskWithProgressDialog<Void, Void, Boolean>("Create Playlist") {
-
-						@Override
-						protected Boolean doInBackground(Void... params) {
-							return Boolean.valueOf(PlaylistManager.createPlaylist(playlist));
-						}
-
-						protected void onPostExecute(Boolean result) {
-							super.onPostExecute(result);
-							if (result) {
-								new AsyncTaskWithProgressDialog<Void, Void, PlaylistProcessor>("") {
-
-									@Override
-									protected PlaylistProcessor doInBackground(Void... params) {
-										return PlaylistManager.getPlaylistProcessor(playlist);
-									}
-
-									protected void onPostExecute(PlaylistProcessor result) {
-										super.onPostExecute(result);
-										MainActivity.UPNP_PROCESSOR.setPlaylistProcessor(result);
-										m_playlistView.backToListPlaylist();
-									};
-
-								}.execute(new Void[] {});
-
-							} else {
-								Toast.makeText(getContext(), "Create playlist fail", Toast.LENGTH_SHORT).show();
-							}
-						};
-					}.execute(new Void[] {});
-
+					createPlaylist(value);
 				}
 			}
 		});
@@ -152,6 +125,49 @@ public class PlaylistToolbar extends LinearLayout {
 		alert.setNegativeButton("Cancel", null);
 
 		alert.show();
+	}
+
+	private void createPlaylist(String name) {
+		final Playlist playlist = new Playlist();
+		playlist.setName(name);
+
+		new AsyncTaskWithProgressDialog<Void, Void, Boolean>("Create Playlist") {
+
+			@Override
+			protected Boolean doInBackground(Void... params) {
+				return Boolean.valueOf(PlaylistManager.createPlaylist(playlist));
+			}
+
+			protected void onPostExecute(Boolean result) {
+				super.onPostExecute(result);
+				if (result) {
+					new AsyncTaskWithProgressDialog<Void, Void, PlaylistProcessor>("") {
+
+						@Override
+						protected PlaylistProcessor doInBackground(Void... params) {
+							return PlaylistManager.getPlaylistProcessor(playlist);
+						}
+
+						protected void onPostExecute(PlaylistProcessor result) {
+							super.onPostExecute(result);
+							// if current playlist is unsaved then switch to new
+							// playlist
+							PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
+							if (playlistProcessor != null && playlistProcessor.getData().getId() == 1) {
+								int currentPost = playlistProcessor.getCurrentItemIndex();
+								result.setCurrentItem(currentPost);
+								MainActivity.UPNP_PROCESSOR.setPlaylistProcessor(result);
+							}
+							m_playlistView.backToListPlaylist();
+						};
+
+					}.execute(new Void[] {});
+
+				} else {
+					Toast.makeText(getContext(), "Create playlist fail", Toast.LENGTH_SHORT).show();
+				}
+			};
+		}.execute(new Void[] {});
 	}
 
 	private void confirmDelete() {
