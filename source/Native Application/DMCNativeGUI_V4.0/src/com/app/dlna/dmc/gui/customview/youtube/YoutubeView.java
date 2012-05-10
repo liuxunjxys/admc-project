@@ -4,6 +4,7 @@ import java.util.List;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
@@ -61,6 +62,7 @@ public class YoutubeView extends LinearLayout {
 		@Override
 		public void onClick(View v) {
 			String query = m_ed_query.getText().toString();
+			m_adapter.clear();
 			m_youtubeProcessor.executeQueryAsync(query, m_youtubeListener);
 		}
 	};
@@ -69,7 +71,25 @@ public class YoutubeView extends LinearLayout {
 
 		@Override
 		public void onItemClick(AdapterView<?> adapter, View view, int position, long arg3) {
-			m_youtubeProcessor.getDirectLinkAsync(m_adapter.getItem(position), m_youtubeListener);
+			PlaylistProcessor playlistProcessor = ((LibraryActivity) getContext()).getPlaylistView()
+					.getCurrentPlaylistProcessor();
+			PlaylistItem added = playlistProcessor.addYoutubeItem(m_adapter.getItem(position));
+			if (added != null) {
+				Toast.makeText(getContext(), "Added item to playlist", Toast.LENGTH_SHORT).show();
+				Log.i(TAG, "new idx = 	" + playlistProcessor.setCurrentItem(added));
+				DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
+				if (dmrProcessor != null)
+					dmrProcessor.setURIandPlay(playlistProcessor.getCurrentItem());
+				// m_youtubeProcessor.getDirectLinkAsync(m_adapter.getItem(position),
+				// m_youtubeListener);
+			} else {
+				if (playlistProcessor.isFull()) {
+					Toast.makeText(getContext(), "Current playlist is full", Toast.LENGTH_SHORT).show();
+				} else {
+					Toast.makeText(getContext(), "An error occurs, try again later", Toast.LENGTH_SHORT).show();
+				}
+			}
+
 		}
 	};
 	private OnItemLongClickListener m_itemLongClick = new OnItemLongClickListener() {
@@ -105,6 +125,7 @@ public class YoutubeView extends LinearLayout {
 						m_adapter.clear();
 						for (YoutubeItem item : result)
 							m_adapter.add(item);
+						m_listView.smoothScrollToPosition(0);
 					}
 				});
 
@@ -112,32 +133,19 @@ public class YoutubeView extends LinearLayout {
 
 		@Override
 		public void onGetDirectLinkComplete(final YoutubeItem result) {
-			if (m_progress.isShowing())
-				MainActivity.INSTANCE.runOnUiThread(new Runnable() {
-
-					@Override
-					public void run() {
-						m_progress.dismiss();
-						PlaylistProcessor playlistProcessor = ((LibraryActivity) getContext()).getPlaylistView()
-								.getCurrentPlaylistProcessor();
-						PlaylistItem added = playlistProcessor.addYoutubeItem(result);
-						DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
-						if (added != null) {
-							Toast.makeText(getContext(), "Added item to playlist", Toast.LENGTH_SHORT).show();
-							playlistProcessor.setCurrentItem(added);
-							if (dmrProcessor != null)
-								dmrProcessor.setURIandPlay(playlistProcessor.getCurrentItem());
-						} else {
-							if (playlistProcessor.isFull()) {
-								Toast.makeText(getContext(), "Current playlist is full", Toast.LENGTH_SHORT).show();
-							} else {
-								Toast.makeText(getContext(), "An error occurs, try again later", Toast.LENGTH_SHORT)
-										.show();
-							}
-						}
-					}
-
-				});
+			// if (m_progress.isShowing())
+			// MainActivity.INSTANCE.runOnUiThread(new Runnable() {
+			//
+			// @Override
+			// public void run() {
+			// m_progress.dismiss();
+			// DMRProcessor dmrProcessor =
+			// MainActivity.UPNP_PROCESSOR.getDMRProcessor();
+			// if (dmrProcessor != null)
+			// dmrProcessor.setURIandPlay(playlistProcessor.getCurrentItem());
+			// }
+			//
+			// });
 		}
 
 		@Override

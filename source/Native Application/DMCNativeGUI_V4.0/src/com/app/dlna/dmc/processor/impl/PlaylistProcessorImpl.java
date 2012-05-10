@@ -119,7 +119,7 @@ public class PlaylistProcessorImpl implements PlaylistProcessor {
 		synchronized (m_playlistItems) {
 			if (m_playlistItems.contains(item)) {
 				m_currentItemIdx = m_playlistItems.indexOf(item);
-				return m_currentItemIdx;
+				return m_currentItemIdx; 
 			}
 			return -1;
 		}

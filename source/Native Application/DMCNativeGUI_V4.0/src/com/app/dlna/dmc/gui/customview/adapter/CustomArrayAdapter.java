@@ -20,6 +20,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.location.GpsStatus.NmeaListener;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -49,6 +50,7 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 	private static Bitmap BM_AUDIO;
 	private static Bitmap BM_YOUTUBE;
 	private static Bitmap BM_UNKNOW;
+	private boolean m_isDropDown;
 
 	public CustomArrayAdapter(Context context, int textViewResourceId) {
 		super(context, textViewResourceId);
@@ -65,6 +67,8 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 			BM_UNKNOW = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_didlobject_unknow);
 		if (BM_YOUTUBE == null)
 			BM_YOUTUBE = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_playlist_youtube);
+
+		m_isDropDown = false;
 	}
 
 	@Override
@@ -78,9 +82,7 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 		final AdapterItem object = getItem(position);
 
 		final ViewHolder holder = (ViewHolder) convertView.getTag();
-		holder.name.setTextColor(Color.BLACK);
 		holder.desc.setVisibility(View.GONE);
-		holder.action.setTag(new Integer(position));
 		holder.action.setVisibility(View.GONE);
 		if (object.getData() instanceof Playlist) {
 			initPlaylist((Playlist) object.getData(), holder, position);
@@ -121,6 +123,8 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
+		if (m_isDropDown)
+			return getDropDownView(position, convertView, parent);
 		if (convertView == null || convertView instanceof ProgressBar) {
 			convertView = m_inflater.inflate(R.layout.lvitem_generic_item, null, false);
 		}
@@ -150,6 +154,10 @@ public class CustomArrayAdapter extends ArrayAdapter<AdapterItem> {
 		// }
 
 		return convertView;
+	}
+
+	public void setDropDownMode(boolean value) {
+		m_isDropDown = value;
 	}
 
 	// private void initYoutubeItem(YoutubeItem data, ViewHolder holder) {

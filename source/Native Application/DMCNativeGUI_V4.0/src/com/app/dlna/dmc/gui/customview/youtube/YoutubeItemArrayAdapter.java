@@ -51,7 +51,7 @@ public class YoutubeItemArrayAdapter extends ArrayAdapter<YoutubeItem> {
 		if (cache.containsKey(imageUrl) && cache.get(imageUrl) != null) {
 			holder.icon.setImageBitmap(cache.get(imageUrl));
 		} else {
-			// holder.icon.setImageBitmap(BM_VIDEO);
+			holder.icon.setImageBitmap(BM_VIDEO);
 			cache.put(imageUrl, BM_VIDEO);
 			Utility.loadImageItemThumbnail(holder.icon, imageUrl, Cache.getBitmapCache(), IMAGE_SIZE);
 		}
