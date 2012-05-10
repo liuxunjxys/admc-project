@@ -41,7 +41,6 @@ public class NowPlayingActivity extends Activity implements Callback {
 	private Animation m_animFlipInPrevious;
 	private Animation m_animFlipOutPrevious;
 	private SurfaceView m_surface;
-	private SurfaceHolder m_holder;
 	private ImageView m_image;
 	private LinearLayout m_content;
 	private boolean m_isPausing;
@@ -61,8 +60,6 @@ public class NowPlayingActivity extends Activity implements Callback {
 		m_image.setOnTouchListener(m_swipeDetector);
 		m_surface = (SurfaceView) findViewById(R.id.surface);
 		m_surface.setOnTouchListener(m_swipeDetector);
-		m_holder = m_surface.getHolder();
-		m_holder.addCallback(this);
 
 		m_content = (LinearLayout) findViewById(R.id.content);
 
@@ -143,9 +140,11 @@ public class NowPlayingActivity extends Activity implements Callback {
 	}
 
 	public void updateItemInfo() {
-		if (MainActivity.UPNP_PROCESSOR.getCurrentDMR() == null)
+		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
+		DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
+		if (dmrProcessor == null || playlistProcessor == null)
 			return;
-		PlaylistItem item = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getCurrentItem();
+		PlaylistItem item = playlistProcessor.getCurrentItem();
 		if (item == null)
 			return;
 		((TextView) m_viewFlipper.getCurrentView()).setText(item.getTitle());
@@ -159,7 +158,7 @@ public class NowPlayingActivity extends Activity implements Callback {
 		}
 		case VIDEO_LOCAL:
 		case VIDEO_REMOTE: {
-			if (MainActivity.UPNP_PROCESSOR.getDMRProcessor() instanceof LocalDMRProcessorImpl) {
+			if (dmrProcessor instanceof LocalDMRProcessorImpl) {
 				m_surface.setVisibility(View.VISIBLE);
 				m_image.setVisibility(View.GONE);
 			} else {
@@ -210,40 +209,38 @@ public class NowPlayingActivity extends Activity implements Callback {
 			break;
 		}
 		}
-		DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
-		if (dmrProcessor != null) {
-			dmrProcessor.setURIandPlay(item);
-		}
 		updateSurfaceView();
+		dmrProcessor.setURIandPlay(item);
 	}
 
 	@Override
 	protected void onResume() {
+		Log.e(TAG, "nowplaying ressume");
 		super.onResume();
+		m_surface.getHolder().addCallback(this);
 		m_isPausing = false;
 		updatePlaylist();
 		updateItemInfo();
 		m_rendererControl.connectToDMR();
 	}
 
-	public void updatePlaylist() {
-		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
-		if (playlistProcessor != null)
-			playlistProcessor.addListener(m_playlistListener);
-	}
-
 	@Override
 	protected void onPause() {
+		Log.e(TAG, "nowplaying pause");
 		super.onPause();
+		m_surface.getHolder().removeCallback(this);
 		m_isPausing = true;
 		m_rendererControl.disconnectToDMR();
 		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
 		if (playlistProcessor != null)
 			playlistProcessor.removeListener(m_playlistListener);
-		if (MainActivity.UPNP_PROCESSOR.getDMRProcessor() instanceof LocalDMRProcessorImpl) {
-			LocalDMRProcessorImpl localDMR = (LocalDMRProcessorImpl) MainActivity.UPNP_PROCESSOR.getDMRProcessor();
-			localDMR.getPlayer().setDisplay(null);
-		}
+		updateSurfaceView();
+	}
+
+	public void updatePlaylist() {
+		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
+		if (playlistProcessor != null)
+			playlistProcessor.addListener(m_playlistListener);
 	}
 
 	public void updateDMRControlView() {
@@ -268,25 +265,27 @@ public class NowPlayingActivity extends Activity implements Callback {
 	}
 
 	private void updateSurfaceView() {
-		Log.i(TAG, "Update surface view");
 		try {
-			if (MainActivity.UPNP_PROCESSOR.getDMRProcessor() instanceof LocalDMRProcessorImpl) {
-				LocalDMRProcessorImpl localDMR = (LocalDMRProcessorImpl) MainActivity.UPNP_PROCESSOR.getDMRProcessor();
+			DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
+			if (dmrProcessor == null)
+				return;
+			if (dmrProcessor instanceof LocalDMRProcessorImpl) {
+				LocalDMRProcessorImpl localDMR = (LocalDMRProcessorImpl) dmrProcessor;
 				if (m_isPausing) {
 					localDMR.getPlayer().setDisplay(null);
-					return;
-				}
-				if (m_surface.getVisibility() == View.VISIBLE) {
-					localDMR.getPlayer().setDisplay(m_holder);
-					localDMR.getPlayer().setSufaceDimension(m_content.getWidth(), m_content.getHeight());
 				} else {
-					localDMR.getPlayer().setDisplay(null);
+					localDMR.getPlayer().setDisplay(m_surface.getHolder());
+					localDMR.getPlayer().setSufaceDimension(m_content.getWidth(), m_content.getHeight());
 				}
-
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+
+	@Override
+	public void onBackPressed() {
+
 	}
 
 }

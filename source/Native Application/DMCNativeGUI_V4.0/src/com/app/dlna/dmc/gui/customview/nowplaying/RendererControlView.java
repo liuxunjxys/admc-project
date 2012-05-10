@@ -1,5 +1,6 @@
 package com.app.dlna.dmc.gui.customview.nowplaying;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.teleal.cling.model.message.UpnpResponse;
@@ -120,8 +121,9 @@ public class RendererControlView extends LinearLayout {
 
 		@Override
 		public void onItemClick(AdapterView<?> arg0, View view, final int position, long arg3) {
-			if (m_playlistAdapter.getItem(position).getData()
-					.equals(MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getData()))
+			PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
+			if (playlistProcessor != null && m_playlistAdapter.getItem(position).getData()
+					.equals(playlistProcessor.getData()))
 				dismissSelectDialog();
 			else
 				new AsyncTaskWithProgressDialog<Void, Void, PlaylistProcessor>("Loading playlist") {
@@ -166,8 +168,11 @@ public class RendererControlView extends LinearLayout {
 
 				@Override
 				protected List<PlaylistItem> doInBackground(Void... params) {
+					PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
+					if (playlistProcessor == null)
+						return new ArrayList<PlaylistItem>();
 					return PlaylistManager.getPlaylistProcessor(
-							MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getData()).getAllItems();
+							playlistProcessor.getData()).getAllItems();
 				}
 
 				protected void onPostExecute(java.util.List<PlaylistItem> result) {
@@ -389,12 +394,12 @@ public class RendererControlView extends LinearLayout {
 
 		@Override
 		public void onCheckURLStart() {
-
+			
 		}
 
 		@Override
 		public void onCheckURLEnd() {
-
+			
 		}
 
 	};

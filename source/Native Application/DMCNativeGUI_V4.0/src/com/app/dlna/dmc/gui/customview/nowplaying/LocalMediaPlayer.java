@@ -1,6 +1,5 @@
 package com.app.dlna.dmc.gui.customview.nowplaying;
 
-import android.graphics.Rect;
 import android.media.MediaPlayer;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -14,22 +13,19 @@ public class LocalMediaPlayer extends MediaPlayer {
 
 	@Override
 	public void setDisplay(SurfaceHolder sh) {
-		Log.e(TAG, " call set display");
-		if (sh == null) {
-			m_surfaceHolder = null;
-			super.setDisplay(null);
-			return;
-		}
-		if (sh.getSurface().isValid()) {
-			super.setDisplay(sh);
-			m_surfaceHolder = sh;
-		} else {
-			super.setDisplay(null);
-			m_surfaceHolder = null;
-		}
-		Rect rect = null;
-		if ((rect = sh.getSurfaceFrame()) != null) {
-			Log.i(TAG, "rectsize = " + rect.toShortString());
+		try {
+			Log.e(TAG, "set display");
+			if (sh == null) {
+				Log.e(TAG, "sh = null");
+				m_surfaceHolder = null;
+				super.setDisplay(null);
+			} else {
+				Log.e(TAG, "sh != null");
+				super.setDisplay(sh);
+				m_surfaceHolder = sh;
+			}
+		} catch (Exception ex) {
+
 		}
 
 	}
@@ -39,7 +35,6 @@ public class LocalMediaPlayer extends MediaPlayer {
 	}
 
 	public void setSufaceDimension(int width, int height) {
-		Log.e(TAG, "set dimension, w = " + width + "; h = " + height);
 		surface_width = width;
 		surface_height = height;
 		scaleContent();
@@ -54,9 +49,10 @@ public class LocalMediaPlayer extends MediaPlayer {
 	}
 
 	public void scaleContent() {
+
 		int video_width = getVideoWidth();
 		int video_height = getVideoHeight();
-
+		Log.i(TAG, "scale content, vwidth = " + video_width + " vheight = " + video_height);
 		if (video_width != 0 && video_height != 0 && m_surfaceHolder != null) {
 			float scale_width = (float) video_width / surface_width;
 			float scale_height = (float) video_height / surface_height;
@@ -66,4 +62,5 @@ public class LocalMediaPlayer extends MediaPlayer {
 			m_surfaceHolder.setFixedSize(target_width, target_height);
 		}
 	}
+	
 }
