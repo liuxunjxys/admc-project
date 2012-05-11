@@ -8,10 +8,7 @@ import com.app.dlna.dmc.processor.http.HTTPServerData;
 public class PlaylistItem {
 	public enum Type {
 		VIDEO_LOCAL, AUDIO_LOCAL, IMAGE_LOCAL, YOUTUBE, AUDIO_REMOTE, VIDEO_REMOTE, IMAGE_REMOTE, UNKNOW,
-
 	}
-
-	private static final String TAG = PlaylistItem.class.getName();;
 
 	private long m_id;
 	private String m_url;

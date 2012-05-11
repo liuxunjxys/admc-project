@@ -71,8 +71,9 @@ public class YoutubeView extends LinearLayout {
 
 		@Override
 		public void onItemClick(AdapterView<?> adapter, View view, int position, long arg3) {
-			PlaylistProcessor playlistProcessor = ((LibraryActivity) getContext()).getPlaylistView()
-					.getCurrentPlaylistProcessor();
+			MainActivity.UPNP_PROCESSOR.setPlaylistProcessor(((LibraryActivity) getContext()).getPlaylistView()
+					.getCurrentPlaylistProcessor());
+			PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
 			PlaylistItem added = playlistProcessor.addYoutubeItem(m_adapter.getItem(position));
 			if (added != null) {
 				Toast.makeText(getContext(), "Added item to playlist", Toast.LENGTH_SHORT).show();
@@ -80,6 +81,7 @@ public class YoutubeView extends LinearLayout {
 				DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
 				if (dmrProcessor != null)
 					dmrProcessor.setURIandPlay(playlistProcessor.getCurrentItem());
+
 				// m_youtubeProcessor.getDirectLinkAsync(m_adapter.getItem(position),
 				// m_youtubeListener);
 			} else {
@@ -89,7 +91,6 @@ public class YoutubeView extends LinearLayout {
 					Toast.makeText(getContext(), "An error occurs, try again later", Toast.LENGTH_SHORT).show();
 				}
 			}
-
 		}
 	};
 	private OnItemLongClickListener m_itemLongClick = new OnItemLongClickListener() {

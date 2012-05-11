@@ -7,17 +7,20 @@ public class SwipeDetector implements View.OnTouchListener {
 	private NowPlayingActivity m_activity;
 	private static final int MIN_DISTANCE = 100;
 	private float m_downX, m_upX;
+	private boolean m_enabled = true;
 
 	public SwipeDetector(NowPlayingActivity activity) {
 		this.m_activity = activity;
 	}
 
 	public void onRightToLeftSwipe() {
-		m_activity.doNext();
+		if (m_enabled)
+			m_activity.doNext();
 	}
 
 	public void onLeftToRightSwipe() {
-		m_activity.doPrev();
+		if (m_enabled)
+			m_activity.doPrev();
 	}
 
 	public boolean onTouch(View v, MotionEvent event) {
@@ -47,5 +50,9 @@ public class SwipeDetector implements View.OnTouchListener {
 		}
 		}
 		return false;
+	}
+
+	public void setEnable(boolean enabled) {
+		m_enabled = enabled;
 	}
 }
