@@ -11,6 +11,7 @@ import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.util.Log;
+import android.view.SurfaceHolder;
 
 import com.app.dlna.dmc.gui.customview.nowplaying.LocalMediaPlayer;
 import com.app.dlna.dmc.processor.interfaces.DMRProcessor;
@@ -74,11 +75,6 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 	public LocalDMRProcessorImpl(Context context) {
 		m_listeners = new ArrayList<DMRProcessor.DMRProcessorListner>();
 		m_currentItem = new PlaylistItem();
-		m_player = new LocalMediaPlayer();
-		m_player.setOnPreparedListener(m_preparedListener);
-		m_player.setOnCompletionListener(m_completeListener);
-		m_player.setOnErrorListener(m_onErrorListener);
-		m_player.setScreenOnWhilePlaying(true);
 		m_audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 		m_maxVolume = m_audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
 		m_isRunning = true;
@@ -112,13 +108,15 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 							Log.d(TAG,
 									"Get direct-link complete from id = " + result.getId() + "; link = "
 											+ result.getDirectLink());
-							if (m_player == null)
-								return;
+							stop();
+							m_player = new LocalMediaPlayer();
+							m_player.setDisplay(m_holder);
+							m_player.setOnPreparedListener(m_preparedListener);
+							m_player.setOnCompletionListener(m_completeListener);
+							m_player.setOnErrorListener(m_onErrorListener);
+							m_player.setScreenOnWhilePlaying(true);
 							if (result.getId().equals(m_currentItem.getUrl()))
 								synchronized (m_currentItem) {
-									if (m_player.isPlaying())
-										m_player.stop();
-									m_player.reset();
 									try {
 										m_player.setDataSource(result.getDirectLink());
 										m_player.prepareAsync();
@@ -160,14 +158,16 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 				@Override
 				public void run() {
 					CheckResult result = Utility.checkItemURL(item);
-					if (m_player == null)
-						return;
+					stop();
+					m_player = new LocalMediaPlayer();
+					m_player.setDisplay(m_holder);
+					m_player.setOnPreparedListener(m_preparedListener);
+					m_player.setOnCompletionListener(m_completeListener);
+					m_player.setOnErrorListener(m_onErrorListener);
+					m_player.setScreenOnWhilePlaying(true);
 					if (result.getItem().equals(m_currentItem)) {
 						if (result.isReachable())
 							synchronized (m_currentItem) {
-								if (m_player.isPlaying())
-									m_player.stop();
-								m_player.reset();
 								Type itemType = m_currentItem.getType();
 								if (itemType != Type.IMAGE_LOCAL && itemType != Type.IMAGE_REMOTE)
 									try {
@@ -238,11 +238,13 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 			return true;
 		}
 	};
+	private SurfaceHolder m_holder = null;
 
 	@Override
 	public void play() {
 		try {
-			m_player.start();
+			if (m_player != null)
+				m_player.start();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -250,25 +252,27 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 
 	@Override
 	public void pause() {
-		try {
-			m_player.pause();
-			m_currentState = STATE_PAUSED;
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+		if (m_player != null && m_player.isPlaying())
+			try {
+				m_player.pause();
+				m_currentState = STATE_PAUSED;
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
 	}
 
 	@Override
 	public void stop() {
-		try {
-			if (m_player.isPlaying()) {
-				m_player.seekTo(0);
-				m_player.pause();
+		if (m_player != null)
+			try {
+				m_player.setDisplay(null);
+				m_player.reset();
+				m_player.release();
+				m_player = null;
+				m_currentState = STATE_STOPED;
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-			m_currentState = STATE_STOPED;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	@Override
@@ -322,7 +326,10 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 	@Override
 	public void dispose() {
 		m_listeners.clear();
-		m_player.release();
+		if (m_player != null) {
+			m_player.reset();
+			m_player.release();
+		}
 		m_player = null;
 		m_isRunning = false;
 	}
@@ -386,10 +393,6 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 		}
 	}
 
-	public LocalMediaPlayer getPlayer() {
-		return m_player;
-	}
-
 	private void autoNext() {
 		m_player.reset();
 		fireOnStopedEvent();
@@ -397,4 +400,14 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 			m_playlistProcessor.next();
 	}
 
+	public void setHolder(SurfaceHolder holder, int width, int height) {
+		m_holder = holder;
+		if (m_player != null) {
+			m_player.setDisplay(holder);
+			LocalMediaPlayer.surface_width = width;
+			LocalMediaPlayer.surface_height = height;
+			m_player.scaleContent();
+			// m_player.setSufaceDimension(width, height);
+		}
+	}
 }

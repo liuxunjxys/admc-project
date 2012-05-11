@@ -22,6 +22,7 @@ import android.widget.ViewFlipper;
 import app.dlna.controller.v4.R;
 
 import com.app.dlna.dmc.gui.MainActivity;
+import com.app.dlna.dmc.gui.customview.nowplaying.LocalMediaPlayer;
 import com.app.dlna.dmc.gui.customview.nowplaying.RendererControlView;
 import com.app.dlna.dmc.processor.async.AsyncTaskWithProgressDialog;
 import com.app.dlna.dmc.processor.impl.LocalDMRProcessorImpl;
@@ -31,7 +32,7 @@ import com.app.dlna.dmc.processor.interfaces.PlaylistProcessor.PlaylistListener;
 import com.app.dlna.dmc.processor.playlist.PlaylistItem;
 import com.app.dlna.dmc.utility.Utility;
 
-public class NowPlayingActivity extends Activity implements Callback {
+public class NowPlayingActivity extends Activity {
 	protected String TAG = NowPlayingActivity.class.getName();
 	private RendererControlView m_rendererControl;
 	private ViewFlipper m_viewFlipper;
@@ -42,8 +43,9 @@ public class NowPlayingActivity extends Activity implements Callback {
 	private Animation m_animFlipOutPrevious;
 	private SurfaceView m_surface;
 	private ImageView m_image;
-	private LinearLayout m_content;
 	private boolean m_isPausing;
+	private LinearLayout m_content;
+	private SurfaceHolder m_holder;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -55,13 +57,14 @@ public class NowPlayingActivity extends Activity implements Callback {
 		m_progressDialog.setTitle("Loading image");
 		m_progressDialog.setCancelable(true);
 
+		m_content = (LinearLayout) findViewById(R.id.content);
+
 		m_swipeDetector = new SwipeDetector(this);
 		m_image = (ImageView) findViewById(R.id.image);
 		m_image.setOnTouchListener(m_swipeDetector);
 		m_surface = (SurfaceView) findViewById(R.id.surface);
 		m_surface.setOnTouchListener(m_swipeDetector);
-
-		m_content = (LinearLayout) findViewById(R.id.content);
+		m_holder = m_surface.getHolder();
 
 		m_animFlipInNext = AnimationUtils.loadAnimation(this, R.anim.flipinnext);
 		m_animFlipInNext.setAnimationListener(m_animationListner);
@@ -90,7 +93,6 @@ public class NowPlayingActivity extends Activity implements Callback {
 					m_viewFlipper.setInAnimation(m_animFlipInPrevious);
 					m_viewFlipper.setOutAnimation(m_animFlipOutPrevious);
 					m_viewFlipper.showPrevious();
-					updateItemInfo();
 				}
 			});
 		}
@@ -104,7 +106,6 @@ public class NowPlayingActivity extends Activity implements Callback {
 					m_viewFlipper.setInAnimation(m_animFlipInNext);
 					m_viewFlipper.setOutAnimation(m_animFlipOutNext);
 					m_viewFlipper.showNext();
-					updateItemInfo();
 				}
 			});
 
@@ -115,11 +116,12 @@ public class NowPlayingActivity extends Activity implements Callback {
 
 		@Override
 		public void onAnimationStart(Animation animation) {
+			m_swipeDetector.setEnable(false);
 		}
 
 		@Override
 		public void onAnimationRepeat(Animation animation) {
-
+			m_swipeDetector.setEnable(false);
 		}
 
 		@Override
@@ -127,16 +129,22 @@ public class NowPlayingActivity extends Activity implements Callback {
 			PlaylistItem item = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().getCurrentItem();
 			if (item != null)
 				((TextView) m_viewFlipper.getCurrentView()).setText(item.getTitle());
+			updateItemInfo();
+			m_swipeDetector.setEnable(true);
 		}
 	};
 	private SwipeDetector m_swipeDetector;
 
 	public void doNext() {
-		MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().next();
+		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
+		if (playlistProcessor != null)
+			playlistProcessor.next();
 	}
 
 	public void doPrev() {
-		MainActivity.UPNP_PROCESSOR.getPlaylistProcessor().previous();
+		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
+		if (playlistProcessor != null)
+			playlistProcessor.previous();
 	}
 
 	public void updateItemInfo() {
@@ -156,6 +164,7 @@ public class NowPlayingActivity extends Activity implements Callback {
 			m_surface.setVisibility(View.GONE);
 			break;
 		}
+		case YOUTUBE:
 		case VIDEO_LOCAL:
 		case VIDEO_REMOTE: {
 			if (dmrProcessor instanceof LocalDMRProcessorImpl) {
@@ -217,8 +226,8 @@ public class NowPlayingActivity extends Activity implements Callback {
 	protected void onResume() {
 		Log.e(TAG, "nowplaying ressume");
 		super.onResume();
-		m_surface.getHolder().addCallback(this);
 		m_isPausing = false;
+		m_holder.addCallback(m_surfaceCallback);
 		updatePlaylist();
 		updateItemInfo();
 		m_rendererControl.connectToDMR();
@@ -228,13 +237,13 @@ public class NowPlayingActivity extends Activity implements Callback {
 	protected void onPause() {
 		Log.e(TAG, "nowplaying pause");
 		super.onPause();
-		m_surface.getHolder().removeCallback(this);
 		m_isPausing = true;
+		m_holder.removeCallback(m_surfaceCallback);
+		updateSurfaceView();
 		m_rendererControl.disconnectToDMR();
 		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
 		if (playlistProcessor != null)
 			playlistProcessor.removeListener(m_playlistListener);
-		updateSurfaceView();
 	}
 
 	public void updatePlaylist() {
@@ -248,20 +257,8 @@ public class NowPlayingActivity extends Activity implements Callback {
 	}
 
 	@Override
-	public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-		Log.i(TAG, "widht = " + width + ", height = " + height);
-		updateSurfaceView();
-	}
+	public void onBackPressed() {
 
-	@Override
-	public void surfaceCreated(SurfaceHolder holder) {
-		updateSurfaceView();
-
-	}
-
-	@Override
-	public void surfaceDestroyed(SurfaceHolder holder) {
-		updateSurfaceView();
 	}
 
 	private void updateSurfaceView() {
@@ -272,10 +269,12 @@ public class NowPlayingActivity extends Activity implements Callback {
 			if (dmrProcessor instanceof LocalDMRProcessorImpl) {
 				LocalDMRProcessorImpl localDMR = (LocalDMRProcessorImpl) dmrProcessor;
 				if (m_isPausing) {
-					localDMR.getPlayer().setDisplay(null);
+					localDMR.setHolder(null, 0, 0);
 				} else {
-					localDMR.getPlayer().setDisplay(m_surface.getHolder());
-					localDMR.getPlayer().setSufaceDimension(m_content.getWidth(), m_content.getHeight());
+					Log.i(TAG, "suface state = " + m_surface.isShown());
+					if (m_surface.isShown()) {
+						localDMR.setHolder(m_holder, m_content.getWidth(), m_content.getHeight());
+					}
 				}
 			}
 		} catch (Exception ex) {
@@ -283,9 +282,28 @@ public class NowPlayingActivity extends Activity implements Callback {
 		}
 	}
 
-	@Override
-	public void onBackPressed() {
+	private SurfaceHolder.Callback m_surfaceCallback = new Callback() {
 
-	}
+		@Override
+		public void surfaceDestroyed(SurfaceHolder holder) {
+			DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
+			if (dmrProcessor instanceof LocalDMRProcessorImpl) {
+				LocalDMRProcessorImpl localDMR = (LocalDMRProcessorImpl) dmrProcessor;
+				localDMR.setHolder(null, 0, 0);
+			}
+		}
+
+		@Override
+		public void surfaceCreated(SurfaceHolder holder) {
+			LocalMediaPlayer.surface_width = m_content.getWidth();
+			LocalMediaPlayer.surface_height = m_content.getHeight();
+			updateSurfaceView();
+		}
+
+		@Override
+		public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+			updateSurfaceView();
+		}
+	};
 
 }
