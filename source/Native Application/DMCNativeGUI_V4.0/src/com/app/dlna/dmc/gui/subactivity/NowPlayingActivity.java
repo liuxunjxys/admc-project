@@ -272,9 +272,11 @@ public class NowPlayingActivity extends Activity {
 					localDMR.setHolder(null, 0, 0);
 				} else {
 					Log.i(TAG, "suface state = " + m_surface.isShown());
-					if (m_surface.isShown()) {
-						localDMR.setHolder(m_holder, m_content.getWidth(), m_content.getHeight());
-					}
+					// if (m_surface.isShown()) {
+					LocalMediaPlayer.surface_width = m_content.getWidth();
+					LocalMediaPlayer.surface_height = m_content.getHeight();
+					localDMR.setHolder(m_holder, m_content.getWidth(), m_content.getHeight());
+					// }
 				}
 			}
 		} catch (Exception ex) {
@@ -286,6 +288,7 @@ public class NowPlayingActivity extends Activity {
 
 		@Override
 		public void surfaceDestroyed(SurfaceHolder holder) {
+			Log.e(TAG, "surface destroyed");
 			DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
 			if (dmrProcessor instanceof LocalDMRProcessorImpl) {
 				LocalDMRProcessorImpl localDMR = (LocalDMRProcessorImpl) dmrProcessor;
@@ -295,6 +298,7 @@ public class NowPlayingActivity extends Activity {
 
 		@Override
 		public void surfaceCreated(SurfaceHolder holder) {
+			Log.e(TAG, "surface created");
 			LocalMediaPlayer.surface_width = m_content.getWidth();
 			LocalMediaPlayer.surface_height = m_content.getHeight();
 			updateSurfaceView();
@@ -302,6 +306,9 @@ public class NowPlayingActivity extends Activity {
 
 		@Override
 		public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+			Log.e(TAG, "surface changed");
+			LocalMediaPlayer.surface_width = m_content.getWidth();
+			LocalMediaPlayer.surface_height = m_content.getHeight();
 			updateSurfaceView();
 		}
 	};
