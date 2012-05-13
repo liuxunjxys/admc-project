@@ -258,7 +258,7 @@ public class NowPlayingActivity extends Activity {
 
 	@Override
 	public void onBackPressed() {
-
+		MainActivity.INSTANCE.switchToLibrary();
 	}
 
 	private void updateSurfaceView() {
