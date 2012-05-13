@@ -59,6 +59,8 @@ import com.app.dlna.dmc.processor.systemservice.RestartService;
 import com.app.dlna.dmc.processor.upnp.CoreUpnpService;
 
 public class MainActivity extends UpnpListenerTabActivity {
+	private static final int NOWPLAYING = 1;
+	private static final int LIBRARY = 0;
 	private static final String TAG = MainActivity.class.getName();
 	private TabHost m_tabHost;
 	public static UpnpProcessor UPNP_PROCESSOR = null;
@@ -236,7 +238,7 @@ public class MainActivity extends UpnpListenerTabActivity {
 		for (int i = 0; i < m_tabHost.getTabWidget().getChildCount(); ++i) {
 			View view = m_tabHost.getTabWidget().getChildAt(i);
 			if (view instanceof TextView)
-				((TextView) view).setTextColor(getResources().getColor(android.R.color.white));
+				((TextView) view).setTextColor(getResources().getColor(R.color.blue));
 		}
 	}
 
@@ -603,5 +605,13 @@ public class MainActivity extends UpnpListenerTabActivity {
 			hideRendererCompactView();
 		else
 			showRendererCompactView();
+	}
+
+	public void switchToLibrary() {
+		m_tabHost.setCurrentTab(LIBRARY);
+	}
+
+	public void switchToNowPlaying() {
+		m_tabHost.setCurrentTab(NOWPLAYING);
 	}
 }
