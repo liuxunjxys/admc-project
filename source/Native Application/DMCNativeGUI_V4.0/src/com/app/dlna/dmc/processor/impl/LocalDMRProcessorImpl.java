@@ -32,17 +32,28 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 	private AudioManager m_audioManager;
 	private int m_maxVolume;
 	private boolean m_selfAutoNext;
-	private boolean m_isRunning;
+	// private boolean m_isRunning;
 	private static final int STATE_PLAYING = 0;
 	private static final int STATE_STOPED = 1;
 	private static final int STATE_PAUSED = 2;
 	protected static final String TAG = LocalDMRProcessorImpl.class.getName();
 	private int m_currentState;
+	private UpdateThread m_updateThread;
 
 	private class UpdateThread extends Thread {
+
+		private boolean running = true;
+
+		public void stopThread() {
+			Log.e(TAG, " stop thread");
+			running = false;
+			this.interrupt();
+		}
+
 		@Override
 		public void run() {
-			while (m_isRunning) {
+			while (running && m_player != null) {
+				Log.d(TAG, "Update thread still running");
 				try {
 					if (m_player != null && m_player.isPlaying()) {
 						int currentPosition = m_player.getCurrentPosition() / 1000;
@@ -65,8 +76,25 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
+					if (!running)
+						return;
 				} catch (Exception ex) {
-					m_isRunning = false;
+					ex.printStackTrace();
+					running = false;
+					if (m_player != null) {
+						try {
+							m_player.reset();
+							m_player.release();
+						} catch (Exception e) {
+
+						} finally {
+							m_player = null;
+						}
+					}
+					fireOnStopedEvent();
+					if (m_playlistProcessor != null)
+						m_playlistProcessor.next();
+					return;
 				}
 			}
 		}
@@ -77,9 +105,10 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 		m_currentItem = new PlaylistItem();
 		m_audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 		m_maxVolume = m_audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-		m_isRunning = true;
+		// m_isRunning = true;
 		m_selfAutoNext = true;
-		new UpdateThread().start();
+		m_updateThread = new UpdateThread();
+		m_updateThread.start();
 	}
 
 	@Override
@@ -140,18 +169,6 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 		case IMAGE_REMOTE:
 		case UNKNOW:
 			break;
-		// case VIDEO_LOCAL:
-		// case AUDIO_LOCAL:
-		// URL url;
-		// try {
-		// url = new URL(item.getUrl());
-		// item.setUrl("http://" + HTTPServerData.HOST + ":" +
-		// HTTPServerData.PORT + "/" + url.getFile());
-		// } catch (MalformedURLException e1) {
-		// e1.printStackTrace();
-		// }
-		// case AUDIO_REMOTE:
-		// case VIDEO_REMOTE:
 		default:
 			new Thread(new Runnable() {
 
@@ -193,27 +210,12 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 		}
 	}
 
-	// private void fireOnCheckURLStart() {
-	// synchronized (m_listeners) {
-	// for (DMRProcessorListner listener : m_listeners) {
-	// listener.onCheckURLStart();
-	// }
-	// }
-	// }
-	//
-	// private void fireOnCheckURLEnd() {
-	// synchronized (m_listeners) {
-	// for (DMRProcessorListner listener : m_listeners) {
-	// listener.onCheckURLEnd();
-	// }
-	// }
-	// }
-
 	private OnPreparedListener m_preparedListener = new OnPreparedListener() {
 
 		@Override
 		public void onPrepared(MediaPlayer mp) {
 			mp.start();
+			setRunning(true);
 			m_currentState = STATE_PLAYING;
 		}
 
@@ -234,7 +236,16 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 
 		@Override
 		public boolean onError(MediaPlayer mp, int what, int extra) {
-			autoNext();
+			if (m_player != null) {
+				m_player.reset();
+				m_player.release();
+				m_player = null;
+				setRunning(false);
+			}
+
+			if (m_playlistProcessor != null)
+				m_playlistProcessor.next();
+
 			return true;
 		}
 	};
@@ -310,8 +321,9 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 	@Override
 	public void addListener(DMRProcessorListner listener) {
 		synchronized (m_listeners) {
-			if (!m_listeners.contains(listener))
+			if (!m_listeners.contains(listener)) {
 				m_listeners.add(listener);
+			}
 		}
 	}
 
@@ -325,13 +337,23 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 
 	@Override
 	public void dispose() {
+		Log.e(TAG, "dispose");
 		m_listeners.clear();
 		if (m_player != null) {
 			m_player.reset();
 			m_player.release();
 		}
 		m_player = null;
-		m_isRunning = false;
+		// m_isRunning = false;
+		// Thread tmpThread = m_updateThread;
+		// m_updateThread = null;
+		// if (tmpThread != null) {
+		// tmpThread.interrupt();
+		// }
+		if (m_updateThread != null) {
+			m_updateThread.stopThread();
+			m_updateThread.interrupt();
+		}
 	}
 
 	@Override
@@ -356,9 +378,17 @@ public class LocalDMRProcessorImpl implements DMRProcessor {
 
 	@Override
 	public void setRunning(boolean running) {
-		m_isRunning = running;
-		if (running)
-			new UpdateThread().start();
+		if (running) {
+			if (m_updateThread != null) {
+				m_updateThread.stopThread();
+				m_updateThread = new UpdateThread();
+				m_updateThread.start();
+			}
+		} else {
+			if (m_updateThread != null)
+				m_updateThread.stopThread();
+			m_updateThread = null;
+		}
 	}
 
 	private void fireUpdatePositionEvent(long current, long max) {

@@ -122,8 +122,8 @@ public class RendererControlView extends LinearLayout {
 		@Override
 		public void onItemClick(AdapterView<?> arg0, View view, final int position, long arg3) {
 			PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
-			if (playlistProcessor != null && m_playlistAdapter.getItem(position).getData()
-					.equals(playlistProcessor.getData()))
+			if (playlistProcessor != null
+					&& m_playlistAdapter.getItem(position).getData().equals(playlistProcessor.getData()))
 				dismissSelectDialog();
 			else
 				new AsyncTaskWithProgressDialog<Void, Void, PlaylistProcessor>("Loading playlist") {
@@ -171,8 +171,7 @@ public class RendererControlView extends LinearLayout {
 					PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
 					if (playlistProcessor == null)
 						return new ArrayList<PlaylistItem>();
-					return PlaylistManager.getPlaylistProcessor(
-							playlistProcessor.getData()).getAllItems();
+					return PlaylistManager.getPlaylistProcessor(playlistProcessor.getData()).getAllItems();
 				}
 
 				protected void onPostExecute(java.util.List<PlaylistItem> result) {
@@ -215,9 +214,8 @@ public class RendererControlView extends LinearLayout {
 
 	public void connectToDMR() {
 		DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
-		if (dmrProcessor == null)
-			return;
-		dmrProcessor.addListener(m_dmrListener);
+		if (dmrProcessor != null)
+			dmrProcessor.addListener(m_dmrListener);
 	}
 
 	public void disconnectToDMR() {
@@ -394,12 +392,12 @@ public class RendererControlView extends LinearLayout {
 
 		@Override
 		public void onCheckURLStart() {
-			
+
 		}
 
 		@Override
 		public void onCheckURLEnd() {
-			
+
 		}
 
 	};
