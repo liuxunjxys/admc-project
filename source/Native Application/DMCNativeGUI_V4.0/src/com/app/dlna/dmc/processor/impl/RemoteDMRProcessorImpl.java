@@ -41,11 +41,11 @@ public class RemoteDMRProcessorImpl implements DMRProcessor {
 	private static final String TAG = RemoteDMRProcessorImpl.class.getName();
 	private static final int UPDATE_INTERVAL = 1000;
 	private static final int MAX_VOLUME = 100;
-	private static final int PLAYING = 0;
-	private static final int PAUSE = 1;
-	private static final int STOP = 2;
+	// private static final int PLAYING = 0;
+	// private static final int PAUSE = 1;
+	// private static final int STOP = 2;
 	private static final long SEEK_DELAY_INTERVAL = 200;
-	private static final int AUTO_NEXT_DELAY = 10; // second
+	private static final int AUTO_NEXT_DELAY = 8; // second
 	@SuppressWarnings("rawtypes")
 	private Device m_device;
 	private ControlPoint m_controlPoint;
@@ -58,12 +58,12 @@ public class RemoteDMRProcessorImpl implements DMRProcessor {
 	private boolean m_isRunning = true;
 	private int m_currentVolume;
 	private boolean m_isBusy = false;
-	private int m_state = -1;
+	// private int m_state = -1;
 	private boolean m_checkGetPositionInfo = false;
 	private boolean m_checkGetTransportInfo = false;
 	private boolean m_checkGetVolumeInfo = false;
-	private boolean m_user_stop = false;
-	private boolean m_seftAutoNext = true;
+	private boolean m_user_stop;
+	private boolean m_seftAutoNext;
 	private int m_autoNextPending = 0;
 	private String m_currentTrackURI;
 	private PlaylistItem m_currentItem;
@@ -97,21 +97,23 @@ public class RemoteDMRProcessorImpl implements DMRProcessor {
 
 							if (positionInfo.getTrackDurationSeconds() == 0) {
 								// Log.v(TAG, "auto next");
-								m_state = STOP;
-								new Thread(new Runnable() {
-
-									@Override
-									public void run() {
-										try {
-											Thread.sleep(2000);
-											if (m_state == STOP && m_user_stop == false) {
-												fireOnEndTrackEvent();
-											}
-										} catch (InterruptedException e) {
-											e.printStackTrace();
-										}
-									}
-								}).start();
+								// m_state = STOP;
+								fireOnEndTrackEvent();
+								// new Thread(new Runnable() {
+								//
+								// @Override
+								// public void run() {
+								// try {
+								// Thread.sleep(2000);
+								// if (m_state == STOP && m_user_stop == false)
+								// {
+								// fireOnEndTrackEvent();
+								// }
+								// } catch (InterruptedException e) {
+								// e.printStackTrace();
+								// }
+								// }
+								// }).start();
 							}
 							m_checkGetPositionInfo = false;
 						}
@@ -135,15 +137,15 @@ public class RemoteDMRProcessorImpl implements DMRProcessor {
 							switch (transportInfo.getCurrentTransportState()) {
 							case PLAYING:
 								fireOnPlayingEvent();
-								m_state = PLAYING;
+								// m_state = PLAYING;
 								break;
 							case PAUSED_PLAYBACK:
 								fireOnPausedEvent();
-								m_state = PAUSE;
+								// m_state = PAUSE;
 								break;
 							case STOPPED:
 								fireOnStopedEvent();
-								m_state = STOP;
+								// m_state = STOP;
 								break;
 							default:
 								break;
@@ -191,6 +193,8 @@ public class RemoteDMRProcessorImpl implements DMRProcessor {
 		m_renderingControl = m_device.findService(new ServiceType("schemas-upnp-org", "RenderingControl"));
 		m_listeners = new ArrayList<DMRProcessor.DMRProcessorListner>();
 		m_currentItem = new PlaylistItem();
+		m_seftAutoNext = true;
+		m_user_stop = false;
 		new UpdateThread().start();
 	}
 
@@ -206,7 +210,7 @@ public class RemoteDMRProcessorImpl implements DMRProcessor {
 			public void success(ActionInvocation invocation) {
 				super.success(invocation);
 				m_isBusy = false;
-				m_state = PLAYING;
+				// m_state = PLAYING;
 				m_user_stop = false;
 			}
 
@@ -233,7 +237,7 @@ public class RemoteDMRProcessorImpl implements DMRProcessor {
 			public void success(ActionInvocation invocation) {
 				super.success(invocation);
 				m_isBusy = false;
-				m_state = PAUSE;
+				// m_state = PAUSE;
 			}
 
 			@Override
@@ -259,7 +263,7 @@ public class RemoteDMRProcessorImpl implements DMRProcessor {
 				super.success(invocation);
 				fireUpdatePositionEvent(0, 0);
 				m_isBusy = false;
-				m_state = STOP;
+				// m_state = STOP;
 				m_user_stop = true;
 			}
 
@@ -344,14 +348,14 @@ public class RemoteDMRProcessorImpl implements DMRProcessor {
 	}
 
 	private void fireOnEndTrackEvent() {
-		Log.i(TAG, "fireOnEndTrackEvent, m_autoNextPending = " + m_autoNextPending);
+		Log.e(TAG, "fireOnEndTrackEvent, m_autoNextPending = " + m_autoNextPending);
 		if (m_isBusy)
 			return;
 		synchronized (m_listeners) {
 			if (m_seftAutoNext) {
 				// Log.i(TAG, "seft next");
 				if (m_autoNextPending == 0) {
-					if (m_playlistProcessor != null) {
+					if (m_playlistProcessor != null && !m_user_stop) {
 						Log.i(TAG, "Auto next");
 						m_playlistProcessor.next();
 					}
@@ -506,17 +510,18 @@ public class RemoteDMRProcessorImpl implements DMRProcessor {
 						}
 					});
 			break;
-//		case VIDEO_LOCAL:
-//		case AUDIO_LOCAL:
-//		case IMAGE_LOCAL: {
-//			URL itemUrl;
-//			try {
-//				itemUrl = new URL(item.getUrl());
-//				item.setUrl("http://" + HTTPServerData.HOST + ":" + HTTPServerData.PORT + "/" + itemUrl.getFile());
-//			} catch (MalformedURLException e1) {
-//				e1.printStackTrace();
-//			}
-//		}
+		// case VIDEO_LOCAL:
+		// case AUDIO_LOCAL:
+		// case IMAGE_LOCAL: {
+		// URL itemUrl;
+		// try {
+		// itemUrl = new URL(item.getUrl());
+		// item.setUrl("http://" + HTTPServerData.HOST + ":" +
+		// HTTPServerData.PORT + "/" + itemUrl.getFile());
+		// } catch (MalformedURLException e1) {
+		// e1.printStackTrace();
+		// }
+		// }
 		default:
 			new Thread(new Runnable() {
 
@@ -589,7 +594,7 @@ public class RemoteDMRProcessorImpl implements DMRProcessor {
 								super.success(invocation);
 								fireUpdatePositionEvent(0, 0);
 								m_isBusy = false;
-								m_state = STOP;
+								// m_state = STOP;
 								m_controlPoint.execute(new SetAVTransportURI(m_avtransportService, url, null) {
 									@Override
 									public void success(ActionInvocation invocation) {
@@ -607,7 +612,7 @@ public class RemoteDMRProcessorImpl implements DMRProcessor {
 
 											public void success(ActionInvocation invocation) {
 												m_isBusy = false;
-												m_state = PLAYING;
+												// m_state = PLAYING;
 											};
 										});
 									}

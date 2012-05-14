@@ -148,6 +148,7 @@ public class NowPlayingActivity extends Activity {
 	}
 
 	public void updateItemInfo() {
+		m_rendererControl.connectToDMR();
 		PlaylistProcessor playlistProcessor = MainActivity.UPNP_PROCESSOR.getPlaylistProcessor();
 		DMRProcessor dmrProcessor = MainActivity.UPNP_PROCESSOR.getDMRProcessor();
 		if (dmrProcessor == null || playlistProcessor == null)
@@ -230,7 +231,6 @@ public class NowPlayingActivity extends Activity {
 		m_holder.addCallback(m_surfaceCallback);
 		updatePlaylist();
 		updateItemInfo();
-		m_rendererControl.connectToDMR();
 	}
 
 	@Override
